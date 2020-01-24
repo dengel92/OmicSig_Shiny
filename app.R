@@ -2,7 +2,9 @@ library(shiny)
 
 ui <- fluidPage(
   tabsetPanel(
-    tabPanel("Upload Signature")
+    tabPanel("Upload Signature"),
+    
+    tabPanel("Search Signatures")
   )
 )
 
