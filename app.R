@@ -4,7 +4,8 @@ ui <- fluidPage(
   tabsetPanel(
     tabPanel("Upload Signature"),
     
-    tabPanel("Search Signatures")
+    tabPanel("Search Signatures",
+        "Here you can search for all signatures matching certain criteria.")
   )
 )
 
