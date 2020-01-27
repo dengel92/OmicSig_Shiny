@@ -12,37 +12,49 @@ library(pool)
 library(dplyr)
 library(DBI)
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
    
-  output$distPlot <- renderPlot({
-    
-    # generate bins based on input$bins from ui.R
-    x    <- faithful[, 2] 
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    
-  })
+  #simplequery & featurename_table 
+  #are test functions to get a feel for
+  #RShiny-MySQL interaction
   
-  output$testout <- function(){
-    print("Hi there")
-  }
-  
-
-  
-  simplequery<-reactive({
-    conn <- dbConnect(
+  new_conn_handle<-function(){
+    dbConnect(
       drv = RMySQL::MySQL(),
       dbname = "sigrepo",
       host = "localhost",
       username = "guest",
       password = "guest")
+  }
+  
+  simplequery<-reactive({
+    conn <- new_conn_handle()
     on.exit(dbDisconnect(conn), add = TRUE)
     query_obj<-dbGetQuery(conn,statement="Select * from sigrepo.features limit 1,5;")
     query_obj
   })
-  
   output$featurename_table<-renderTable(simplequery())
+  
+  
+  #Autocomplete for Species
+  autocomplete_species<-reactive({
+    species_handle<-new_conn_handle()
+    on.exit(dbDisconnect(species_handle,add=TRUE))
+    species_obj<-dbGetQuery(species_handle,
+                          statement="
+                          select 
+                            concat(species,'[',taxonomic_id,']') 
+                            as species
+                          from species;
+                          ")
+    return((species_obj$species))
+  })
+  observe({
+    updateSelectizeInput(session,
+                         "species_id",
+                         choices = c("",autocomplete_species())
+    )
+  })
+  #end autocomplete for species
   
 })

@@ -29,14 +29,22 @@ ui_questionmark <- fluidPage(
   tags$h1("REEEEEEEE"),
   navbarPageWithInputs(
   "SigRepo",
-  tabPanel("Plot",
+  tabPanel("Upload",
            sidebarLayout(
              sidebarPanel(
-               textInput(inputId="firstone",label="name",placeholder=NULL),
-               textInput(inputId="second",label="signature type",placeholder=NULL),
-               textInput(inputId="third",label="species",placeholder=NULL),
-               textInput(inputId="fourth",label="platform",placeholder=NULL),
-               textInput(inputId="fifth",label="etc",placeholder=NULL)
+               fileInput(inputId="rds_file", label="Signature File", multiple = FALSE, accept = NULL,
+                         width = NULL, buttonLabel = "Browse...",
+                         placeholder = "No file selected"),
+               HTML(
+                 paste("Would be good to link to an example rds file here",
+                          "(Maybe for all levels)"), sep="<br/></br>"),
+               textInput(inputId="signature_name",label="Signature Name",placeholder=NULL),
+               textInput(inputId="group_id",label="Group Name",placeholder=NULL),
+               selectizeInput(inputId="species_id",label="Species",choices=NULL),
+               textInput(inputId="platform_id",label="Platform",placeholder=NULL),
+               textInput(inputId="cell_line",label="Cell Line(ATCC)",placeholder=NULL),
+               textInput(inputId="keywords",label="Keywords(Optional)"),
+               actionButton("add_signature","Add Signature")
              ),
              
              # Show a plot of the generated distribution
