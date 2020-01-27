@@ -10,6 +10,7 @@
 library(shiny)
 library(shinythemes)
 library(shinyjs)
+library(shinyalert)
 library(markdown)
 library(RMySQL)
 
@@ -25,6 +26,7 @@ navbarPageWithInputs <- function(..., inputs) {
 }
 
 ui_questionmark <- fluidPage(
+  useShinyalert(),
   theme=shinytheme("sandstone"),
   tags$h1("REEEEEEEE"),
   navbarPageWithInputs(

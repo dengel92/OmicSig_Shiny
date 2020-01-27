@@ -57,4 +57,9 @@ shinyServer(function(input, output, session) {
   })
   #end autocomplete for species
   
+  observeEvent(input$add_signature, {
+    shinyalert("If you're reading this, then this function is still in development aw jeez")
+  })
+  
+  
 })
