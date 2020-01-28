@@ -7,12 +7,12 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny)
-library(shinythemes)
-library(shinyjs)
-library(shinyalert)
-library(markdown)
-library(RMySQL)
+# library(shiny)
+# library(shinythemes)
+# library(shinyjs)
+# library(shinyalert)
+# library(markdown)
+# library(RMySQL)
 
 
 # Define UI for application that will do something at some point
@@ -25,7 +25,7 @@ navbarPageWithInputs <- function(..., inputs) {
   navbar
 }
 
-ui_questionmark <- fluidPage(
+ui <- fluidPage(
   useShinyalert(),
   theme=shinytheme("sandstone"),
   tags$h1("SigRepo"),

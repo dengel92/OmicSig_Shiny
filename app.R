@@ -1,16 +1,17 @@
+# Load libraries
 library(shiny)
+library(shinythemes)
+library(shinyjs)
+library(shinyalert)
+library(markdown)
+library(RMySQL)
+library(pool)
+library(dplyr)
+library(DBI)
 
-ui <- fluidPage(
-  tabsetPanel(
-    tabPanel("Upload Signature"),
-    
-    tabPanel("Search Signatures",
-        "Here you can search for all signatures matching certain criteria.")
-  )
-)
+# Source the files containing the UI and server definitions
+source('ui.R')
+source('server.R')
 
-server <- function(input, output) {
-
-}
-
+# Run the app
 shinyApp(ui, server)
