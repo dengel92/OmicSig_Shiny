@@ -28,7 +28,7 @@ navbarPageWithInputs <- function(..., inputs) {
 ui_questionmark <- fluidPage(
   useShinyalert(),
   theme=shinytheme("sandstone"),
-  tags$h1("REEEEEEEE"),
+  tags$h1("SigRepo"),
   navbarPageWithInputs(
   "SigRepo",
   tabPanel("Upload",
@@ -41,11 +41,11 @@ ui_questionmark <- fluidPage(
                  paste("Would be good to link to an example rds file here",
                           "(Maybe for all levels)"), sep="<br/></br>"),
                textInput(inputId="signature_name",label="Signature Name",placeholder=NULL),
-               textInput(inputId="group_id",label="Group Name",placeholder=NULL),
+               textInput(inputId="group_id",label="Collection Name",placeholder=NULL),
                selectizeInput(inputId="species_id",label="Species",choices=NULL),
                textInput(inputId="platform_id",label="Platform",placeholder=NULL),
                textInput(inputId="cell_line",label="Cell Line(ATCC)",placeholder=NULL),
-               textInput(inputId="keywords",label="Keywords(Optional)"),
+               selectizeInput(inputId="keywords",label="Keywords(Optional)",multiple=TRUE,choices=c("a","b","c")),
                actionButton("add_signature","Add Signature")
              ),
              

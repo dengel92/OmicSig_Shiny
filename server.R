@@ -22,7 +22,8 @@ shinyServer(function(input, output, session) {
     dbConnect(
       drv = RMySQL::MySQL(),
       dbname = "sigrepo",
-      host = "localhost",
+      host = "sigrepo.bu.edu",
+      port=4253,
       username = "guest",
       password = "guest")
   }
