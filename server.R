@@ -1,8 +1,8 @@
 # The following libraries used here are loaded in app.R
-# library(shiny)
-# library(pool)
-# library(dplyr)
-# library(DBI)
+ library(shiny)
+ library(pool)
+ library(dplyr)
+ library(DBI)
 
 # Define server logic
 server <- shinyServer(function(input, output, session) {
