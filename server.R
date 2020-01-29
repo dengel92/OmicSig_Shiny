@@ -29,7 +29,7 @@ server <- shinyServer(function(input, output, session) {
         query_obj <-
             dbGetQuery(conn,
                 statement = "Select * from sigrepo.features limit 1,5;")
-        # Print the results of the query?
+        # Returns/outputs the results of the query
         query_obj
     })
     # Display query results

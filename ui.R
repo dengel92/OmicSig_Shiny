@@ -6,7 +6,9 @@
 # library(markdown)
 # library(RMySQL)
 
-# ???
+# function that appends elements to a navbar
+# intended purpose is to add a text search input in navbar
+# but can be applied with multiple different elements
 navbarPageWithInputs <- function(..., inputs) {
     navbar <- navbarPage(...)
     form <- tags$form(class = "navbar-form", inputs)
@@ -16,11 +18,14 @@ navbarPageWithInputs <- function(..., inputs) {
 
 # Define UI
 ui <- fluidPage(
+    #allows for alert feature
     useShinyalert(),
     theme = shinytheme("sandstone"),
     tags$h1("SigRepo"),
     navbarPageWithInputs(
+        # original navbar setup
         "SigRepo",
+        # upload signature page structure
         tabPanel("Upload",
             sidebarLayout(
                 sidebarPanel(
@@ -74,11 +79,13 @@ ui <- fluidPage(
                     actionButton("add_signature", "Add Signature")
                 ),
                 
-                # Show a plot of the generated distribution
+                # 
                 mainPanel("could put something here")
             )),
+        # Summary page. has placeholder elements for now
         tabPanel("Summary",
             tableOutput("featurename_table")),
+        # second parameter in navbar appending function above
         inputs = textInput(
             inputId = "search",
             label = "",
