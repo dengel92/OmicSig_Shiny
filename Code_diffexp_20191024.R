@@ -53,9 +53,14 @@ head(toptable_MDA_CYP)
 siggenes_MDA_CYP=fData(dat)[rownames(toptable_MDA_CYP)[1:10],"hgnc_symbol"]
 siggenes_MDA_CYP
 
-#### ####
+#### another example ####
 #dat_taz=readRDS("taz_yap_dpagt1_hnsc.RDS")
 #View(pData(dat_taz)) # ctrl vs Taz, ctrl vs Yap
+
+
+#### Jan/2020 Vanessa note ####
+    # the following were based on SigObj developed originally before Oct 2019, 
+    # NOT the new OmicCollection object
 
 #### sig Obj ####
 # following is copied from SigObj.R #
