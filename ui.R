@@ -1,10 +1,10 @@
-# The following libraries used here are loaded in app.R
- library(shiny)
- library(shinythemes)
- library(shinyjs)
- library(shinyalert)
- library(markdown)
- library(RMySQL)
+# Load required libraries
+library(shiny)
+library(shinythemes)
+library(shinyjs)
+library(shinyalert)
+library(markdown)
+library(RMySQL)
 
 # function that appends elements to a navbar
 # intended purpose is to add a text search input in navbar
