@@ -35,7 +35,7 @@ server <- shinyServer(function(input, output, session) {
     # Display query results
     output$featurename_table <- renderTable(simplequery())
     
-    # Autocomplete for Species
+    # Autocomplete for species
     autocomplete_species <- reactive({
         # Connect to database
         species_handle <- new_conn_handle()
@@ -59,6 +59,32 @@ server <- shinyServer(function(input, output, session) {
         updateSelectizeInput(session,
             "species_id",
             choices = c("", autocomplete_species()))
+    })
+    # End autocomplete for species
+    
+    # Autocomplete for platform
+    autocomplete_platform <- reactive({
+        # Connect to database
+        platform_handle <- new_conn_handle()
+        # Disconnect from database when exiting autocomplete_platform()
+        on.exit(dbDisconnect(platform_handle, add = TRUE))
+        # Query database
+        platform_obj <- dbGetQuery(
+            platform_handle,
+            statement = "
+                        select
+                            platform_name
+                        from assay_platforms;
+                        "
+        )
+        # Return results of query
+        return((platform_obj$platform_name))
+    })
+    # Update options in dropdown menu
+    observe({
+        updateSelectizeInput(session,
+            "platform_id",
+            choices = c("", autocomplete_platform()))
     })
     # End autocomplete for species
     

@@ -60,10 +60,10 @@ ui <- fluidPage(
                         label = "Species",
                         choices = NULL
                     ),
-                    textInput(
+                    selectizeInput(
                         inputId = "platform_id",
                         label = "Platform",
-                        placeholder = NULL
+                        choices = NULL
                     ),
                     textInput(
                         inputId = "cell_line",
