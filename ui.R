@@ -74,7 +74,8 @@ ui <- fluidPage(
                         inputId = "keywords",
                         label = "Keywords(Optional)",
                         multiple = TRUE,
-                        choices = c("a", "b", "c")
+                        choices = c("a", "b", "c"),
+                        options=list(create=TRUE)
                     ),
                     actionButton("add_signature", "Add Signature")
                 ),
