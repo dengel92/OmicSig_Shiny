@@ -19,9 +19,7 @@ server <- shinyServer(function(input, output, session) {
         )
     }
     
-    #QC of rds file to ensure it's 
-    #not corrupted
-    #in the right format(later)
+    # QC of rds file to ensure it's not corrupted and in the right format(later)
     checkRDS <- function(rds_file,input_name){
       #observe+trycatch meant to capture error and display in UI,
       #rather than crashing the app when an error happens.
