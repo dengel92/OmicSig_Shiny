@@ -30,13 +30,31 @@ ui <- fluidPage(
             sidebarLayout(
                 sidebarPanel(
                     fileInput(
-                        inputId = "rds_file",
+                        inputId = "rds_file_1",
                         label = "Signature File",
                         multiple = FALSE,
-                        accept = NULL,
+                        accept = c("text/csv","text/rds",".rds"),
                         width = NULL,
                         buttonLabel = "Browse...",
                         placeholder = "No file selected"
+                    ),
+                    fileInput(
+                      inputId = "rds_file_2",
+                      label = "Signature File",
+                      multiple = FALSE,
+                      accept = c("text/csv","text/rds",".rds"),
+                      width = NULL,
+                      buttonLabel = "Browse...",
+                      placeholder = "No file selected"
+                    ),
+                    fileInput(
+                      inputId = "rds_file_3",
+                      label = "Signature File",
+                      multiple = FALSE,
+                      accept = c("text/csv","text/rds",".rds"),
+                      width = NULL,
+                      buttonLabel = "Browse...",
+                      placeholder = "No file selected"
                     ),
                     HTML(
                         paste(
