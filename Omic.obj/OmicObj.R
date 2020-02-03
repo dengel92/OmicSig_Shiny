@@ -34,7 +34,8 @@ library(dplyr)
   ))
 }
 
-{ # Testing data
+
+{ # Testing data example
   metadata <- list(
     "organism" = "human",
     "tissue" = "cell",
@@ -46,24 +47,26 @@ library(dplyr)
 
 
   difexp <- read.table("MDA_AhR.txt", header = TRUE, stringsAsFactors = FALSE)
+  # change the column names to the standard names as required in OmicSig Obj lv1:
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "t"), "Score")
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "logfc"), "logFC")
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "gene_symbol"), "symbol")
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "adj.P.Val"), "fdr")
   difexp$Probe_ID <- rownames(difexp)
 
-  signatures <- list(
+  signatures <- list( # a bi-directional example
     "Up_Regulated_Symbol" = filter(difexp, Score > 0 & fdr < 0.001) %>% pull(symbol),
     "Dn_Regulated_Symbol" = filter(difexp, Score < 0 & fdr < 0.001) %>% pull(symbol),
     "Up_Regulated_Score" = filter(difexp, Score > 0 & fdr < 0.001) %>% pull(Score),
     "Dn_Regulated_Score" = filter(difexp, Score < 0 & fdr < 0.001) %>% pull(Score)
-  )
+  ) 
 
-  # Object examples
+  # Object:
   Omic.obj <- OmicCollection$new(metadata, signatures, difexp)
   print(Omic.obj)
-  Omic.obj$extract.signature("logFC > 0.5")
-  Omic.obj$extract.signature("logFC < -0.5; fdr < 0.001")
-  Omic.obj$extract.signature("abs(logFC) > 0.5; fdr < 0.001")
 }
+
+Omic.obj$extract.signature("logFC > 0.5")
+Omic.obj$extract.signature("logFC < -0.5; fdr < 0.001")
+Omic.obj$extract.signature("abs(logFC) > 0.5; fdr < 0.001")
 Omic.obj$signatures

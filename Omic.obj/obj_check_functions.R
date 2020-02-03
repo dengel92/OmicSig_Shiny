@@ -15,6 +15,7 @@ check_metadata <- function(omic.obj) {
   }
 }
 
+
 check_signatures <- function(omic.obj) {
   signatures <- omic.obj$signatures
   signature_type <- omic.obj$metadata$type
@@ -61,15 +62,17 @@ check_signatures <- function(omic.obj) {
   return(TRUE)
 }
 
+
 check_difexp <- function(omic.obj) {
   difexp <- omic.obj$difexp
-  # should be data frame, contain columns: "Probe_ID","Symbol","logFC","AveExpr","Score","P.Value","fdr"
+  # should be data frame, contain columns: "Probe_ID","symbol","logFC","AveExpr","Score","P.Value","fdr"
 
   # check if it's data.frame:
   if (class(difexp) == "matrix") {
     difexp <- as.data.frame(difexp)
   }
   if (class(difexp) == "data.frame") {
+    # check if it is NULL:
     if (nrow(difexp) == 0) {
       return(paste("Warning: There is no Differential Express Matrix (lv1 data) available. "))
     } else {
@@ -80,10 +83,8 @@ check_difexp <- function(omic.obj) {
     # use "return" instead of "print" here, so if this criteria is not met, the following steps will not run
   }
 
-  # check if it is NULL:
-
-
   # check column names:
+  # note: if there are additional columns besides the required columns, there will not be any warning messages. However, when writing the obj into json txt file, those additional columns will be lost.
   difexp_colname_required <- c("Probe_ID", "symbol", "logFC", "AveExpr", "Score", "P.Value", "fdr")
   difexp_colname_missing <- setdiff(difexp_colname_required, colnames(difexp))
   print(paste("Input Differential Express Matrix (lv1 data) have to contain columns: ", paste(difexp_colname_required, collapse = ", "), " .", sep = ""))
@@ -108,7 +109,7 @@ check_difexp <- function(omic.obj) {
   # "symbol" should be character. if it's factor, then change it into character
   if ("symbol" %in% colnames(difexp)) {
     if (class(difexp$symbol) == "factor") {
-      difexp$Symbol <- as.character(difexp$symbol)
+      difexp$symbol <- as.character(difexp$symbol)
     }
     if (class(difexp$symbol) == "character") {
       print(paste("Checked. Symbol is character.", sep = ""))
