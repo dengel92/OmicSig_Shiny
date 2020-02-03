@@ -21,8 +21,8 @@ server <- shinyServer(function(input, output, session) {
     
     # QC of rds file to ensure it's not corrupted and in the right format(later)
     checkRDS <- function(rds_file,input_name){
-      #observe+trycatch meant to capture error and display in UI,
-      #rather than crashing the app when an error happens.
+      # Observe+trycatch meant to capture error and display in UI,
+      # Rather than crashing the app when an error happens.
       observe({
         tryCatch(
           readRDS(rds_file),
