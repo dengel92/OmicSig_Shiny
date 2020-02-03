@@ -7,7 +7,7 @@ library(markdown)
 library(RMySQL)
 
 # Source separate UI files for each tab
-source('upload_ui.R')
+source('upload/upload_ui.R')
 
 # function that appends elements to a navbar
 # intended purpose is to add a text search input in navbar
