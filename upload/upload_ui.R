@@ -52,7 +52,7 @@ upload_ui <- tabPanel("Upload",
                 choices = NULL
             ),
             selectizeInput(
-                inputId = "platform_id",
+                inputId = "platform_name",
                 label = "Platform",
                 choices = NULL
             ),
