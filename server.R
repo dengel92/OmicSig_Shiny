@@ -144,6 +144,20 @@ server <- shinyServer(function(input, output, session) {
         # 2) write the file with the original name, but have soft links named <hash name> that point to the original file, with the hash key
         #     also reflected in the DB
         #also need to add alerts confirming to the user that the operation is/was successful
+        now <- Sys.time()
+        
+        signature_name <- input$signature_name
+        species_tax_id <-
+        
+        insert_query <- paste("insert into signatures(
+                              signature_name,
+                              upload_date,
+                              exp_type_id,
+                              submitter_id,
+                              species_id,
+                              platform_id,
+                              cell_line) values(",
+                              "placeholder")
     })
     
 })

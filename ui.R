@@ -33,7 +33,7 @@ ui <- fluidPage(
                         inputId = "rds_file_1",
                         label = "Signature File",
                         multiple = FALSE,
-                        accept = c("text/csv","text/rds",".rds"),
+                        accept = c("text/csv","text/txt","text/tsv",".csv",".txt",".tsv"),
                         width = NULL,
                         buttonLabel = "Browse...",
                         placeholder = "No file selected"
@@ -42,7 +42,7 @@ ui <- fluidPage(
                       inputId = "rds_file_2",
                       label = "Signature File",
                       multiple = FALSE,
-                      accept = c("text/csv","text/rds",".rds"),
+                      accept = c("text/csv","text/txt","text/tsv",".csv",".txt",".tsv"),
                       width = NULL,
                       buttonLabel = "Browse...",
                       placeholder = "No file selected"
@@ -51,7 +51,7 @@ ui <- fluidPage(
                       inputId = "rds_file_3",
                       label = "Signature File",
                       multiple = FALSE,
-                      accept = c("text/csv","text/rds",".rds"),
+                      accept = c("text/csv","text/txt","text/tsv",".csv",".txt",".tsv"),
                       width = NULL,
                       buttonLabel = "Browse...",
                       placeholder = "No file selected"
@@ -108,7 +108,7 @@ ui <- fluidPage(
         inputs = textInput(
             inputId = "search",
             label = "",
-            placeholder = "REEEEE",
+            placeholder = "Search...",
             width = "100px"
         )
     )
