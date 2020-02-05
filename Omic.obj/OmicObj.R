@@ -46,7 +46,7 @@ library(dplyr)
   )
 
 
-  difexp <- read.table("MDA_AhR.txt", header = TRUE, stringsAsFactors = FALSE)
+  difexp <- read.table("Omic.obj/example_diffmatrix_MDA_AhR.txt", header = TRUE, stringsAsFactors = FALSE)
   # change the column names to the standard names as required in OmicSig Obj lv1:
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "t"), "Score")
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "logfc"), "logFC")
@@ -66,7 +66,15 @@ library(dplyr)
   print(Omic.obj)
 }
 
+# extract signature function:
 Omic.obj$extract.signature("logFC > 0.5")
 Omic.obj$extract.signature("logFC < -0.5; fdr < 0.001")
 Omic.obj$extract.signature("abs(logFC) > 0.5; fdr < 0.001")
 Omic.obj$signatures
+
+# test check-functions:
+source("Omic.obj/obj_check_functions.R")
+check_metadata(Omic.obj$metadata)
+check_difexp(Omic.obj$difexp)
+check_signatures(Omic.obj)
+check_signatures(Omic.obj$signatures, signature_type = "bi-directional")
