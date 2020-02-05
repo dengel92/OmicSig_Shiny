@@ -1,93 +1,131 @@
 check_metadata <- function(omic.obj) {
-  metadata <- omic.obj$metadata
-  # should be a list
-  if (class(metadata) == "list") {
-    print(paste("Checked. metadata is a list."))
-  } else {
-    return(paste("Error: metadata should be a list.", sep = ""))
+  # metadata should be a list with required attributes
+  if (class(metadata)[1] == "OmicCollection") {
+    metadata <- omic.obj$metadata
   }
-  metadata_missing <- setdiff(c("organism", "platform", "type"), names(metadata))
+
+  if (class(metadata) == "list") {
+    print(paste("Checked. Metadata is a list."))
+  }
+  else {
+    return(paste("Error: Metadata not found in OmicCollection object, or metadata is not a list. "))
+  }
+
+  metadata_required <- c("organism", "platform", "type")
+  metadata_missing <- setdiff(metadata_required, names(metadata))
+  print(paste("Input metadata have to contain columns: ", paste(metadata_required, collapse = ", "), " .", sep = ""))
+  
   if (length(metadata_missing) == 0) {
     print(paste("Checked. Metadata contains all the essential attributes."))
     return(TRUE)
   } else {
-    return(paste("Warning: Metadata does not contain attribute(s): ", paste(metadata_missing, collapse = ", "), ". This can cause problem when retriving data.", sep = ""))
+    return(paste("Warning: Metadata does not contain attribute(s): ",
+                 paste(metadata_missing, collapse = ", "),
+                 ". This can cause problem when retriving data.",
+                 sep = ""))
   }
 }
 
+#----------------------------------------------
+# we need the information of "signature_type" in the metadata
+# so, the input need to either be OmicSig Obj, or need to specify signature type
+check_signatures <- function(omic.obj, signature_type = NULL) {
 
-check_signatures <- function(omic.obj) {
-  signatures <- omic.obj$signatures
-  signature_type <- omic.obj$metadata$type
+  # read the signature, and check if it is a list:
+  if (class(omic.obj)[1] == "OmicCollection") {
+    signatures <- omic.obj$signatures
+    signature_type <- omic.obj$metadata$type
+  }
+  else if (class(omic.obj)[1] == "list") {
+    signatures <- omic.obj
+    remove(omic.obj)
+  }
+  else {
+    return(paste("Error: Signature not found in OmicCollection object, or signature is not a list. ", sep = ""))
+  }
+
+  # signatures should be of proper length, according to the "type":
   if (signature_type == "multi-directional") {
     sample_number <- omic.obj$metadata$sample_number
   }
 
-  # should be a list of proper length:
-  if (class(signatures) == "list") {
-    if (signature_type == "bi-directional" && length(signatures) == 4) {
-      print(paste("Checked. signature is bi-directional with length of 4. "))
-      if ("Up_Regulated_Symbol" %in% names(signatures) &&
-        "Dn_Regulated_Symbol" %in% names(signatures) &&
-        "Up_Regulated_Score" %in% names(signatures) &&
-        "Dn_Regulated_Symbol" %in% names(signatures)) {
-        print(paste("Checked. signature contains *Up Regulated* and *Dn Regulated* elements. "))
-        signatures$Up_Regulated_Symbol <- as.character(signatures$Up_Regulated_Symbol)
-        signatures$Dn_Regulated_Symbol <- as.character(signatures$Dn_Regulated_Symbol)
-        signatures$Up_Regulated_Score <- as.numeric(signatures$Up_Regulated_Score)
-        signatures$Dn_Regulated_Score <- as.numeric(signatures$Dn_Regulated_Score)
-        if (length(signatures$Up_Regulated_Symbol) * length(signatures$Up_Regulated_Symbol) == 0) {
-          return(paste("Warning: No signatures saved in the Omic Object."))
-        }
-      } else {
-        print(paste("Warning: Signature need to be named as Up_Regulated_Symbol, Dn_Regulated_Symbol, Up_Regulated_Score, Dn_Regulated_Score. This can cause problem when you trying to save the OmicSig object."))
+  # bi-directional signature:
+  # note: each signature type need to be in "else if",
+  # because if none of the type meet the criteria required, we need an "else" to output error.
+  if (signature_type == "bi-directional" && length(signatures) == 4) {
+    print(paste("Checked. signature is bi-directional with length of 4. "))
+    if ("Up_Regulated_Symbol" %in% names(signatures) &&
+      "Dn_Regulated_Symbol" %in% names(signatures) &&
+      "Up_Regulated_Score" %in% names(signatures) &&
+      "Dn_Regulated_Symbol" %in% names(signatures)) {
+      print(paste("Checked. signature contains *Up Regulated* and *Dn Regulated* elements. "))
+      signatures$Up_Regulated_Symbol <- as.character(signatures$Up_Regulated_Symbol)
+      signatures$Dn_Regulated_Symbol <- as.character(signatures$Dn_Regulated_Symbol)
+      signatures$Up_Regulated_Score <- as.numeric(signatures$Up_Regulated_Score)
+      signatures$Dn_Regulated_Score <- as.numeric(signatures$Dn_Regulated_Score)
+      if (length(signatures$Up_Regulated_Symbol) * length(signatures$Up_Regulated_Symbol) == 0) {
+        return(paste("Warning: No signatures saved in the Omic Object."))
       }
-    } else if (signature_type == "uni-directional" && length(signatures) == 2) {
-      print(paste("Checked. Signature is uni-directional with length of 2. "))
-      if ("Signature_Symbol" %in% names(signatures) && "Signature_Score" %in% names(signatures)) {
-        print(paste("Checked. Signature contains *Signature_Symbol* and *Signature_Score* elements. "))
-      } else {
-        print(paste("Warning: Signature need to be named as Signature_Symbol, Signature_Score. This can cause problem when you trying to save the OmicSig object."))
-      }
-    } else if (signature_type == "multi-directional" && length(signatures) == sample_number) {
-      print(paste("Checked. Signature is multi-directional with", sample_number, "samples.", sep = " "))
     } else {
-      return(paste(
-        "Error: Signature is not a list with proper length. Or the sample_number is not specified in multi-directional signature."
-      ))
+      print(paste("Warning: Signature need to be named as Up_Regulated_Symbol, Dn_Regulated_Symbol, Up_Regulated_Score, Dn_Regulated_Score. This can cause problem when you trying to save the OmicSig object."))
     }
-  } else {
-    return(paste("Error: Signature is not a list or signature not found. "))
   }
+
+  # uni-directional signature:
+  else if (signature_type == "uni-directional" && length(signatures) == 2) {
+    print(paste("Checked. Signature is uni-directional with length of 2. "))
+    if ("Signature_Symbol" %in% names(signatures) && "Signature_Score" %in% names(signatures)) {
+      print(paste("Checked. Signature contains *Signature_Symbol* and *Signature_Score* elements. "))
+    } else {
+      print(paste("Warning: Signature need to be named as Signature_Symbol, Signature_Score. This can cause problem when you trying to save the OmicSig object."))
+    }
+  }
+
+  # multi-directional signature:
+  else if (signature_type == "multi-directional" && length(signatures) == sample_number) {
+    print(paste("Checked. Signature is multi-directional with", sample_number, "samples.", sep = " "))
+  }
+
+  # if none of the signature type is meet:
+  else {
+    return(paste("Error: Signature is not a list with proper length. Or the sample_number is not specified in a multi-directional signature."))
+  }
+
   return(TRUE)
+    # note: except erroes, all the output in check_signature are "print" now
+    #       have not "locked" the return yet in case in the future we need to check more things
 }
 
-
+#----------------------------------------------
+# check_difexp() function supports input Obj or dataframe
 check_difexp <- function(omic.obj) {
-  difexp <- omic.obj$difexp
   # should be data frame, contain columns: "Probe_ID","symbol","logFC","AveExpr","Score","P.Value","fdr"
 
-  # check if it's data.frame:
-  if (class(difexp) == "matrix") {
-    difexp <- as.data.frame(difexp)
+  if (class(omic.obj)[1] == "OmicCollection") {
+    difexp <- omic.obj$difexp
   }
-  if (class(difexp) == "data.frame") {
-    # check if it is NULL:
-    if (nrow(difexp) == 0) {
-      return(paste("Warning: There is no Differential Express Matrix (lv1 data) available. "))
-    } else {
-      print(paste("Checked. Input Differential Express Matrix (lv1 data) is a data frame. "))
-    }
+  else if (class(omic.obj)[1] == "data.frame") {
+    difexp <- omic.obj
+    remove(omic.obj)
+  }
+  else {
+    return(paste("Error: Input is not a OmicCollection object or dataframe. "))
+  }
+
+  # check if it's empty:
+  if (nrow(difexp) == 0) {
+    return(paste("Error: There is no Differential Express Matrix (lv1 data) available. "))
   } else {
-    return(paste("Error: Input Differential Express Matrix (lv1 data) is not a data.frame or matrix. "))
-    # use "return" instead of "print" here, so if this criteria is not met, the following steps will not run
+    print(paste("Checked. Input Differential Express Matrix (lv1 data) is a data frame. "))
   }
 
   # check column names:
-  # note: if there are additional columns besides the required columns, there will not be any warning messages. However, when writing the obj into json txt file, those additional columns will be lost.
+  # note: if there are additional columns besides the required columns, there will Not be any warning messages
+  # 2020/02/05: Vanessa currently working on develop read, write json function to preserve the optional columns
   difexp_colname_required <- c("Probe_ID", "symbol", "logFC", "AveExpr", "Score", "P.Value", "fdr")
   difexp_colname_missing <- setdiff(difexp_colname_required, colnames(difexp))
   print(paste("Input Differential Express Matrix (lv1 data) have to contain columns: ", paste(difexp_colname_required, collapse = ", "), " .", sep = ""))
+  
   if (length(difexp_colname_missing) == 0) {
     print(paste("Checked. Input Differential Express Matrix (lv1 data) contain all the essential columns. "))
   } else {
@@ -105,7 +143,6 @@ check_difexp <- function(omic.obj) {
       }
     }
   }
-
   # "symbol" should be character. if it's factor, then change it into character
   if ("symbol" %in% colnames(difexp)) {
     if (class(difexp$symbol) == "factor") {
@@ -117,5 +154,8 @@ check_difexp <- function(omic.obj) {
       print(paste("Warning: Symbol is not character."))
     }
   }
+
   return(TRUE)
+  # note: except errors, all the output in check_difexp are "print" now
+  #       have not "locked" the return yet in case in the future we need to check more things
 }
