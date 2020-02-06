@@ -8,6 +8,7 @@ library(RMySQL)
 
 # Source separate UI files for each tab
 source('upload/upload_ui.R')
+source('search/search_ui.R')
 
 # function that appends elements to a navbar
 # intended purpose is to add a text search input in navbar
@@ -30,6 +31,8 @@ ui <- fluidPage(
         "SigRepo",
         # upload signature page structure
         upload_ui,
+        # search signatures page structure
+        search_ui,
         # Summary page. has placeholder elements for now
         tabPanel("Summary",
             tableOutput("featurename_table")),
