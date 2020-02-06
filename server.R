@@ -38,6 +38,7 @@ server <- shinyServer(function(input, output, session) {
     # Source separate server files for each tab
     # local = TRUE -> objects are inside server function
     source('upload/upload_server.R', local = TRUE)
+    source('search/search_server.R', local = TRUE)
     
     # Summary page (test)
     # Test function to get a feel for RShiny-MySQL interaction
