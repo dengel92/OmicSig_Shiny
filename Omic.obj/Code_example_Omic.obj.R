@@ -12,6 +12,7 @@ check_difexp(Omic.obj.new)
 Omic.obj.new$extract.signature("logFC < -1; fdr < 0.001")
 Omic.obj.new$signatures
 # write_Obj_to_json(Omic.obj.new,"Omic.obj/example_Omic.obj.txt")
+# write.table(Omic.obj.new$difexp, "Omic.obj/example_lv1.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 
 #### prepare lv2lv3.omic.obj example ####
 Omic.obj.new$difexp <- NULL
