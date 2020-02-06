@@ -72,5 +72,5 @@ upload_ui <- tabPanel("Upload",
         ),
         
         # 
-        mainPanel("could put something here")
+        mainPanel("could put something here. Display preview of uploaded file?")
     ))
