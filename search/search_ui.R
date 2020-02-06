@@ -28,7 +28,7 @@ search_ui <- tabPanel("Search",
             ),
             selectizeInput(
                 inputId = "keywords",
-                label = "Keywords(Optional)",
+                label = "Keywords",
                 multiple = TRUE,
                 choices = c("a", "b", "c"),
                 options=list(create=TRUE)
@@ -36,5 +36,5 @@ search_ui <- tabPanel("Search",
         ),
         
         # 
-        mainPanel("could put something here")
+        mainPanel("Display table of matching signatures?")
     ))
