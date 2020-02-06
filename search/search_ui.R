@@ -12,6 +12,9 @@ search_ui <- tabPanel("Search",
                 label = "Collection Name",
                 placeholder = NULL
             ),
+            htmlOutput(
+                outputId = "search_selected_species"
+            ),
             checkboxGroupInput("search_species",
                 label = "Choose species",
                 choices = NULL,
