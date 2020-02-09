@@ -39,8 +39,9 @@ sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000)
   output[[1]] <- Venn
   output[[2]] <- setdiff(sig1$symbol, sig2$symbol)
   output[[3]] <- setdiff(sig2$symbol, sig1$symbol)
-  output[[4]] <- hyper_pval
-  names(output) <- c("Venn", "only_sig1", "only_sig2", "hyper_p.value")
+  output[[4]] <- sig_both
+  output[[5]] <- hyper_pval
+  names(output) <- c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value")
   return(output)
 }
 
