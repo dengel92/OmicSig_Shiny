@@ -1,4 +1,4 @@
-write_Obj <- function(omic.obj, file) {
+write_obj <- function(omic.obj, file) {
   write_lv2lv3 <- list(
     "Up_Regulated_Symbol" = omic.obj$signatures$Up_Regulated_Symbol,
     "Dn_Regulated_Symbol" = omic.obj$signatures$Dn_Regulated_Symbol,

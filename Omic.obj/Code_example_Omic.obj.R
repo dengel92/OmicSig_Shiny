@@ -3,7 +3,7 @@
 source("Omic.obj/Function_json.R")
 source("Omic.obj/Function_objCheck.R")
 
-write_Obj(Omic.obj, "Omic.obj/example_Omic.obj.txt")
+write_obj(Omic.obj, "Omic.obj/example_Omic.obj.txt")
 
 Omic.obj.new <- read_json("Omic.obj/example_Omic.obj.txt")
 check_metadata(Omic.obj.new)
@@ -16,7 +16,7 @@ Omic.obj.new$signatures
 
 #### prepare lv2lv3.omic.obj example ####
 Omic.obj.new$difexp <- NULL
-write_Obj(Omic.obj.new, "Omic.obj/example_lv2lv3_Omic.obj.txt")
+write_obj(Omic.obj.new, "Omic.obj/example_lv2lv3_Omic.obj.txt")
 # re-read to check:
 Omic.obj.lv2 <- read_json("Omic.obj/example_lv2lv3_Omic.obj.txt")
 Omic.obj.lv2$signatures
