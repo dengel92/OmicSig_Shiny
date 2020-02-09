@@ -59,7 +59,7 @@ library(dplyr)
     "Dn_Regulated_Symbol" = filter(difexp, Score < 0 & fdr < 0.001) %>% pull(symbol),
     "Up_Regulated_Score" = filter(difexp, Score > 0 & fdr < 0.001) %>% pull(Score),
     "Dn_Regulated_Score" = filter(difexp, Score < 0 & fdr < 0.001) %>% pull(Score)
-  ) 
+  )
 
   # Object:
   Omic.obj <- OmicCollection$new(metadata, signatures, difexp)
@@ -73,7 +73,7 @@ Omic.obj$extract.signature("abs(logFC) > 0.5; fdr < 0.001")
 Omic.obj$signatures
 
 # test check-functions:
-source("Omic.obj/obj_check_functions.R")
+source("Omic.obj/Function_objCheck.R")
 check_metadata(Omic.obj$metadata)
 check_difexp(Omic.obj$difexp)
 check_signatures(Omic.obj)

@@ -1,7 +1,7 @@
 
-#### test json_functions, obj_check_functions ####
-source("Omic.obj/json_functions.R")
-source("Omic.obj/obj_check_functions.R")
+#### test json, objCheck functions ####
+source("Omic.obj/Function_json.R")
+source("Omic.obj/Function_objCheck.R")
 
 write_Obj_to_json(Omic.obj, "Omic.obj/example_Omic.obj.txt")
 
