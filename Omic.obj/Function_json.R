@@ -1,4 +1,4 @@
-write_Obj_to_json <- function(omic.obj, file) {
+write_Obj <- function(omic.obj, file) {
   write_lv2lv3 <- list(
     "Up_Regulated_Symbol" = omic.obj$signatures$Up_Regulated_Symbol,
     "Dn_Regulated_Symbol" = omic.obj$signatures$Dn_Regulated_Symbol,
@@ -15,7 +15,7 @@ write_Obj_to_json <- function(omic.obj, file) {
   return("finished")
 }
 
-read_json_to_Obj <- function(filename) {
+read_json <- function(filename) {
   read_json <- rjson::fromJSON(file = filename)
 
   read_lv1 <- as.data.frame(dplyr::bind_rows(read_json[c("Probe_ID", "symbol", "logFC", "AveExpr", "Score", "P.Value", "fdr")]))
