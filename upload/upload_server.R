@@ -112,6 +112,28 @@ sql_finding_query <- function(fields="*", target_table, field_where=NULL, field_
     return(sql_generic(sql))
 }
 
+add_lv2 <- function(lv2_file, sid){
+  lv2_table = read.table(lv2_file, header=T)
+  lv2_table$direction = as.character(lv2_table$direction)
+  lv2_table$direction[which(tolower(lv2_table$direction)=="up")]="+"
+  lv2_table$direction[which(tolower(lv2_table$direction)=="dn")]="-"
+  lv2_feature_ids = (lapply(as.character(lv2_table$symbol), 
+         sql_finding_query,
+         fields="feature_id", 
+         target_table="features", 
+         field_where="feature_name"))
+  fids = bind_rows(lv2_feature_ids)$feature_id
+  sid_col = rep(sid, length(fids))
+  lv2_insert.df = data.frame(
+    signature_id = sid_col,
+    feature_id = fids,
+    weight = lv2_table$score,
+    direction = single_quoted(lv2_table$direction)
+  )
+  insert_records = paste("(",lv2_insert.df$signature_id, ",", lv2_insert.df$feature_id, ",", lv2_insert.df$weight, ",", lv2_insert.df$direction,")",sep="",collapse=",")
+  insert_lv2_query = paste("INSERT INTO feature_signature(signature_id,feature_id,weight,direction) VALUES ",insert_records,sep="")
+  sql_generic(insert_lv2_query)
+}
 
 
 #When you click the 'submit' button...
@@ -140,8 +162,9 @@ observeEvent(input$add_signature, {
                               upload_date,
                               species_id,
                               platform_id) values(", paste(signature_name,"now()",species_id_insert,platform_id,sep=","),");")
-    shinyalert(insert_query)
     insert_signature_conn = new_conn_handle()
     dbSendQuery(insert_signature_conn, insert_query)
     dbDisconnect(insert_signature_conn)
+    last_sid = sql_generic("select signature_id from signatures where signature_name=",signature_name,";")
+    add_lv2(input$rds_file_2,last_sid)
 })

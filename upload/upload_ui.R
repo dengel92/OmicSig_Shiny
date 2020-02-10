@@ -4,6 +4,15 @@ upload_ui <- tabPanel("Upload",
         sidebarPanel(
             fileInput(
                 inputId = "rds_file_1",
+                label = "Signature File (Lvl1)",
+                multiple = FALSE,
+                accept = c("text/csv","text/rds",".rds"),
+                width = NULL,
+                buttonLabel = "Browse...",
+                placeholder = "No file selected"
+            ),
+            fileInput(
+                inputId = "rds_file_2(Lvl2)",
                 label = "Signature File",
                 multiple = FALSE,
                 accept = c("text/csv","text/rds",".rds"),
@@ -12,16 +21,7 @@ upload_ui <- tabPanel("Upload",
                 placeholder = "No file selected"
             ),
             fileInput(
-                inputId = "rds_file_2",
-                label = "Signature File",
-                multiple = FALSE,
-                accept = c("text/csv","text/rds",".rds"),
-                width = NULL,
-                buttonLabel = "Browse...",
-                placeholder = "No file selected"
-            ),
-            fileInput(
-                inputId = "rds_file_3",
+                inputId = "rds_file_3(Lvl3)",
                 label = "Signature File",
                 multiple = FALSE,
                 accept = c("text/csv","text/rds",".rds"),
