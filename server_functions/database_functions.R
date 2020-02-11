@@ -1,5 +1,10 @@
 # Database related functions
 
+# Add single quotation marks around a string
+single_quoted <- function(my_string){
+    return(paste("'", my_string, "'", sep = ""))
+}
+
 # Create a connection to the database
 new_conn_handle <- function() {
     dbConnect(
@@ -46,3 +51,5 @@ get_platforms <- reactive ({
     # Return results of query
     return(platform_obj$platform_name)
 })
+
+# 'select * from platform_signature_view'
