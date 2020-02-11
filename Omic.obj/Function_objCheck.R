@@ -1,7 +1,7 @@
-check_metadata <- function(omic.obj) {
+check_metadata <- function(metadata) {
   # metadata should be a list with required attributes
   if (class(metadata)[1] == "OmicCollection") {
-    metadata <- omic.obj$metadata
+    metadata <- metadata$metadata
   }
 
   if (class(metadata) == "list") {
@@ -14,15 +14,16 @@ check_metadata <- function(omic.obj) {
   metadata_required <- c("organism", "platform", "type")
   metadata_missing <- setdiff(metadata_required, names(metadata))
   print(paste("Input metadata have to contain columns: ", paste(metadata_required, collapse = ", "), " .", sep = ""))
-  
+
   if (length(metadata_missing) == 0) {
     print(paste("Checked. Metadata contains all the essential attributes."))
     return(TRUE)
   } else {
     return(paste("Warning: Metadata does not contain attribute(s): ",
-                 paste(metadata_missing, collapse = ", "),
-                 ". This can cause problem when retriving data.",
-                 sep = ""))
+      paste(metadata_missing, collapse = ", "),
+      ". This can cause problem when retriving data.",
+      sep = ""
+    ))
   }
 }
 
@@ -63,8 +64,10 @@ check_signatures <- function(omic.obj, signature_type = NULL) {
       signatures$Dn_Regulated_Symbol <- as.character(signatures$Dn_Regulated_Symbol)
       signatures$Up_Regulated_Score <- as.numeric(signatures$Up_Regulated_Score)
       signatures$Dn_Regulated_Score <- as.numeric(signatures$Dn_Regulated_Score)
-      if (length(signatures$Up_Regulated_Symbol) * length(signatures$Up_Regulated_Symbol) == 0) {
+      if ((length(signatures$Up_Regulated_Symbol) + length(signatures$Dn_Regulated_Symbol)) == 0) {
         return(paste("Warning: No signatures saved in the Omic Object."))
+      } else if ((length(signatures$Up_Regulated_Symbol) * length(signatures$Dn_Regulated_Symbol)) == 0) {
+        print(paste("Warning: Only one of the bi-directional signature is found."))
       }
     } else {
       print(paste("Warning: Signature need to be named as Up_Regulated_Symbol, Dn_Regulated_Symbol, Up_Regulated_Score, Dn_Regulated_Score. This can cause problem when you trying to save the OmicSig object."))
@@ -92,8 +95,8 @@ check_signatures <- function(omic.obj, signature_type = NULL) {
   }
 
   return(TRUE)
-    # note: except erroes, all the output in check_signature are "print" now
-    #       have not "locked" the return yet in case in the future we need to check more things
+  # note: except erroes, all the output in check_signature are "print" now
+  #       have not "locked" the return yet in case in the future we need to check more things
 }
 
 #----------------------------------------------
@@ -125,7 +128,7 @@ check_difexp <- function(omic.obj) {
   difexp_colname_required <- c("Probe_ID", "symbol", "logFC", "AveExpr", "Score", "P.Value", "fdr")
   difexp_colname_missing <- setdiff(difexp_colname_required, colnames(difexp))
   print(paste("Input Differential Express Matrix (lv1 data) have to contain columns: ", paste(difexp_colname_required, collapse = ", "), " .", sep = ""))
-  
+
   if (length(difexp_colname_missing) == 0) {
     print(paste("Checked. Input Differential Express Matrix (lv1 data) contain all the essential columns. "))
   } else {
