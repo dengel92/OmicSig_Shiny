@@ -9,6 +9,7 @@ write_obj <- function(omic.obj, file) {
   write_json_obj <- rjson::toJSON(c(omic.obj$metadata,
     "metadata_length" = metadata_length,
     write_lv2lv3,
+    list("lv1_colnames" = colnames(omic.obj$difexp)),
     omic.obj$difexp
   ))
   write(write_json_obj, file)
@@ -17,8 +18,8 @@ write_obj <- function(omic.obj, file) {
 
 read_json <- function(filename) {
   read_json <- rjson::fromJSON(file = filename)
-
-  read_lv1 <- as.data.frame(dplyr::bind_rows(read_json[c("Probe_ID", "symbol", "logFC", "AveExpr", "Score", "P.Value", "fdr")]))
+  lv1_colnames <- read_json$lv1_colnames
+  read_lv1 <- as.data.frame(dplyr::bind_rows(read_json[c(lv1_colnames)]))
   read_lv2lv3 <- list(
     "Up_Regulated_Symbol" = read_json$Up_Regulated_Symbol,
     "Dn_Regulated_Symbol" = read_json$Dn_Regulated_Symbol,
