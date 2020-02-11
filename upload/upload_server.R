@@ -23,59 +23,19 @@ copy_file <- function(input_file, destination){
     }
 }
 
-# Autocomplete for species
-autocomplete_species <- reactive({
-    # Connect to database
-    species_handle <- new_conn_handle()
-    # Disconnect from database when exiting autocomplete_species()
-    on.exit(dbDisconnect(species_handle, add = TRUE))
-    # Query database
-    species_obj <- dbGetQuery(
-        species_handle,
-        statement = "
-                        select
-                            concat(species,'[',taxonomic_id,']')
-                            as species
-                        from species;
-                        "
-    )
-    # Return results of query
-    return((species_obj$species))
-})
-# Update options in dropdown menu
+# Update options in species dropdown menu with list of species from database
 observe({
     updateSelectizeInput(session,
         "species_id",
-        choices = c("", autocomplete_species()))
+        choices = c("", get_species()))
 })
-# End autocomplete for species
 
-# Autocomplete for platform
-autocomplete_platform <- reactive({
-    # Connect to database
-    platform_handle <- new_conn_handle()
-    # Disconnect from database when exiting autocomplete_platform()
-    on.exit(dbDisconnect(platform_handle, add = TRUE))
-    # Query database
-    platform_obj <- dbGetQuery(
-        platform_handle,
-        statement = "
-                        select
-                            platform_name
-                        from assay_platforms;
-                        "
-    )
-    # Return results of query
-    return((platform_obj$platform_name))
-})
-# Update options in dropdown menu
+# Update options in platform dropdown menu with list of platforms from database
 observe({
     updateSelectizeInput(session,
         "platform_name",
-        choices = c("", autocomplete_platform()))
+        choices = c("", get_platforms()))
 })
-# End autocomplete for species
-###
 
 #checking quality of files uploaded, yielding in error
 #if rds file is 'bad'
