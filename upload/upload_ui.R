@@ -2,6 +2,12 @@
 upload_ui <- tabPanel("Upload",
     sidebarLayout(
         sidebarPanel(
+          tags$h2("Upload Form"),
+          tags$b("Example Files: "),
+          tags$a(href = "http://localhost/example_files/example_lv1.txt", "Level 1",download=T),
+          tags$a(href = "http://localhost/example_files/example_lv2.txt", "Level 2",download=T),
+          tags$a(href = "http://localhost/example_files/example_lv3.txt", "Level 3",download=T),
+          br(),br(),br(),
             fileInput(
                 inputId = "rds_file_1",
                 label = "Signature File (Lvl1)",
@@ -12,8 +18,8 @@ upload_ui <- tabPanel("Upload",
                 placeholder = "No file selected"
             ),
             fileInput(
-                inputId = "rds_file_2(Lvl2)",
-                label = "Signature File",
+                inputId = "rds_file_2",
+                label = "Signature File (Lvl2)",
                 multiple = FALSE,
                 accept = c("text/csv","text/rds",".rds"),
                 width = NULL,
@@ -21,20 +27,13 @@ upload_ui <- tabPanel("Upload",
                 placeholder = "No file selected"
             ),
             fileInput(
-                inputId = "rds_file_3(Lvl3)",
-                label = "Signature File",
+                inputId = "rds_file_3",
+                label = "Signature File (Lvl3)",
                 multiple = FALSE,
                 accept = c("text/csv","text/rds",".rds"),
                 width = NULL,
                 buttonLabel = "Browse...",
                 placeholder = "No file selected"
-            ),
-            HTML(
-                paste(
-                    "Would be good to link to an example rds file here",
-                    "(Maybe for all levels)"
-                ),
-                sep = "<br/></br>"
             ),
             textInput(
                 inputId = "signature_name",
