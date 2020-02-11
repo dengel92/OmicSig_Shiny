@@ -112,27 +112,82 @@ sql_finding_query <- function(fields="*", target_table, field_where=NULL, field_
     return(sql_generic(sql))
 }
 
+#function will insert lvl2/3 data into DB
+#inputs: file path to lvl2/3 data file, signature id
 add_lv2 <- function(lv2_file, sid){
+  #reading file into a table
   lv2_table = read.table(lv2_file, header=T)
+  #converting direction to + or -
   lv2_table$direction = as.character(lv2_table$direction)
   lv2_table$direction[which(tolower(lv2_table$direction)=="up")]="+"
   lv2_table$direction[which(tolower(lv2_table$direction)=="dn")]="-"
+  #fetching feature ids corresponding to symbols
   lv2_feature_ids = (lapply(as.character(lv2_table$symbol), 
          sql_finding_query,
          fields="feature_id", 
          target_table="features", 
          field_where="feature_name"))
   fids = bind_rows(lv2_feature_ids)$feature_id
+  #all coming from same signature, hence 'rep'
   sid_col = rep(sid, length(fids))
+  #dataframe for inserting into db
   lv2_insert.df = data.frame(
     signature_id = sid_col,
     feature_id = fids,
     weight = lv2_table$score,
     direction = single_quoted(lv2_table$direction)
   )
+  #making insert query for all records at once. if transaction fails, 
+  #sql will rollback, which is what we want.
   insert_records = paste("(",lv2_insert.df$signature_id, ",", lv2_insert.df$feature_id, ",", lv2_insert.df$weight, ",", lv2_insert.df$direction,")",sep="",collapse=",")
   insert_lv2_query = paste("INSERT INTO feature_signature(signature_id,feature_id,weight,direction) VALUES ",insert_records,sep="")
+  #executes insert
   sql_generic(insert_lv2_query)
+}
+
+
+#function for adding keyword-signature pairs
+#inputs: 
+#   character vector containing keywords
+#   signature id associated with keywords
+add_signature_keywords <- function(keyword_v, sid){
+  keywords = unique(as.character(keyword_v))
+  #what keywords already are in the DB?
+  #isolate new keywords and insert into core table
+  keyword_sql = bind_rows(
+    lapply(
+      keywords,
+      sql_finding_query,
+      fields=c("keyword_id","keyword"),
+      target_table="keywords",
+      field_where="keyword"
+      )
+    )
+  #new keywords
+  new_keywords = setdiff(keywords, keyword_sql$keyword)
+  #if there are any, add them to db
+  if(length(new_keywords)!=0){
+    insert_newkeywords_query = paste("INSERT INTO keywords(keyword) VALUES ",paste("(",new_keywords,")",sep="",collapse=","),";")
+    insert_newkeywords_sql = sql_generic(insert_newkeywords_query)
+    new_keyword_ids = bind_rows(
+      lapply(
+        new_keywords,
+        sql_finding_query,
+        fields=c("keyword_id"),
+        target_table="keywords",
+        field_where="keyword"
+      )
+    )$keyword_id
+  }
+  #make dataframe of insert values
+  #if there's a function that mass inserts a dataframe into the db
+  #i'd like to do that instead of all these pastes
+  keyword_signature.df<-data.frame(
+    signature_id = rep(sid, length(keyword_v)),
+    keyword_id = bind_rows(keyword_sql$keyword_id,new_keyword_ids)
+  )
+  keyword_signature_insert_query = paste("INSERT INTO keyword_signature(signature_id,keyword_id) VALUES ",paste("(",keyword_signature.df$signature_id,",",keyword_signature.df$keyword_id,")",sep="",collapse=","),";")
+  sql_generic(keyword_signature_insert_query)
 }
 
 
@@ -165,6 +220,11 @@ observeEvent(input$add_signature, {
     insert_signature_conn = new_conn_handle()
     dbSendQuery(insert_signature_conn, insert_query)
     dbDisconnect(insert_signature_conn)
+    #since signature is inserted now, we can get its signature id
+    #and feed it into the lvl2/3 upload function
     last_sid = sql_generic("select signature_id from signatures where signature_name=",signature_name,";")
     add_lv2(input$rds_file_2,last_sid)
+    if(length(input$keywords)!=0){
+      add_signature_keywords(input$keywords,last_sid)
+    }
 })
