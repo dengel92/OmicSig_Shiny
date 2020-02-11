@@ -35,6 +35,24 @@ get_species <- reactive ({
     return(species_obj$species)
 })
 
+sql_finding_query <- function(fields="*", target_table, field_where=NULL, field_where_value=NULL){
+  sql = paste("SELECT " , paste(fields,collapse=","), " FROM ", target_table, sep='')
+  sql_where = ""
+  if(!is.null(field_where) && !is.null(field_where_value)){
+    sql_where = paste(
+      " WHERE ", 
+      field_where, 
+      "=",
+      switch(typeof(field_where_value),
+             "character"=paste( single_quoted(field_where_value),sep=""),
+             field_where_value
+      ),sep=""
+    )
+  }
+  sql = paste(sql, sql_where, ";", sep="")
+  return(sql_generic(sql))
+}
+
 # Get choices for platform
 get_platforms <- reactive ({
     # Query database
