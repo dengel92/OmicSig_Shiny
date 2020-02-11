@@ -15,7 +15,7 @@ new_conn_handle <- function() {
 # Generic sql function
 sql_generic <- function(query){
     conn = new_conn_handle()
-    # Disconnect from database when exiting simplequery()
+    # Disconnect from database when exiting sql_generic()
     on.exit(dbDisconnect(conn), add = TRUE)
     this_query =
         dbGetQuery(conn,
