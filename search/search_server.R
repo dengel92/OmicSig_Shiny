@@ -70,6 +70,7 @@ output$search_selected_platforms <- renderText(
 observeEvent(input$search, {
     shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
     output$search_results <- renderTable({
+        # Ensure that the table updates only once, immediately after clicking
         isolate(
             # Search database for matching signatures
             sql_obj <-
