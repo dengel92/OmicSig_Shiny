@@ -1,0 +1,7 @@
+symbol	direction
+ADGRF1	Up
+APBB1IP	Dn
+MUC1	Dn
+TFF1	Dn
+CST2	Dn
+TFF2	Dn
