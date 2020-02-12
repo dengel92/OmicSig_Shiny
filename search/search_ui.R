@@ -15,9 +15,11 @@ search_ui <- tabPanel("Search",
                 label = "Platform",
                 choices = NULL,
                 multiple = TRUE
-            )
+            ),
+            actionButton("search", "Search Signatures")
         ),
         
-        #
-        mainPanel("Display table of matching signatures?")
+        mainPanel(
+            tableOutput("search_results")
+        )
     ))

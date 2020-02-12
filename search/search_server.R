@@ -63,3 +63,22 @@ output$search_selected_platforms <- renderText(
         "</p></font>"
     )
 )
+
+### NOT FULLY IMPLEMENTED YET
+### Currently only looks at species input
+# Show table of matching signatures when you hit the search button
+observeEvent(input$search, {
+    shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
+    output$search_results <- renderTable({
+        isolate(
+            # Search database for matching signatures
+            sql_obj <-
+                sql_finding_query(
+                    target_table = "platform_signature_view",
+                    field_where = "species",
+                    field_where_value = input$search_species
+                )
+        )
+        return(sql_obj)
+    })
+})
