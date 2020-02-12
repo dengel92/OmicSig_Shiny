@@ -48,7 +48,7 @@ get_species <- reactive ({
 #field_where: string; field you want to narrow search by. multi-where not implemented here yet
 #field_where_value: whatever type is in the field of the DB table you're querying into. usually,
 #you will lapply some list of values with this function, where the list is field_where_value
-sql_finding_query <- function(fields="*", target_table, field_where=NULL, field_where_value=NULL){
+sql_finding_query <- function(fields=c("*"), target_table, field_where=NULL, field_where_value=NULL){
   #query construction
   sql = paste("SELECT " , paste(fields,collapse=","), " FROM ", target_table, sep='')
   #if where clause, add where clause to main query
