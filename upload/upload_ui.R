@@ -4,9 +4,9 @@ upload_ui <- tabPanel("Upload",
         sidebarPanel(
           tags$h2("Upload Form"),
           tags$b("Example Files: "),
-          tags$a(href = paste("http://sigrepo.bu.edu:3838/example_files/example_lv1.txt",sep=""), "Level 1"),
-          tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv2.txt", "Level 2",download=T),
-          tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv3.txt", "Level 3",download=T),
+          tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv1.txt", "Level 1",download="level1_example.txt"),
+          tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv2.txt", "Level 2",download="level2_example.txt"),
+          tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv3.txt", "Level 3",download="level3_example.txt"),
           br(),br(),br(),
             fileInput(
                 inputId = "rds_file_1",
@@ -59,6 +59,11 @@ upload_ui <- tabPanel("Upload",
                 inputId = "cell_line",
                 label = "Cell Line(ATCC)",
                 placeholder = NULL
+            ),
+            textInput(
+              inputId = "source_type",
+              label = "Source",
+              placeholder = NULL
             ),
             selectizeInput(
                 inputId = "keywords",
