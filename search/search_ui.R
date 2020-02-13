@@ -37,10 +37,10 @@ search_ui <- tabPanel("Search",
                 options=list(create=TRUE)
             ),
             actionButton("search", "Search Signatures")
-        )),
+        ),
           
         
         mainPanel(
             tableOutput("search_results")
         )
-    )
+    ))
