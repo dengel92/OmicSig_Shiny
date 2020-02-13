@@ -37,21 +37,6 @@ observe({
         choices = c("", get_platforms()))
 })
 
-#checking quality of files uploaded, yielding in error
-#if rds file is 'bad'
-#for testing purposes(writing, reading, etc), I comment out the checkRDS line, so that I can
-#just work with whatever file I want 
-observeEvent(input$rds_file_1, {
-    #checkRDS(input$rds_file_1,"rds_file_1")
-    #file.copy(input$rds_file_1$datapath,"~/ree.txt")
-})
-observeEvent(input$rds_file_2, {
-    checkRDS(input$rds_file_2,"rds_file_2")
-})
-observeEvent(input$rds_file_3, {
-    checkRDS(input$rds_file_3,"rds_file_3")
-})
-#end QC for file uploads
 
 
 
@@ -74,6 +59,18 @@ add_lv2 <- function(lv2_file, sid){
   fids = bind_rows(lv2_feature_ids)$feature_id
   #all coming from same signature, hence 'rep'
   sid_col = rep(sid, length(fids))
+  
+  if(TRUE){
+    print(lv2_feature_ids)
+    print(fids)
+    print(lv2_table$score)
+    print(lv2_table$direction)
+    print(length(fids))
+    print(length(sid_col))
+    print(length(lv2_table$score))
+    print(length(lv2_table$direction))
+  }
+  
   #dataframe for inserting into db
   lv2_insert.df = data.frame(
     signature_id = sid_col,
@@ -151,8 +148,8 @@ observeEvent(input$add_signature, {
     #also need to add alerts confirming to the user that the operation is/was successful
     now = Sys.time()
     signature_name = single_quoted(input$signature_name)
-    species_tax_id = input$species_id
-    species_tax_id = as.integer(strsplit(species_tax_id,split="[\\[,\\]]+",perl=T)[[1]][2])
+    my_species = single_quoted(input$species_id)
+    species_tax_id = as.integer(sql_generic(paste("select taxonomic_id from species where species=",(my_species),";",sep=""))$taxonomic_id[1])
     species_id_insert = sql_finding_query(c("species_id"),"species","taxonomic_id",species_tax_id)$species_id[1]
     platform_id = as.integer(sql_finding_query(c("platform_id"),"assay_platforms","platform_name",input$platform_name)$platform_id[1])
     cell_line = input$cell_line
@@ -166,8 +163,8 @@ observeEvent(input$add_signature, {
     dbDisconnect(insert_signature_conn)
     #since signature is inserted now, we can get its signature id
     #and feed it into the lvl2/3 upload function
-    last_sid = sql_generic("select signature_id from signatures where signature_name=",signature_name,";")
-    add_lv2(input$rds_file_2,last_sid)
+    last_sid = as.integer(sql_generic(paste("select signature_id from signatures where signature_name=",(signature_name),";",sep=""))$signature_id[1])
+    add_lv2(input$rds_file_2$datapath,last_sid)
     if(length(input$keywords)!=0){
       add_signature_keywords(input$keywords,last_sid)
     }

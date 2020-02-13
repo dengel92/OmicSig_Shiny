@@ -21,7 +21,7 @@ upload_ui <- tabPanel("Upload",
                 inputId = "rds_file_2",
                 label = "Signature File (Lvl2)",
                 multiple = FALSE,
-                accept = c("text/csv","text/rds",".rds"),
+                accept = c("text/csv","text/txt",".txt","text/rds",".rds"),
                 width = NULL,
                 buttonLabel = "Browse...",
                 placeholder = "No file selected"
