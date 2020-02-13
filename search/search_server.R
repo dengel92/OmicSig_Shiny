@@ -66,7 +66,7 @@ output$search_selected_platforms <- renderText(
 ### Currently only looks at species input
 # Show table of matching signatures when you hit the search button
 observeEvent(input$search, {
-    shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
+    #shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
     output$search_results <- renderTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
