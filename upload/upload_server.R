@@ -1,5 +1,7 @@
 # Server logic for upload page
 
+upload_root_path <- "/srv/shiny-server/signatures/"
+
 # QC of rds file to ensure it's not corrupted and in the right format(later)
 checkRDS <- function(rds_file,input_name){
     # Observe+trycatch meant to capture error and display in UI,
@@ -43,7 +45,7 @@ observe({
 
 #function will insert lvl2/3 data into DB
 #inputs: file path to lvl2/3 data file, signature id
-add_lv2 <- function(lv2_file, sid){
+add_lv2 <- function(lv2_file, sid, sig_name){
   #reading file into a table
   lv2_table = read.table(lv2_file, header=T)
   #converting direction to + or -
@@ -84,6 +86,7 @@ add_lv2 <- function(lv2_file, sid){
   insert_lv2_query = paste("INSERT INTO feature_signature(signature_id,feature_id,weight,direction) VALUES ",insert_records,sep="")
   #executes insert
   sql_generic(insert_lv2_query)
+  write.csv(lv2_table, paste(upload_root_path,"level_2/",sig_name,".csv",sep=""))
 }
 
 
@@ -166,6 +169,6 @@ observeEvent(input$add_signature, {
     last_sid = as.integer(sql_generic(paste("select signature_id from signatures where signature_name=",(signature_name),";",sep=""))$signature_id[1])
     add_lv2(input$rds_file_2$datapath,last_sid)
     if(length(input$keywords)!=0){
-      add_signature_keywords(input$keywords,last_sid)
+      add_signature_keywords(input$keywords,last_sid, signature_name)
     }
 })
