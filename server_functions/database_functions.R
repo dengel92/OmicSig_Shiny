@@ -67,6 +67,9 @@ sql_finding_query <-
         }
         # Final construction of query
         sql = paste(sql, sql_where, ";", sep = "")
+        if(TRUE){
+          print(sql)
+        }
         # Execute
         return(sql_generic(sql))
     }
