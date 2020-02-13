@@ -1,11 +1,10 @@
 # Server logic for search page
 
-# Update species checkboxes with list of species from database 
+# Update species dropdown with list of species from database
 observe({
-  updateCheckboxGroupInput(session,
-    "search_species",
-    choices = c(get_species())
-  )
+    updateSelectizeInput(session,
+        "search_species",
+        choices = c("", get_species()))
 })
 
 # Show which species have been selected so far
@@ -13,7 +12,10 @@ output$search_selected_species <- renderText(
     c(
         "<p><font size=3><b>",
         "Selected Species:</b></font></p><p><font size=2>",
-        input$search_species,
+        if (length(input$search_species) < 1) {
+            "No species selected"
+        } else {
+            input$search_species},
         "</p></font>"
     )
 )
@@ -62,11 +64,12 @@ output$search_selected_platforms <- renderText(
     )
 )
 
+
 ### NOT FULLY IMPLEMENTED YET
 ### Currently only looks at species input
 # Show table of matching signatures when you hit the search button
 observeEvent(input$search, {
-    #shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
+    shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
     output$search_results <- renderTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
