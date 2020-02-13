@@ -35,10 +35,12 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE,
                 choices = c("a", "b", "c"),
                 options=list(create=TRUE)
-            ),
-            actionButton("search_signature", "Search")
+            )
+        ),
+            actionButton("search", "Search Signatures")
         ),
         
-        # 
-        mainPanel("Display table of matching signatures?")
-    ))
+        mainPanel(
+            tableOutput("search_results")
+        )
+    )
