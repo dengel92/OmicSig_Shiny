@@ -35,8 +35,9 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE,
                 choices = c("a", "b", "c"),
                 options=list(create=TRUE)
-            ),actionButton("search", "Search Signatures")
-        ),
+            ),
+            actionButton("search", "Search Signatures")
+        )),
           
         
         mainPanel(
