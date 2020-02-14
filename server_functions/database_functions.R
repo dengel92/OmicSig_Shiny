@@ -38,11 +38,11 @@ sql_generic <- function(query) {
 # field_where_value: whatever type is in field_where of target_table,
 #   usually you will lapply some list of values with this function,
 #   where the list is field_where_value
-sql_finding_query <-
-    function(fields = c("*"),
+sql_finding_query <-function(fields = c("*"),
         target_table,
         field_where = NULL,
-        field_where_value = NULL) {
+        field_where_value = NULL,
+        one_more_thing = NULL) {
         # Query construction
         sql = paste("SELECT ",
             paste(fields, collapse = ","),
@@ -51,23 +51,42 @@ sql_finding_query <-
             sep = '')
         # If there's a where clause, add where clause to main query
         sql_where = ""
+        #type of values in argument
+        value_type = typeof(field_where_value)
+        #length of argument
+        value_length = length(field_where_value)
+        #think of the below like a dictionary, or a switch. 
+        #I would pass the type of the argument like a key into this object to determine how
+        #this argument is to be played with
+        type_tovalue = list("character"=single_quoted(field_where_value),"double"=field_where_value)
+        #There's a very subtle but important point to be made when dealing with 
+        #multiple possible values you want to query the DB with.
+        #Here, I could pass a vector of values, but the query constructed would 
+        #asking for everything in one go. 
+        #If you lapply instead, using the list of where values, you'll get separate queries/executions.
+        #lapply approach is advised if you're doing granular checking of values in a submitted list.
+        #bulk approach technically works as well, but you won't know which values resulted in
+        #zero records from the DB.
+        value_where = ifelse(
+          value_length>1,
+          paste("IN (", paste(type_tovalue[[value_type]],collapse=","),")",sep=""),
+          paste("=",type_tovalue[[value_type]],sep="")
+        )
         if (!is.null(field_where) && !is.null(field_where_value)) {
-            sql_where = paste(" WHERE ",
-                field_where,
-                "=",
-                switch(
-                    typeof(field_where_value),
-                    # If you're querying based on string value,
-                    #   you must put the values in single quotes
-                    #   so as not to mess up the final string
-                    "character" = paste(single_quoted(field_where_value),
-                        sep = ""),
-                    field_where_value
-                ), sep = "")
+            sql_where = paste(
+              "WHERE",
+              field_where,
+              value_where,
+              sep=" ")
+        }
+        extra_wheres=""
+        if(!is.null(one_more_thing)){
+          extra_wheres=paste(names(one_more_thing),single_quoted(one_more_thing),sep="=",collapse=" AND ")
         }
         # Final construction of query
-        sql = paste(sql, sql_where, ";", sep = "")
-        if(TRUE){
+        sql = paste(sql, sql_where, "AND", extra_wheres,";", sep = " ")
+        #Debugging block
+        if(FALSE){
           print(sql)
         }
         # Execute

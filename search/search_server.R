@@ -26,13 +26,12 @@ observeEvent(input$search_species, {
     if (!is.null(input$search_species)) {
         # Query database to find platforms matching selected species
         sql_obj <-
-            lapply(input$search_species,sql_finding_query,
+          sql_finding_query(
                 fields=c("platform_name"),
                 target_table = "platform_signature_view",
-                field_where = "species"
-            )
-        
-        print(sql_obj)
+                field_where = "species",
+                field_where_value=input$search_species
+                )
         # Update platform dropdown
         updateSelectizeInput(session,
             "search_platform_name",
@@ -71,7 +70,6 @@ output$search_selected_platforms <- renderText(
 ### Currently only looks at species input
 # Show table of matching signatures when you hit the search button
 observeEvent(input$search, {
-    shinyalert("Uh oh", "Seems this isn't fully implemented yet... :(")
     output$search_results <- renderTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
