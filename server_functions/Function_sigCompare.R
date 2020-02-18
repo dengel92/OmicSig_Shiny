@@ -1,4 +1,4 @@
-sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000) {
+sigCompare_two <- function(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", is.lv2 = TRUE, background_number = 22000) {
   # check: should be dataframe with symbol, (score), direction
   if (class(sig1) == "data.frame" & class(sig2) == "data.frame") {
     if (is.lv2 == TRUE) {
@@ -33,7 +33,7 @@ sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000)
   Venn <- VennDiagram::draw.pairwise.venn(
     area1 = length(sig1_symbol), area2 = length(sig2_symbol), cross.area = length(sig_both),
     cex = rep(3, 3), cat.cex = rep(3, 2), fontfamily = rep("Palatino", 3), cat.fontfamily = rep("Palatino", 2),
-    category = c("sig1", "sig2"), fill = c("darkseagreen1", "plum1"),
+    category = c(sig1_name, sig2_name), fill = c("darkseagreen1", "plum1"),
     scaled = T, cat.pos = rep(180, 2), cat.dist = c(0.05, 0.05)
   )
 
@@ -56,7 +56,9 @@ sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000)
   output[[5]] <- hyper_pval
   output[[6]] <- sig1_symbol
   output[[7]] <- sig2_symbol
-  names(output) <- c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_symbol", "sig2_symbol")
+  output[[8]] <- sig1_name
+  output[[9]] <- sig2_name
+  names(output) <- c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_symbol", "sig2_symbol", "sig1_name", "sig2_name")
   return(output)
 }
 
