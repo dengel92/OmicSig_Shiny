@@ -80,11 +80,11 @@ sql_finding_query <-function(fields = c("*"),
               sep=" ")
         }
         extra_wheres=""
-        if(!is.null(one_more_thing)){
-          extra_wheres=paste(names(one_more_thing),single_quoted(one_more_thing),sep="=",collapse=" AND ")
+        if(!is.null(one_more_thing) && length(one_more_thing)>0){
+          extra_wheres=paste("AND", paste(names(one_more_thing),single_quoted(one_more_thing),sep="=",collapse=" AND "))
         }
         # Final construction of query
-        sql = paste(sql, sql_where, "AND", extra_wheres,";", sep = " ")
+        sql = paste(sql, sql_where, extra_wheres,";", sep = " ")
         #Debugging block
         if(FALSE){
           print(sql)
@@ -103,6 +103,19 @@ get_species <- reactive ({
     # Return results of query
     return(species_obj$species)
 })
+
+# Get signatures
+get_signature_names <- reactive ({
+  # Query database
+  signature_name_obj <- sql_generic("
+        select
+            signature_name
+        from signatures;
+        ")
+  # Return results of query
+  return(signature_name_obj$signature_name)
+})
+
 
 # Get choices for platform
 get_platforms <- reactive ({
