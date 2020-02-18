@@ -50,18 +50,58 @@ output$compare_result <- renderText({
   c(
     "<font face = \"PT Sans\",font size=3>",
     "<p>The signatures you are comparing:",
-    "<br><font color=\"#228822\">", input$compare_1, "(", length(compare_result_variable()$sig1), " signatures found )", " </font> ",
-    "and <font color=\"#881199\">", input$compare_2, "(", length(compare_result_variable()$sig2), " signatures found )", "</font></p>",
+    "<br><font color=\"#228822\">",
+    input$compare_1,
+    "(",
+    length(compare_result_variable()$sig1),
+    " signatures found )",
+    " </font> ",
+    "and <font color=\"#881199\">",
+    input$compare_2,
+    "(",
+    length(compare_result_variable()$sig2),
+    " signatures found )",
+    "</font></p>",
     "<p>",
-    "<p><i>The unique signatures in ", input$compare_1, " are:</i>",
-    "<br>", compare_result_variable()$only_sig1,
-    "<br><i>The unique signatures in ", input$compare_2, " are:</i>",
-    "<br>", compare_result_variable()$only_sig2,
+    "<p><i>The unique signatures in ",
+    input$compare_1,
+    " are:</i>",
+    "<br>",
+    {
+      if (length(compare_result_variable()$only_sig1) == 0) {
+        paste("*Nothing found*")
+      } else {
+        paste(compare_result_variable()$only_sig1)
+      }
+    },
+    "<br><i>The unique signatures in ",
+    input$compare_2,
+    " are:</i>",
+    "<br>",
+    {
+      if (length(compare_result_variable()$only_sig2) == 0) {
+        paste("*Nothing found*")
+      } else {
+        paste(compare_result_variable()$only_sig2)
+      }
+    },
     "<br><i>The signatures appeared in both lists are:</i>",
-    "<br>", compare_result_variable()$sig_both, "</p>",
+    "<br>",
+    {
+      if (length(compare_result_variable()$sig_both) == 0) {
+        paste("*Nothing found*")
+      } else {
+        paste(compare_result_variable()$sig_both)
+      }
+    },
+    "</p>",
     "<p> Please see the Venn diagram below for a better visualization! </p>",
-    "<p>After the Hyper Geometric test, with the background set as ", input$compare_background_number, " genes / proteins: ",
-    "<br>the p-value we got is <b>", compare_result_variable()$hyper_p.value, "</b>.</p>",
+    "<p>After the Hyper Geometric test, with the background set as ",
+    input$compare_background_number,
+    " genes / proteins: ",
+    "<br>the p-value we got is <b>",
+    compare_result_variable()$hyper_p.value,
+    "</b>.</p>",
     "<p><font color=\"#AB6611\"><b><i> Thank you for using! </font></b></i></p>",
     "</font>"
   )
@@ -70,7 +110,27 @@ output$compare_result <- renderText({
 
 output$compare_show_signatures <- renderText({
   c(
-    "<p><i>All signatures in", input$compare_1, ":</i> <br><font color=\"#228822\">", compare_result_variable()$sig1, "</font></p>",
-    "<p><i>All signatures in", input$compare_2, ":</i> <br><font color=\"#881199\">", compare_result_variable()$sig2, "</font></p>"
+    "<p><i>All signatures in",
+    input$compare_1,
+    ":</i> <br><font color=\"#228822\">",
+    {
+      if (length(compare_result_variable()$sig1) == 0) {
+        paste("*Nothing Found.* Signature is empty.")
+      } else {
+        paste(compare_result_variable()$sig1)
+      }
+    },
+    "</font></p>",
+    "<p><i>All signatures in",
+    input$compare_2,
+    ":</i> <br><font color=\"#881199\">",
+    {
+      if (length(compare_result_variable()$sig2) == 0) {
+        paste("*Nothing Found. Signature is empty.*")
+      } else {
+        paste(compare_result_variable()$sig2)
+      }
+    },
+    "</font></p>"
   )
 })
