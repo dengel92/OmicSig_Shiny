@@ -7,18 +7,31 @@ sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000)
       colnames_required <- c("symbol")
     }
     if (length(setdiff(colnames_required, colnames(sig1))) != 0 | length(setdiff(colnames_required, colnames(sig2))) != 0) {
-      return(paste("Error: input signature(s) does not contain required columns."))
+      return(paste("Error: input signatures are dataframes but do not contain required columns."))
     }
-  } else {
-    return(paste("Error: input signature(s) is not a dataframe."))
+    sig1_score <- sig1$score
+    sig2_score <- sig2$score
+    sig1_symbol <- sig1$symbol
+    sig2_symbol <- sig2$symbol
+    remove(sig1, sig2)
+  } else if (class(sig1) == "character" & class(sig2) == "character") {
+    if (is.lv2 == TRUE) {
+      return(paste("Error: for lv2 data, input signatures should be dataframe."))
+    }
+    sig1_symbol <- sig1
+    sig2_symbol <- sig2
+    remove(sig1, sig2)
+  }
+  else {
+    return(paste("Error: input signatures are not valid."))
   }
 
   output <- list()
 
   # comparison 1: compare name + Venn diagram
-  sig_both <- intersect(sig1$symbol, sig2$symbol)
+  sig_both <- intersect(sig1_symbol, sig2_symbol)
   Venn <- VennDiagram::draw.pairwise.venn(
-    area1 = length(sig1$symbol), area2 = length(sig2$symbol), cross.area = length(sig_both),
+    area1 = length(sig1_symbol), area2 = length(sig2_symbol), cross.area = length(sig_both),
     cex = rep(3, 3), cat.cex = rep(3, 2), fontfamily = rep("Palatino", 3), cat.fontfamily = rep("Palatino", 2),
     category = c("sig1", "sig2"), fill = c("darkseagreen1", "plum1"),
     scaled = T, cat.pos = rep(180, 2), cat.dist = c(0.05, 0.05)
@@ -31,22 +44,39 @@ sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000)
   # k: (a random selection of balls) number of signature 2
   # x: (number of marked balls within the selection) number in both signatures
   q <- length(sig_both)
-  m <- length(sig1$symbol)
-  n <- background_number - length(sig1$symbol)
-  k <- length(sig2$symbol)
+  m <- length(sig1_symbol)
+  n <- background_number - length(sig1_symbol)
+  k <- length(sig2_symbol)
   hyper_pval <- phyper(q = q, m = m, n = n, k = k, lower.tail = FALSE)
 
   output[[1]] <- Venn
-  output[[2]] <- setdiff(sig1$symbol, sig2$symbol)
-  output[[3]] <- setdiff(sig2$symbol, sig1$symbol)
+  output[[2]] <- setdiff(sig1_symbol, sig2_symbol)
+  output[[3]] <- setdiff(sig2_symbol, sig1_symbol)
   output[[4]] <- sig_both
   output[[5]] <- hyper_pval
-  names(output) <- c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value")
+  output[[6]] <- sig1_symbol
+  output[[7]] <- sig2_symbol
+  if (length(output[[2]]) == 0) {
+    output[[2]] <- c("*Nothing found*")
+  }
+  if (length(output[[3]]) == 0) {
+    output[[3]] <- c("*Nothing found.*")
+  }
+  if (length(output[[4]]) == 0) {
+    output[[4]] <- c("*Nothing found*")
+  }
+  if (length(output[[6]]) == 0) {
+    output[[6]] <- c("*Nothing found. Signature is empty.*")
+  }
+  if (length(output[[7]]) == 0) {
+    output[[7]] <- c("*Nothing found. Signature is empty.*")
+  }
+  names(output) <- c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_symbol", "sig2_symbol")
   return(output)
 }
 
 
 # test the function:
-sig1 <- read.table("server_functions/example_sigCompare_1.txt", header = T)
-sig2 <- read.table("server_functions/example_sigCompare_2.txt", header = T)
-sigCompare_two(sig1, sig2, is.lv2 = T)
+# sig1 <- read.table("server_functions/example_sigCompare_1.txt", header = T)
+# sig2 <- read.table("server_functions/example_sigCompare_2.txt", header = T)
+# sigCompare_two(sig1, sig2, is.lv2 = T)
