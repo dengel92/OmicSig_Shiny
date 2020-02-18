@@ -41,7 +41,7 @@ compare_result_variable <- eventReactive(input$compare_signatures, {
       sep = ""
     )
   )$feature_name
-  return(sigCompare_two(sig1, sig2, is.lv2 = FALSE, background_number = input$compare_background_number))
+  return(sigCompare_two(sig1, sig2, sig1_name = input$compare_1, sig2_name = input$compare_2, is.lv2 = FALSE, background_number = input$compare_background_number))
   # names: c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value")
 })
 output$compare_result_Venn <- renderPlot(compare_result_variable()$Venn)
@@ -51,20 +51,20 @@ output$compare_result <- renderText({
     "<font face = \"PT Sans\",font size=3>",
     "<p>The signatures you are comparing:",
     "<br><font color=\"#228822\">",
-    input$compare_1,
+    compare_result_variable()$sig1_name,
     "(",
-    length(compare_result_variable()$sig1),
+    length(compare_result_variable()$sig1_symbol),
     " signatures found )",
     " </font> ",
     "and <font color=\"#881199\">",
-    input$compare_2,
+    compare_result_variable()$sig2_name,
     "(",
-    length(compare_result_variable()$sig2),
+    length(compare_result_variable()$sig2_symbol),
     " signatures found )",
     "</font></p>",
     "<p>",
     "<p><i>The unique signatures in ",
-    input$compare_1,
+    compare_result_variable()$sig1_name,
     " are:</i>",
     "<br>",
     {
@@ -75,7 +75,7 @@ output$compare_result <- renderText({
       }
     },
     "<br><i>The unique signatures in ",
-    input$compare_2,
+    compare_result_variable()$sig2_name,
     " are:</i>",
     "<br>",
     {
@@ -111,24 +111,24 @@ output$compare_result <- renderText({
 output$compare_show_signatures <- renderText({
   c(
     "<p><i>All signatures in",
-    input$compare_1,
+    compare_result_variable()$sig1_name,
     ":</i> <br><font color=\"#228822\">",
     {
-      if (length(compare_result_variable()$sig1) == 0) {
+      if (length(compare_result_variable()$sig1_symbol) == 0) {
         paste("*Nothing Found.* Signature is empty.")
       } else {
-        paste(compare_result_variable()$sig1)
+        paste(compare_result_variable()$sig1_symbol)
       }
     },
     "</font></p>",
     "<p><i>All signatures in",
-    input$compare_2,
+    compare_result_variable()$sig2_name,
     ":</i> <br><font color=\"#881199\">",
     {
-      if (length(compare_result_variable()$sig2) == 0) {
+      if (length(compare_result_variable()$sig2_symbol) == 0) {
         paste("*Nothing Found. Signature is empty.*")
       } else {
-        paste(compare_result_variable()$sig2)
+        paste(compare_result_variable()$sig2_symbol)
       }
     },
     "</font></p>"
