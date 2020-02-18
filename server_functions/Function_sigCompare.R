@@ -56,25 +56,9 @@ sigCompare_two <- function(sig1, sig2, is.lv2 = TRUE, background_number = 22000)
   output[[5]] <- hyper_pval
   output[[6]] <- sig1_symbol
   output[[7]] <- sig2_symbol
-  if (length(output[[2]]) == 0) {
-    output[[2]] <- c("*Nothing found*")
-  }
-  if (length(output[[3]]) == 0) {
-    output[[3]] <- c("*Nothing found.*")
-  }
-  if (length(output[[4]]) == 0) {
-    output[[4]] <- c("*Nothing found*")
-  }
-  if (length(output[[6]]) == 0) {
-    output[[6]] <- c("*Nothing found. Signature is empty.*")
-  }
-  if (length(output[[7]]) == 0) {
-    output[[7]] <- c("*Nothing found. Signature is empty.*")
-  }
   names(output) <- c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_symbol", "sig2_symbol")
   return(output)
 }
-
 
 # test the function:
 # sig1 <- read.table("server_functions/example_sigCompare_1.txt", header = T)
