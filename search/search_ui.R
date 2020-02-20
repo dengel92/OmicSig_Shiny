@@ -2,8 +2,7 @@
 search_ui <- tabPanel("Search",
     sidebarLayout(
         sidebarPanel(
-            htmlOutput(outputId = "search_selected_species"),
-            htmlOutput(outputId = "search_selected_platforms"),
+            htmlOutput(outputId = "search_terms"),
             selectizeInput(
                 "search_species",
                 label = "Choose species",
@@ -12,7 +11,7 @@ search_ui <- tabPanel("Search",
             ),
             selectizeInput(
                 inputId = "search_platform_name",
-                label = "Platform",
+                label = "Choose platform",
                 choices = NULL,
                 multiple = TRUE
             ),
