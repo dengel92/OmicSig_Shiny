@@ -27,6 +27,10 @@ sql_generic <- function(query) {
     return(this_query)
 }
 
+pasty_boi <- function(mylist,list_key){
+    paste(list_key, " IN (",paste(single_quoted(mylist[[list_key]]),collapse=","),")",sep="")
+}
+
 # Constructs sql query based on where clause, if one is needed,
 #   and executes final query as output
 # Inputs:
@@ -49,21 +53,8 @@ sql_finding_query <- function(fields = c("*"), target_table, wheres = NULL) {
         # bulk approach technically works as well, but you won't know which
         # values resulted in zero records from the DB.
         if (!is.null(wheres) && length(wheres) > 0) {
-            # Start a vector to store each where clause
-            clauses <- c()
-            # Loop through each field to search by
-            for (i in 1:length(wheres)) {
-                # Get a string of comma separated, single quoted values for this field
-                clause <- paste(lapply(wheres, single_quoted)[[i]], collapse = ', ')
-                # Add parentheses around this string
-                clauses <- c(clauses, paste0('(', clause, ')'))
-            }
-            # Combine all where clauses into one
-            where_clauses <- paste("WHERE",
-                paste(names(wheres),
-                    clauses,
-                    sep = " IN ",
-                    collapse = " AND "))
+            hm = lapply(names(wheres), pasty_boi, mylist=wheres) 
+            where_clauses = paste("WHERE",paste(hm,collapse=" AND "))
         }
         # Add where clauses to query
         sql <- paste(sql, where_clauses,";", sep = " ")
