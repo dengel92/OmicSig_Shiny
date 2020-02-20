@@ -55,6 +55,9 @@ compare_result_variable <- eventReactive(input$compare_signatures, {
   # available names: c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_name", "sig2_name", "sig1_symbol", "sig2_symbol")
 })
 
+# output Venn diagram:
+output$compare_result_Venn <- renderPlot(compare_result_variable()$Venn)
+
 # output the unique, common features, hyper-geometric test resules:
 output$compare_result <- renderText({
   c(
@@ -94,8 +97,7 @@ output$compare_result <- renderText({
   )
 })
 
-# output Venn diagram:
-output$compare_result_Venn <- renderPlot(compare_result_variable()$Venn)
+
 
 # print the actual features in the two signatures for reference:
 output$compare_show_signatures <- renderText({
