@@ -29,8 +29,7 @@ observeEvent(input$search_species, {
           sql_finding_query(
                 fields=c("platform_name"),
                 target_table = "platform_signature_view",
-                field_where = "species",
-                field_where_value=input$search_species
+                wheres = list("species" = input$search_species)
                 )
         # Update platform dropdown
         updateSelectizeInput(session,
@@ -77,8 +76,8 @@ observeEvent(input$search, {
             sql_obj <-
                 sql_finding_query(
                     target_table = "platform_signature_view",
-                    field_where = "species",
-                    field_where_value = input$search_species
+                    wheres = list('platform_name' = input$search_platform_name,
+                        'species' = input$search_species)
                 )
         )
         return(sql_obj)
