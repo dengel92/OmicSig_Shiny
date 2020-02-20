@@ -66,9 +66,17 @@ output$search_selected_platforms <- renderText(
 
 
 ### NOT FULLY IMPLEMENTED YET
-### Currently only looks at species input
+### Currently works only if you select something from each dropdown
 # Show table of matching signatures when you hit the search button
 observeEvent(input$search, {
+    where_species = NULL
+    if (!is.null(input$search_species)) {
+        where_species = list('species' = input$search_species)
+    }
+    where_platform = NULL
+    if (!is.null(input$search_platform_name)) {
+        where_platform = list('platform_name' = input$search_platform_name)
+    }
     output$search_results <- renderTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
@@ -76,8 +84,7 @@ observeEvent(input$search, {
             sql_obj <-
                 sql_finding_query(
                     target_table = "platform_signature_view",
-                    wheres = list('platform_name' = input$search_platform_name,
-                        'species' = input$search_species)
+                    wheres = c(where_species, where_platform)
                 )
         )
         return(sql_obj)

@@ -27,8 +27,16 @@ sql_generic <- function(query) {
     return(this_query)
 }
 
-pasty_boi <- function(mylist,list_key){
-    paste(list_key, " IN (",paste(single_quoted(mylist[[list_key]]),collapse=","),")",sep="")
+# Assemble part of a where clause of the form "<field> IN (<field_values>)"
+# Inputs:
+#   mylist: named list where the names are fields and the values are values
+#       associated with those fields
+#   list_key: the field name to access from mylist
+in_paste <- function(mylist, list_key) {
+    paste0(list_key,
+        " IN (",
+        paste(single_quoted(mylist[[list_key]]), collapse = ","),
+        ")")
 }
 
 # Constructs sql query based on where clause, if one is needed,
@@ -36,8 +44,8 @@ pasty_boi <- function(mylist,list_key){
 # Inputs:
 #   fields: character vector, the fields to select from the target table
 #   target_table: string; the table to select from
-#   wheres: named list where the name is the field to narrow search by and the
-#       value is a vector of the values to look for in that field
+#   wheres: named list where the names are the fields to narrow search by and the
+#       values are vectors of the values to look for in those fields
 sql_finding_query <- function(fields = c("*"), target_table, wheres = NULL) {
         # Query construction
         sql <- paste("SELECT ", paste(fields, collapse = ","),
@@ -53,8 +61,12 @@ sql_finding_query <- function(fields = c("*"), target_table, wheres = NULL) {
         # bulk approach technically works as well, but you won't know which
         # values resulted in zero records from the DB.
         if (!is.null(wheres) && length(wheres) > 0) {
-            hm = lapply(names(wheres), pasty_boi, mylist=wheres) 
-            where_clauses = paste("WHERE",paste(hm,collapse=" AND "))
+            # Assemble the part of each where clause of the form
+            #   "<field> IN (<field_values>)"
+            ins <- lapply(names(wheres), in_paste, mylist = wheres)
+            # Add "WHERE" to the beginning of the where clauses and separate
+            #   each "<field> IN (<field_values>)" clause by " AND "
+            where_clauses <- paste("WHERE", paste(ins, collapse = " AND "))
         }
         # Add where clauses to query
         sql <- paste(sql, where_clauses,";", sep = " ")
