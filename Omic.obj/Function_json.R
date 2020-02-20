@@ -28,6 +28,6 @@ read_json <- function(filename) {
   )
   read_meta <- read_json[c(1:read_json$metadata_length)]
 
-  read_sig.obj <- OmicCollection$new(read_meta, read_lv2lv3, read_lv1)
+  read_sig.obj <- OmicSignature$new(read_meta, read_lv2lv3, read_lv1)
   return(read_sig.obj)
 }

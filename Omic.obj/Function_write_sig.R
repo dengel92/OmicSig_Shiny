@@ -1,4 +1,4 @@
-write_sig_bi <- function(Omic.obj, name = "new_sample", type = Omic.obj$metadata$type) {
+write_sig_bi <- function(Omic.obj, name = "new_sample", type = Omic.obj$metadata$type, address = "Omic.obj/signatures/") {
   signatures <- Omic.obj$signatures
   temp_upregulated <- data.frame(
     cbind(signatures$Up_Regulated_Symbol, signatures$Up_Regulated_Score, rep("Up", length(signatures$Up_Regulated_Symbol)))
@@ -10,8 +10,8 @@ write_sig_bi <- function(Omic.obj, name = "new_sample", type = Omic.obj$metadata
   colnames(example_lv2_df) <- c("symbol", "score", "direction")
   example_lv3_df <- example_lv2_df[, -2]
   remove(temp_upregulated, temp_dnregulated)
-  write.table(example_lv2_df, paste("Omic.obj/signatures/", name, "_lv2.txt", sep = ""), sep = "\t", quote = F, row.names = F, col.names = T)
-  write.table(example_lv3_df, paste("Omic.obj/signatures/", name, "_lv3.txt", sep = ""), sep = "\t", quote = F, row.names = F, col.names = T)
+  write.table(example_lv2_df, paste(address, name, "_lv2.txt", sep = ""), sep = "\t", quote = F, row.names = F, col.names = T)
+  write.table(example_lv3_df, paste(address, name, "_lv3.txt", sep = ""), sep = "\t", quote = F, row.names = F, col.names = T)
 
   return("finished")
 }

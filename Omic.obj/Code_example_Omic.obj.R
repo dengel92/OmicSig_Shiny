@@ -1,23 +1,29 @@
 
-#### test json, objCheck functions ####
+#### json, objCheck functions ####
 source("Omic.obj/Function_json.R")
 source("Omic.obj/Function_objCheck.R")
+source("Omic.obj/OmicObj.R")
 
-write_obj(Omic.obj, "Omic.obj/example_Omic.obj.txt")
+Omic.obj.new <- read_json("Omic.obj/signatures/MDA_AhR_obj.txt")
 
-Omic.obj.new <- read_json("Omic.obj/example_Omic.obj.txt")
+# check functions:
 check_metadata(Omic.obj.new)
 check_signatures(Omic.obj.new)
 check_difexp(Omic.obj.new)
-Omic.obj.new$extract.signature("logFC < -1; fdr < 0.001")
+# view signatures:
 Omic.obj.new$signatures
-# write_Obj(Omic.obj.new,"Omic.obj/example_Omic.obj.txt")
-# write.table(Omic.obj.new$difexp, "Omic.obj/example_lv1.txt", sep = "\t", quote = F, col.names = T, row.names = F)
+# use new criteria to extract signatures:
+Omic.obj.new$extract.signature("logFC < -1; fdr < 0.001")
+# write files:
+write_obj(Omic.obj.new,"Omic.obj/example_Omic.obj.txt")
+write.table(Omic.obj.new$difexp, "Omic.obj/example_lv1.txt", sep = "\t", quote = F, col.names = T, row.names = F)
 
-#### prepare lv2lv3.omic.obj example ####
+
+#### prepare an obj example without lv1 data ####
 Omic.obj.new$difexp <- NULL
 write_obj(Omic.obj.new, "Omic.obj/example_lv2lv3_Omic.obj.txt")
-# re-read to check:
+
+# read again to check:
 Omic.obj.lv2 <- read_json("Omic.obj/example_lv2lv3_Omic.obj.txt")
 Omic.obj.lv2$signatures
 check_metadata(Omic.obj.lv2)
