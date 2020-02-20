@@ -23,6 +23,15 @@ observe({
   )
 })
 
+anotb_length_check <- function(c_vector_name, empty_message="*Nothing found*"){
+    result_list = empty_message
+    if (length(compare_result_variable()[[c_vector_name]]) > 0) {
+        result_list = paste(compare_result_variable()[[c_vector_name]],sep=", ")
+    }
+    return(result_list)
+}
+
+
 # results of compare signatures:
 # Tuturu~
 # Meow!
@@ -46,63 +55,41 @@ compare_result_variable <- eventReactive(input$compare_signatures, {
 })
 output$compare_result_Venn <- renderPlot(compare_result_variable()$Venn)
 
+
 output$compare_result <- renderText({
   c(
-    "<font face = \"PT Sans\",font size=3>",
-    "<p>The signatures you are comparing:",
-    "<br><font color=\"#228822\">",
+    "<h3 class='result_header'>The signatures compared</h3>",
+    "<h3 id='first_sig_compare_header'>",
     compare_result_variable()$sig1_name,
     "(",
     length(compare_result_variable()$sig1_symbol),
-    " signatures found )",
-    " </font> ",
-    "and <font color=\"#881199\">",
+    " features found )",
+    "<h3 id='second_sig_compare_header'>",
     compare_result_variable()$sig2_name,
     "(",
     length(compare_result_variable()$sig2_symbol),
-    " signatures found )",
-    "</font></p>",
+    " features found )",
+    "</h3>",
     "<p>",
-    "<p><i>The unique signatures in ",
+    "<h5><i>Unique features in ",
     compare_result_variable()$sig1_name,
-    " are:</i>",
-    "<br>",
-    {
-      if (length(compare_result_variable()$only_sig1) == 0) {
-        paste("*Nothing found*")
-      } else {
-        paste(compare_result_variable()$only_sig1)
-      }
-    },
-    "<br><i>The unique signatures in ",
+    ":</i></h5>",
+    anotb_length_check("only_sig1"),
+    "<br/><br/><h5><i>Unique features in ",
     compare_result_variable()$sig2_name,
-    " are:</i>",
+    ":</i></h5>",
+    anotb_length_check("only_sig2"),
+    "<br/><br/><h5><i>Shared features:</i>",
     "<br>",
-    {
-      if (length(compare_result_variable()$only_sig2) == 0) {
-        paste("*Nothing found*")
-      } else {
-        paste(compare_result_variable()$only_sig2)
-      }
-    },
-    "<br><i>The signatures appeared in both lists are:</i>",
-    "<br>",
-    {
-      if (length(compare_result_variable()$sig_both) == 0) {
-        paste("*Nothing found*")
-      } else {
-        paste(compare_result_variable()$sig_both)
-      }
-    },
-    "</p>",
-    "<p> Please see the Venn diagram below for a better visualization! </p>",
-    "<p>After the Hyper Geometric test, with the background set as ",
-    input$compare_background_number,
-    " genes / proteins: ",
-    "<br>the p-value we got is <b>",
+    anotb_length_check("sig_both"),
+    "</h5><br/><br/>",
+    "<p> Please see the Venn diagram below for a better visualization! </p><br/>",
+    "<h4>Hyper Geometric test: Parameters and P-value</h4>",
+    "Background: ",input$compare_background_number," features",
+    "<br>P-value: <b>",
     compare_result_variable()$hyper_p.value,
-    "</b>.</p>",
-    "<p><font color=\"#AB6611\"><b><i> Thank you for using! </font></b></i></p>",
+    "</b>.<br/>",
+    "<p id='ty_bb'><b><i> Thank you for using! </font></b></i></p>",
     "</font>"
   )
 })
@@ -113,24 +100,12 @@ output$compare_show_signatures <- renderText({
     "<p><i>All signatures in",
     compare_result_variable()$sig1_name,
     ":</i> <br><font color=\"#228822\">",
-    {
-      if (length(compare_result_variable()$sig1_symbol) == 0) {
-        paste("*Nothing Found.* Signature is empty.")
-      } else {
-        paste(compare_result_variable()$sig1_symbol)
-      }
-    },
+    anotb_length_check("sig1_symbol",empty_message="*Nothing Found.* Signature is empty."),
     "</font></p>",
     "<p><i>All signatures in",
     compare_result_variable()$sig2_name,
     ":</i> <br><font color=\"#881199\">",
-    {
-      if (length(compare_result_variable()$sig2_symbol) == 0) {
-        paste("*Nothing Found. Signature is empty.*")
-      } else {
-        paste(compare_result_variable()$sig2_symbol)
-      }
-    },
+    anotb_length_check("sig2_symbol",empty_message="*Nothing Found.* Signature is empty."),
     "</font></p>"
   )
 })

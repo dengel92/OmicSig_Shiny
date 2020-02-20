@@ -2,6 +2,25 @@ compare_ui <- tabPanel(
   "Compare",
   # If you guys know a cooler/different layout from sidebarLayout,
   # Please tell me, please
+  tags$style(HTML(
+      "
+        .result_header {
+            font-weight: 4;
+        }
+    
+        #first_sig_compare_header{
+            color: #228822;
+        }
+
+        #second_sig_compare_header{
+            color: #882288;
+        }
+
+        #ty_bb{
+            color: #AB6611;
+        }
+      "
+  )),
   sidebarLayout(
     sidebarPanel(
       selectizeInput(
