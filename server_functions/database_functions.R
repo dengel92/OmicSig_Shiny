@@ -60,6 +60,7 @@ sql_finding_query <- function(fields = c("*"), target_table, wheres = NULL) {
         # in a submitted list.
         # bulk approach technically works as well, but you won't know which
         # values resulted in zero records from the DB.
+        where_clauses = ''
         if (!is.null(wheres) && length(wheres) > 0) {
             # Assemble the part of each where clause of the form
             #   "<field> IN (<field_values>)"
@@ -108,7 +109,8 @@ get_platforms <- reactive ({
     platform_obj <- sql_generic("
         select
             platform_name
-        from platform_signature_view;
+        from assay_platforms;
+        #from platform_signature_view;
         ")
     # Return results of query
     return(platform_obj$platform_name)
