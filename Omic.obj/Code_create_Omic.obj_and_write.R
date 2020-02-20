@@ -32,7 +32,7 @@ sample_name <- "MDA_CYP1B1"
   )
 
   # Object:
-  Omic.obj <- OmicCollection$new(metadata, signatures, difexp)
+  Omic.obj <- OmicSignature$new(metadata, signatures, difexp)
   print(Omic.obj)
   remove(metadata, signatures, difexp)
 }
@@ -40,11 +40,11 @@ sample_name <- "MDA_CYP1B1"
 # check-functions:
 check_metadata(Omic.obj)
 check_difexp(Omic.obj$difexp)
-check_signatures(Omic.obj)
 check_signatures(Omic.obj$signatures, signature_type = "bi-directional")
+check_signatures(Omic.obj$signatures, signature_type = "uni-directional")
 
 # write lv2, lv3 txt files:
-write_sig_bi(Omic.obj, name = sample_name)
+write_sig_bi(Omic.obj, name = sample_name, address = "Omic.obj/signatures/")
 
 # write Omic.obj json files:
 write_obj(Omic.obj, file = paste("Omic.obj/signatures/", sample_name, "_obj.txt", sep = ""))
