@@ -1,6 +1,6 @@
 check_metadata <- function(metadata) {
   # metadata should be a list with required attributes
-  if (class(metadata)[1] == "OmicCollection") {
+  if (class(metadata)[1] == "OmicSignature") {
     metadata <- metadata$metadata
   }
 
@@ -8,7 +8,7 @@ check_metadata <- function(metadata) {
     print(paste("Checked. Metadata is a list."))
   }
   else {
-    return(paste("Error: Metadata not found in OmicCollection object, or metadata is not a list. "))
+    return(paste("Error: Metadata not found in OmicSignature object, or metadata is not a list. "))
   }
 
   metadata_required <- c("organism", "platform", "type")
@@ -33,7 +33,7 @@ check_metadata <- function(metadata) {
 check_signatures <- function(omic.obj, signature_type = NULL) {
 
   # read the signature, and check if it is a list:
-  if (class(omic.obj)[1] == "OmicCollection") {
+  if (class(omic.obj)[1] == "OmicSignature") {
     signatures <- omic.obj$signatures
     signature_type <- omic.obj$metadata$type
   }
@@ -42,7 +42,7 @@ check_signatures <- function(omic.obj, signature_type = NULL) {
     remove(omic.obj)
   }
   else {
-    return(paste("Error: Signature not found in OmicCollection object, or signature is not a list. ", sep = ""))
+    return(paste("Error: Signature not found in OmicSignature object, or signature is not a list. ", sep = ""))
   }
 
   # signatures should be of proper length, according to the "type":
@@ -104,7 +104,7 @@ check_signatures <- function(omic.obj, signature_type = NULL) {
 check_difexp <- function(omic.obj) {
   # should be data frame, contain columns: "Probe_ID","symbol","logFC","AveExpr","Score","P.Value","fdr"
 
-  if (class(omic.obj)[1] == "OmicCollection") {
+  if (class(omic.obj)[1] == "OmicSignature") {
     difexp <- omic.obj$difexp
   }
   else if (class(omic.obj)[1] == "data.frame") {
@@ -112,7 +112,7 @@ check_difexp <- function(omic.obj) {
     remove(omic.obj)
   }
   else {
-    return(paste("Error: Input is not a OmicCollection object or dataframe. "))
+    return(paste("Error: Input is not a OmicSignature object or dataframe. "))
   }
 
   # check if it's empty:
@@ -146,12 +146,9 @@ check_difexp <- function(omic.obj) {
       }
     }
   }
-  # "symbol" should be character. if it's factor, then change it into character
+  # "symbol" should be character
   if ("symbol" %in% colnames(difexp)) {
-    if (class(difexp$symbol) == "factor") {
-      difexp$symbol <- as.character(difexp$symbol)
-    }
-    if (class(difexp$symbol) == "character") {
+    if (class(difexp$symbol) == "character" | class(difexp$symbol) == "factor") {
       print(paste("Checked. Symbol is character.", sep = ""))
     } else {
       print(paste("Warning: Symbol is not character."))

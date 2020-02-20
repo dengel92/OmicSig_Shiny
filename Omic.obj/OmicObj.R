@@ -1,8 +1,8 @@
 library(R6)
 library(dplyr)
 
-{ # OmicCollection define
-  OmicCollection <- R6Class("OmicCollection", list(
+{ # OmicSignature define
+  OmicSignature <- R6Class("OmicSignature", list(
     metadata = NULL,
     signatures = NULL,
     difexp = NULL,
