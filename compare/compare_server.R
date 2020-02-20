@@ -23,6 +23,8 @@ observe({
   )
 })
 
+# function used to check if any input signatures / outputs is empty
+# only applicable for this tab
 anotb_length_check <- function(c_vector_name, empty_message="*Nothing found*"){
     result_list = empty_message
     if (length(compare_result_variable()[[c_vector_name]]) > 0) {
@@ -33,8 +35,7 @@ anotb_length_check <- function(c_vector_name, empty_message="*Nothing found*"){
 
 
 # results of compare signatures:
-# Tuturu~
-# Meow!
+# Tuturu~ Meow!
 compare_result_variable <- eventReactive(input$compare_signatures, {
   sig1 <- sql_generic(
     paste(
@@ -51,11 +52,10 @@ compare_result_variable <- eventReactive(input$compare_signatures, {
     )
   )$feature_name
   return(sigCompare_two(sig1, sig2, sig1_name = input$compare_1, sig2_name = input$compare_2, is.lv2 = FALSE, background_number = input$compare_background_number))
-  # names: c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value")
+  # available names: c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_name", "sig2_name", "sig1_symbol", "sig2_symbol")
 })
-output$compare_result_Venn <- renderPlot(compare_result_variable()$Venn)
 
-
+# output the unique, common features, hyper-geometric test resules:
 output$compare_result <- renderText({
   c(
     "<h3 class='result_header'>The signatures compared</h3>",
@@ -80,7 +80,7 @@ output$compare_result <- renderText({
     ":</i></h5>",
     anotb_length_check("only_sig2"),
     "<br/><br/><h5><i>Shared features:</i>",
-    "<br>",
+    "<br><br>",
     anotb_length_check("sig_both"),
     "</h5><br/><br/>",
     "<p> Please see the Venn diagram below for a better visualization! </p><br/>",
@@ -93,16 +93,19 @@ output$compare_result <- renderText({
     "</font>"
   )
 })
-# show_signatures_variable <- eventReactive(input$compare_show_signatures,{compare_result_variable()$})
 
+# output Venn diagram:
+output$compare_result_Venn <- renderPlot(compare_result_variable()$Venn)
+
+# print the actual features in the two signatures for reference:
 output$compare_show_signatures <- renderText({
   c(
-    "<p><i>All signatures in",
+    "<p><i>All features in",
     compare_result_variable()$sig1_name,
     ":</i> <br><font color=\"#228822\">",
     anotb_length_check("sig1_symbol",empty_message="*Nothing Found.* Signature is empty."),
     "</font></p>",
-    "<p><i>All signatures in",
+    "<p><i>All features in",
     compare_result_variable()$sig2_name,
     ":</i> <br><font color=\"#881199\">",
     anotb_length_check("sig2_symbol",empty_message="*Nothing Found.* Signature is empty."),
