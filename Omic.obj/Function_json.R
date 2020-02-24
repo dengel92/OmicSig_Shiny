@@ -28,4 +28,3 @@ read_json <- function(filename) {
   read_sig.obj <- OmicSignature$new(read_meta, read_lv2, read_lv1)
   return(read_sig.obj)
 }
-a <- read_json(paste("Omic.obj/signatures/", sample_name, "_obj.txt", sep = ""))
