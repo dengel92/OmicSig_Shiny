@@ -1,3 +1,4 @@
+# Note: don't need this function anymore after change signature in OmicSig Obj from list to dataframe
 write_sig_bi <- function(Omic.obj, name = "new_sample", type = Omic.obj$metadata$type, address = "Omic.obj/signatures/") {
   signatures <- Omic.obj$signatures
   temp_upregulated <- data.frame(

@@ -1,6 +1,5 @@
 source("Omic.obj/OmicObj.R")
 source("Omic.obj/Function_objCheck.R")
-source("Omic.obj/Function_write_sig.R")
 source("Omic.obj/Function_json.R")
 
 sample_name <- "MDA_CYP1B1"
@@ -24,12 +23,31 @@ sample_name <- "MDA_CYP1B1"
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "adj.P.Val"), "fdr")
   difexp$Probe_ID <- rownames(difexp)
 
-  signatures <- list( # a bi-directional example
-    "Up_Regulated_Symbol" = filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
-    "Dn_Regulated_Symbol" = filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
-    "Up_Regulated_Score" = filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(Score),
-    "Dn_Regulated_Score" = filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(Score)
+  # old code for signature as a list:
+  # signatures <- list( # a bi-directional example
+  #  "Up_Regulated_Symbol" = filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
+  #  "Dn_Regulated_Symbol" = filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
+  #  "Up_Regulated_Score" = filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(Score),
+  #  "Dn_Regulated_Score" = filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(Score)
+  # )
+
+  # Signatures: # a bi-directional example
+  temp_upsig <- cbind(
+    filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
+    filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(Score),
+    "Up"
   )
+  temp_dnsig <- cbind(
+    filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
+    filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(Score),
+    "Dn"
+  )
+  signatures <- data.frame(rbind(temp_upsig, temp_dnsig))
+  colnames(signatures) <- c("signature_symbol", "signature_score", "signature_direction")
+  # signatures$signature_direction <- as.factor(signatures$signature_direction)
+  signatures <- signatures[order(signatures$signature_direction, decreasing = F), ]
+  # save the signatures according to the order of the direction, to make read and write convenient
+  remove(temp_upsig, temp_dnsig)
 
   # Object:
   Omic.obj <- OmicSignature$new(metadata, signatures, difexp)
@@ -43,8 +61,9 @@ check_difexp(Omic.obj$difexp)
 check_signatures(Omic.obj$signatures, signature_type = "bi-directional")
 check_signatures(Omic.obj$signatures, signature_type = "uni-directional")
 
-# write lv2, lv3 txt files:
-write_sig_bi(Omic.obj, name = sample_name, address = "Omic.obj/signatures/")
+# write signaure (lv2/lv3) txt file:
+write.table(Omic.obj$signatures, file = paste("Omic.obj/signatures/", sample_name, "_lv2.txt", sep = ""), header = T, row.names = F, quote = F)
+write.table(Omic.obj$signatures[, c("signature_symbol", "signature_direction")], file = paste("Omic.obj/signatures/", sample_name, "_lv2.txt", sep = ""), header = T, row.names = F, quote = F)
 
 # write Omic.obj json files:
 write_obj(Omic.obj, file = paste("Omic.obj/signatures/", sample_name, "_obj.txt", sep = ""))

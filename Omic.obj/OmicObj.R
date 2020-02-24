@@ -19,8 +19,12 @@ library(dplyr)
       }, names(self$metadata), self$metadata)
       cat("  Signatures: \n")
       sh <- mapply(function(k, v) {
-        cat("    ", k, " (", length(v), ")", "\n", sep = "")
-      }, names(self$signatures), self$signatures)
+        cat("    ", k, " (", v, ")", "\n", sep = "")
+      }, names(summary(self$signatures$signature_direction)), summary(self$signatures$signature_direction))
+      # old code for signature as a list:
+      # sh <- mapply(function(k, v) {
+      #    cat("    ", k, " (", length(v), ")", "\n", sep = "")
+      # }, names(self$signatures), self$signatures)
       cat("  Differential Expression Data: \n")
       cat("    ", nrow(self$difexp), " x ", ncol(self$difexp), "\n", sep = "")
       invisible(self)
