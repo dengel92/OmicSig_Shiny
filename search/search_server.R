@@ -31,6 +31,7 @@ output$search_terms <- renderText(
                 "</br>"
             )
         },
+        # Show selected signature names
         if (length(input$search_signature_name) < 1) {
             "No signature names selected</br>"
         } else {
@@ -57,6 +58,7 @@ observe({
                 "signature_name" = input$search_signature_name
             )
         )
+    # Update dropdown menu
     updateSelectizeInput(
         session,
         "search_species",
@@ -131,7 +133,7 @@ observe({
     )
 })
 
-# Show table of matching signatures when you hit the search button
+# Display output and download button after clicking search button
 observeEvent(input$search, {
     # Construct where clauses for each field
     wheres = list(
@@ -153,7 +155,7 @@ observeEvent(input$search, {
         )
     })
     
-    # Download search results
+    # Download button for search results
     output$search_results_download <- downloadHandler(
         filename = paste("SigRepo_search_results.tsv"),
         content = function(file) {
