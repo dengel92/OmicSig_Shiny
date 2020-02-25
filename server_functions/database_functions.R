@@ -1,3 +1,5 @@
+library(plyr)
+
 # Database related functions
 
 # Add single quotation marks around a string
@@ -33,10 +35,16 @@ sql_generic <- function(query) {
 #       associated with those fields
 #   list_key: the field name to access from mylist
 in_paste <- function(mylist, list_key) {
-    paste0(list_key,
+    in_clause <- paste0(list_key,
         " IN (",
         paste(single_quoted(mylist[[list_key]]), collapse = ","),
         ")")
+    # If the values for this field include 'NA', then allow null values in query
+    #   "(<field> IN (<field_values>) OR <field> is null)"
+    if ('NA' %in% mylist[[list_key]]) {
+        in_clause <- paste0('(', in_clause, ' OR ', list_key, ' is null)')
+    }
+    return(in_clause)
 }
 
 # Constructs sql query based on where clause, if one is needed,
@@ -61,6 +69,8 @@ sql_finding_query <- function(target_table, fields = c("*"),  wheres = NULL) {
         # bulk approach technically works as well, but you won't know which
         # values resulted in zero records from the DB.
         where_clauses = ''
+        # Removes elements where the value is null
+        wheres <- compact(wheres)
         if (!is.null(wheres) && length(wheres) > 0) {
             # Assemble the part of each where clause of the form
             #   "<field> IN (<field_values>)"
@@ -72,7 +82,7 @@ sql_finding_query <- function(target_table, fields = c("*"),  wheres = NULL) {
         # Add where clauses to query
         sql <- paste(sql, where_clauses,";", sep = " ")
         #Debugging block
-        if(FALSE){
+        if(TRUE){
           print(sql)
         }
         # Execute
@@ -90,7 +100,7 @@ get_species <- reactive ({
     return(species_obj$species)
 })
 
-# Get signatures
+# Get choices for signature names
 get_signature_names <- reactive ({
   # Query database
   signature_name_obj <- sql_generic("
@@ -103,14 +113,13 @@ get_signature_names <- reactive ({
 })
 
 
-# Get choices for platform
+# Get choices for platforms
 get_platforms <- reactive ({
     # Query database
     platform_obj <- sql_generic("
         select
             platform_name
         from assay_platforms;
-        #from platform_signature_view;
         ")
     # Return results of query
     return(platform_obj$platform_name)
