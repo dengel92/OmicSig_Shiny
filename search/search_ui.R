@@ -23,6 +23,22 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE
             ),
             
+            # Dropdown menu for selecting experiment group
+            selectizeInput(
+                inputId = "search_experiment_type",
+                label = "Choose experiment types",
+                choices = NULL,
+                multiple = TRUE
+            ),
+            
+            # Dropdown menu for selecting signature name
+            selectizeInput(
+                inputId = "search_signature_name",
+                label = "Choose signature names",
+                choices = NULL,
+                multiple = TRUE
+            ),
+            
             # Button to submit search terms
             actionButton("search", "Search Signatures")
         ),
