@@ -114,3 +114,22 @@ output$compare_show_signatures <- renderText({
     "</font></p>"
   )
 })
+
+
+
+# print the actual features in the two signatures for reference:
+output$compare_show_signatures <- renderText({
+    c(
+        "<p><i>All features in",
+        compare_result_variable()$sig1_name,
+        ":</i> <br><font color=\"#228822\">",
+        anotb_length_check("sig1_symbol",empty_message="*Nothing Found.* Signature is empty."),
+        "</font></p>",
+        "<p><i>All features in",
+        compare_result_variable()$sig2_name,
+        ":</i> <br><font color=\"#881199\">",
+        anotb_length_check("sig2_symbol",empty_message="*Nothing Found.* Signature is empty."),
+        "</font></p>"
+    )
+})
+

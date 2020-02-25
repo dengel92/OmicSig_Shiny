@@ -40,7 +40,8 @@ search_ui <- tabPanel("Search",
             ),
             
             # Button to submit search terms
-            actionButton("search", "Search Signatures")
+            actionButton("search", "Search Signatures"),
+            downloadButton("search_results_table")
         ),
         
         # Add the main panel
@@ -48,5 +49,5 @@ search_ui <- tabPanel("Search",
             # If the output table is too wide, add a scrollbar
             style = "overflow-y:scroll",
             # Show table of signatures matching search terms
-            tableOutput("search_results"))
+            DT::dataTableOutput("search_results"))
     ))
