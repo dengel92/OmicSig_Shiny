@@ -10,6 +10,8 @@ library(RMySQL)
 source('upload/upload_ui.R')
 source('search/search_ui.R')
 source('compare/compare_ui.R')
+source('compare_bulk/compare_bulk_ui.R')
+
 
 # Function that appends elements to a navbar
 # Intended purpose is to add a text search input in navbar,
@@ -36,6 +38,7 @@ ui <- fluidPage(
         upload_ui,
         search_ui,
         compare_ui,
+        compare_bulk_ui,
         # second parameter in navbar appending function above
         inputs = textInput(
             inputId = "search",

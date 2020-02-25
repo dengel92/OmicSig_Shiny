@@ -46,7 +46,7 @@ in_paste <- function(mylist, list_key) {
 #   target_table: string; the table to select from
 #   wheres: named list where the names are the fields to narrow search by and the
 #       values are vectors of the values to look for in those fields
-sql_finding_query <- function(fields = c("*"), target_table, wheres = NULL) {
+sql_finding_query <- function(target_table, fields = c("*"),  wheres = NULL) {
         # Query construction
         sql <- paste("SELECT ", paste(fields, collapse = ","),
             " FROM ", target_table, sep = '')
@@ -72,7 +72,7 @@ sql_finding_query <- function(fields = c("*"), target_table, wheres = NULL) {
         # Add where clauses to query
         sql <- paste(sql, where_clauses,";", sep = " ")
         #Debugging block
-        if(TRUE){
+        if(FALSE){
           print(sql)
         }
         # Execute
