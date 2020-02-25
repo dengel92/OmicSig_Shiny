@@ -140,22 +140,31 @@ observeEvent(input$search, {
         "exp_type_id" = input$search_experiment_type,
         "signature_name" = input$search_signature_name
     )
+    # Search database for matching signatures
+    sql_obj <-
+        sql_finding_query(target_table = "platform_signature_view",
+            wheres = wheres)
+    
+    # Display table of search results
     output$search_results <- renderDataTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
-            # Search database for matching signatures
-            sql_obj <-
-                sql_finding_query(target_table = "platform_signature_view",
-                    wheres = wheres)
+            return(sql_obj)
         )
-        return((sql_obj))
     })
     
-    output$search_results_table <- downloadHandler(
-        filename = paste("ree.tsv"),
+    # Download search results
+    output$search_results_download <- downloadHandler(
+        filename = paste("SigRepo_search_results.tsv"),
         content = function(file) {
-            write.table(sql_finding_query(target_table = "platform_signature_view",
-                                          wheres = wheres), 
-                        file, row.names = F, quote=F, col.names = T, sep="\t")
-        } )
+            write.table(
+                sql_obj,
+                file,
+                row.names = FALSE,
+                quote = FALSE,
+                col.names = TRUE,
+                sep = "\t"
+            )
+        }
+    )
 })
