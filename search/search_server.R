@@ -21,96 +21,102 @@ output$search_terms <- renderText(
     )
 )
 
-# Update species dropdown with list of species from database
+# Update species dropdown
 observe({
-    updateSelectizeInput(session,
+    # Query database to find species matching selected other fields
+    sql_obj <-
+        sql_finding_query(
+            fields = "species",
+            target_table = "platform_signature_view",
+            wheres = list(
+                "platform_name" = input$search_platform_name,
+                "exp_type_id" = input$search_experiment_type,
+                "signature_name" = input$search_signature_name
+            )
+        )
+    updateSelectizeInput(
+        session,
         "search_species",
-        choices = get_species())
+        choices = c(sql_obj$species, input$search_species),
+        selected = input$search_species
+    )
 })
 
-# Update other dropdowns based on input to species
-observeEvent(input$search_species,
-    ignoreNULL = FALSE,
-    handlerExpr = {
-        # If a species is selected
-        if (!is.null(input$search_species)) {
-            # Query database to find platforms matching selected species
-            sql_obj <-
-                sql_finding_query(
-                    fields = "platform_name",
-                    target_table = "platform_signature_view",
-                    wheres = list("species" = input$search_species)
-                )
-            # Update platform dropdown
-            updateSelectizeInput(
-                session,
-                "search_platform_name",
-                choices = c(sql_obj$platform_name, input$search_platform_name),
-                selected = input$search_platform_name
-            )
-        } else {
-            # If user unselects all species, use full list of platforms again
-            updateSelectizeInput(
-                session,
-                "search_platform_name",
-                choices = get_platforms(),
-                selected = input$search_platform_name
-            )
-        }
-    })
-
-# Update platform dropdown with list of platforms from database
+# Update platform dropdown
 observe({
-    updateSelectizeInput(session,
+    # Query database to find platforms matching selected other fields
+    sql_obj <-
+        sql_finding_query(
+            fields = "platform_name",
+            target_table = "platform_signature_view",
+            wheres = list(
+                "species" = input$search_species,
+                "exp_type_id" = input$search_experiment_type,
+                "signature_name" = input$search_signature_name
+            )
+        )
+    # Update dropdown menu
+    updateSelectizeInput(
+        session,
         "search_platform_name",
-        choices = get_platforms())
+        choices = c(sql_obj$platform_name, input$search_platform_name),
+        selected = input$search_platform_name
+    )
 })
 
-# Update other dropdowns based on input to platform
-observeEvent(input$search_platform_name,
-    ignoreNULL = FALSE,
-    handlerExpr = {
-        # If a platform is selected
-        if (!is.null(input$search_platform_name)) {
-            # Query database to find species matching selected platform(s)
-            sql_obj <-
-                sql_finding_query(
-                    fields = "species",
-                    target_table = "platform_signature_view",
-                    wheres = list("platform_name" = input$search_platform_name)
-                )
-            # Update species dropdown
-            updateSelectizeInput(
-                session,
-                "search_species",
-                choices = c(sql_obj$species, input$search_species),
-                selected = input$search_species
+# Update experiment types dropdown
+observe({
+    # Query database to find experiment types matching selected other fields
+    sql_obj <-
+        sql_finding_query(
+            fields = "exp_type_id",
+            target_table = "platform_signature_view",
+            wheres = list(
+                "species" = input$search_species,
+                "platform_name" = input$search_platform_name,
+                "signature_name" = input$search_signature_name
             )
-        } else {
-            # If user unselects all platforms, use full list of species again
-            updateSelectizeInput(
-                session,
-                "search_species",
-                choices = get_species(),
-                selected = input$search_species
+        )
+    # Update dropdown menu
+    updateSelectizeInput(
+        session,
+        "search_experiment_type",
+        choices = c(sql_obj$exp_type_id, input$search_experiment_type),
+        selected = input$search_experiment_type
+    )
+})
+
+# Update signatures names dropdown
+observe({
+    # Query database to find signature names matching selected other fields
+    sql_obj <-
+        sql_finding_query(
+            fields = "signature_name",
+            target_table = "platform_signature_view",
+            wheres = list(
+                "species" = input$search_species,
+                "exp_type_id" = input$search_experiment_type,
+                "platform_name" = input$search_platform_name
             )
-        }
-    })
+        )
+    # Update dropdown menu
+    updateSelectizeInput(
+        session,
+        "search_signature_name",
+        choices = c(sql_obj$signature_name, input$search_signature_name),
+        selected = input$search_signature_name
+    )
+})
 
 # Show table of matching signatures when you hit the search button
 observeEvent(input$search, {
-    # Construct where clause for species
-    where_species = NULL
-    if (!is.null(input$search_species)) {
-        where_species = list('species' = input$search_species)
-    }
-    # Construct where clause for platforms
-    where_platform = NULL
-    if (!is.null(input$search_platform_name)) {
-        where_platform = list('platform_name' = input$search_platform_name)
-    }
-    # Combine all where clauses
-    wheres = c(where_species, where_platform)
+    # Construct where clauses for each field
+    wheres = list(
+        'species' = input$search_species,
+        'platform_name' = input$search_platform_name,
+        'exp_type_id' = input$search_experiment_type,
+        'signature_name' = input$search_signature_name
+    )
     output$search_results <- renderTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
