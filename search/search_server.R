@@ -9,13 +9,36 @@ output$search_terms <- renderText(
         if (length(input$search_species) < 1) {
             "No species selected</br>"
         } else {
-            paste(paste(input$search_species, collapse = ', '), '</br>')
+            paste("Species: ",
+                paste(input$search_species, collapse = ", "),
+                "</br>")
         },
         # Show selected platforms
         if (length(input$search_platform_name) < 1) {
-            "No platforms selected"
+            "No platforms selected</br>"
         } else {
-            paste(input$search_platform_name, collapse = ', ')
+            paste("Platform(s): ",
+                paste(input$search_platform_name, collapse = ", "),
+                "</br>")
+        },
+        # Show selected experiment types
+        if (length(input$search_experiment_type) < 1) {
+            "No experiment types selected</br>"
+        } else {
+            paste(
+                "Experiment type(s): ",
+                paste(input$search_experiment_type, collapse = ", "),
+                "</br>"
+            )
+        },
+        if (length(input$search_signature_name) < 1) {
+            "No signature names selected</br>"
+        } else {
+            paste(
+                "Signature name(s): ",
+                paste(input$search_signature_name, collapse = ", "),
+                "</br>"
+            )
         },
         "</p></font>"
     )
@@ -112,10 +135,10 @@ observe({
 observeEvent(input$search, {
     # Construct where clauses for each field
     wheres = list(
-        'species' = input$search_species,
-        'platform_name' = input$search_platform_name,
-        'exp_type_id' = input$search_experiment_type,
-        'signature_name' = input$search_signature_name
+        "species" = input$search_species,
+        "platform_name" = input$search_platform_name,
+        "exp_type_id" = input$search_experiment_type,
+        "signature_name" = input$search_signature_name
     )
     output$search_results <- renderTable({
         # Ensure that the table updates only once, immediately after clicking
