@@ -76,5 +76,18 @@ upload_ui <- tabPanel("Upload",
         ),
         
         # 
-        mainPanel("could put something here. Display preview of uploaded file?")
+        mainPanel(
+            tags$h2("Upload directly with OmicSig object file"),
+            tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv1.txt", "Example JSON File",download="level1_example.txt"),
+            fileInput(
+                inputId = "omicobj_upload",
+                label = "Object File",
+                multiple = FALSE,
+                accept = c("text/json",".json","text/txt",".txt"),
+                width = NULL,
+                buttonLabel = "Browse...",
+                placeholder = "No file selected"
+            ),
+            actionButton("upload_object", "Upload with File")
+        )
     ))
