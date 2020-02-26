@@ -18,7 +18,7 @@ search_ui <- tabPanel("Search",
             # Dropdown menu for selecting platform
             selectizeInput(
                 inputId = "search_platform_name",
-                label = "Choose platform",
+                label = "Choose platform(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -26,7 +26,7 @@ search_ui <- tabPanel("Search",
             # Dropdown menu for selecting experiment group
             selectizeInput(
                 inputId = "search_experiment_type",
-                label = "Choose experiment types",
+                label = "Choose experiment type(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -34,7 +34,7 @@ search_ui <- tabPanel("Search",
             # Dropdown menu for selecting signature name
             selectizeInput(
                 inputId = "search_signature_name",
-                label = "Choose signature names",
+                label = "Choose signature name(s)",
                 choices = NULL,
                 multiple = TRUE
             ),

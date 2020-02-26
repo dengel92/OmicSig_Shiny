@@ -153,6 +153,7 @@ observeEvent(input$search, {
         isolate(
             search_table <- sql_obj
         )
+        # Make signature name a link to the corresponding signature directory
         search_table$signature_name <- create_link(search_table$signature_name)
         return(search_table)
     }, escape = FALSE)
