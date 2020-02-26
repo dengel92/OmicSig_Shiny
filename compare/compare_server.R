@@ -25,12 +25,12 @@ observe({
 
 # function used to check if any input signatures / outputs is empty
 # only applicable for this tab
-anotb_length_check <- function(c_vector_name, empty_message="*Nothing found*"){
-    result_list = empty_message
-    if (length(compare_result_variable()[[c_vector_name]]) > 0) {
-        result_list = paste(compare_result_variable()[[c_vector_name]],sep=", ")
-    }
-    return(result_list)
+anotb_length_check <- function(c_vector_name, empty_message = "*Nothing found*") {
+  result_list <- empty_message
+  if (length(compare_result_variable()[[c_vector_name]]) > 0) {
+    result_list <- paste(compare_result_variable()[[c_vector_name]], sep = ", ")
+  }
+  return(result_list)
 }
 
 
@@ -88,10 +88,14 @@ output$compare_result <- renderText({
     "</h5><br/><br/>",
     "<p> Please see the Venn diagram below for a better visualization! </p><br/>",
     "<h4>Hyper Geometric test: Parameters and P-value</h4>",
-    "Background: ",input$compare_background_number," features",
+    "Background: ", input$compare_background_number, " features",
     "<br>P-value: <b>",
     compare_result_variable()$hyper_p.value,
     "</b>.<br/>",
+    "<h4>Wilcox rank test for signature with score, if applicable:</h4>",
+    "P-value: <b>",
+    compare_result_variable()$rank_p.value,
+    "</b>.<br><br>.",
     "<p id='ty_bb'><b><i> Thank you for using! </font></b></i></p>",
     "</font>"
   )
@@ -105,12 +109,12 @@ output$compare_show_signatures <- renderText({
     "<p><i>All features in",
     compare_result_variable()$sig1_name,
     ":</i> <br><font color=\"#228822\">",
-    anotb_length_check("sig1_symbol",empty_message="*Nothing Found.* Signature is empty."),
+    anotb_length_check("sig1_symbol", empty_message = "*Nothing Found.* Signature is empty."),
     "</font></p>",
     "<p><i>All features in",
     compare_result_variable()$sig2_name,
     ":</i> <br><font color=\"#881199\">",
-    anotb_length_check("sig2_symbol",empty_message="*Nothing Found.* Signature is empty."),
+    anotb_length_check("sig2_symbol", empty_message = "*Nothing Found.* Signature is empty."),
     "</font></p>"
   )
 })
@@ -119,17 +123,16 @@ output$compare_show_signatures <- renderText({
 
 # print the actual features in the two signatures for reference:
 output$compare_show_signatures <- renderText({
-    c(
-        "<p><i>All features in",
-        compare_result_variable()$sig1_name,
-        ":</i> <br><font color=\"#228822\">",
-        anotb_length_check("sig1_symbol",empty_message="*Nothing Found.* Signature is empty."),
-        "</font></p>",
-        "<p><i>All features in",
-        compare_result_variable()$sig2_name,
-        ":</i> <br><font color=\"#881199\">",
-        anotb_length_check("sig2_symbol",empty_message="*Nothing Found.* Signature is empty."),
-        "</font></p>"
-    )
+  c(
+    "<p><i>All features in",
+    compare_result_variable()$sig1_name,
+    ":</i> <br><font color=\"#228822\">",
+    anotb_length_check("sig1_symbol", empty_message = "*Nothing Found.* Signature is empty."),
+    "</font></p>",
+    "<p><i>All features in",
+    compare_result_variable()$sig2_name,
+    ":</i> <br><font color=\"#881199\">",
+    anotb_length_check("sig2_symbol", empty_message = "*Nothing Found.* Signature is empty."),
+    "</font></p>"
+  )
 })
-
