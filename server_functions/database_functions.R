@@ -7,6 +7,17 @@ single_quoted <- function(my_string) {
     return(paste0("'", my_string, "'"))
 }
 
+# Create a link to a signature file based on the signature name
+# Currently actually just does a Google image search for pandas...
+create_link <-
+    function(signature_name) {
+        paste0('<a href="https://www.google.com/search?q=pandas&rlz=',
+        '1C1CHBF_enUS807US807&sxsrf=ALeKk01pqP3J6pN-SRsmXkw_zBWDMpke_g:',
+        '1582736800703&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjU_pyG2u_',
+        'nAhUvgnIEHU34AfMQ_AUoAXoECBEQAw&biw=1280&bih=610"',
+        'target="_blank">', signature_name, '</a>')
+    }
+
 # Create a connection to the database
 new_conn_handle <- function() {
     dbConnect(
@@ -54,14 +65,20 @@ in_paste <- function(mylist, list_key) {
 #   target_table: string; the table to select from
 #   wheres: named list where the names are the fields to narrow search by and the
 #       values are vectors of the values to look for in those fields
-sql_finding_query <- function(target_table, fields = c("*"),  wheres = NULL) {
+sql_finding_query <-
+    function(target_table,
+        fields = c("*"),
+        wheres = NULL) {
         # Query construction
-        sql <- paste("SELECT ", paste(fields, collapse = ","),
-            " FROM ", target_table, sep = '')
-        # There's a very subtle but important point to be made when dealing with 
+        sql <- paste("SELECT ",
+            paste(fields, collapse = ","),
+            " FROM ",
+            target_table,
+            sep = '')
+        # There's a very subtle but important point to be made when dealing with
         # multiple possible values you want to query the DB with.
-        # Here, I could pass a vector of values, but the query constructed would 
-        # asking for everything in one go. 
+        # Here, I could pass a vector of values, but the query constructed would
+        # asking for everything in one go.
         # If you lapply instead, using the list of where values, you'll get
         # separate queries/executions.
         # lapply approach is advised if you're doing granular checking of values
@@ -77,13 +94,14 @@ sql_finding_query <- function(target_table, fields = c("*"),  wheres = NULL) {
             ins <- lapply(names(wheres), in_paste, mylist = wheres)
             # Add "WHERE" to the beginning of the where clauses and separate
             #   each "<field> IN (<field_values>)" clause by " AND "
-            where_clauses <- paste("WHERE", paste(ins, collapse = " AND "))
+            where_clauses <-
+                paste("WHERE", paste(ins, collapse = " AND "))
         }
         # Add where clauses to query
-        sql <- paste(sql, where_clauses,";", sep = " ")
+        sql <- paste(sql, where_clauses, ";", sep = " ")
         #Debugging block
-        if(FALSE){
-          print(sql)
+        if (FALSE) {
+            print(sql)
         }
         # Execute
         return(sql_generic(sql))
@@ -102,14 +120,14 @@ get_species <- reactive ({
 
 # Get choices for signature names
 get_signature_names <- reactive ({
-  # Query database
-  signature_name_obj <- sql_generic("
+    # Query database
+    signature_name_obj <- sql_generic("
         select
             signature_name
         from signatures;
         ")
-  # Return results of query
-  return(signature_name_obj$signature_name)
+    # Return results of query
+    return(signature_name_obj$signature_name)
 })
 
 

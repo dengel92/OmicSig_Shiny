@@ -151,9 +151,11 @@ observeEvent(input$search, {
     output$search_results <- renderDataTable({
         # Ensure that the table updates only once, immediately after clicking
         isolate(
-            return(sql_obj)
+            search_table <- sql_obj
         )
-    })
+        search_table$signature_name <- create_link(search_table$signature_name)
+        return(search_table)
+    }, escape = FALSE)
     
     # Download button for search results
     output$search_results_download <- downloadHandler(
