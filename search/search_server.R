@@ -45,18 +45,22 @@ output$search_terms <- renderText(
     )
 )
 
-# Update species dropdown
 observe({
+    # Construct list of all possible where clauses for query
+    wheres <- list(
+        "species" = input$search_species,
+        "platform_name" = input$search_platform_name,
+        "exp_type_id" = input$search_experiment_type,
+        "signature_name" = input$search_signature_name
+    )
+    
+    # Update species
     # Query database to find species matching selected other fields
     sql_obj <-
         sql_finding_query(
             fields = "species",
             target_table = "platform_signature_view",
-            wheres = list(
-                "platform_name" = input$search_platform_name,
-                "exp_type_id" = input$search_experiment_type,
-                "signature_name" = input$search_signature_name
-            )
+            wheres = wheres[wheres != "species"]
         )
     # Update dropdown menu
     updateSelectizeInput(
@@ -65,42 +69,30 @@ observe({
         choices = c(sql_obj$species, input$search_species),
         selected = input$search_species
     )
-})
-
-# Update platform dropdown
-observe({
+    
+    # Update platforms
     # Query database to find platforms matching selected other fields
-    sql_obj <-
+    platform_obj <-
         sql_finding_query(
             fields = "platform_name",
             target_table = "platform_signature_view",
-            wheres = list(
-                "species" = input$search_species,
-                "exp_type_id" = input$search_experiment_type,
-                "signature_name" = input$search_signature_name
-            )
+            wheres = wheres[wheres != "platform_name"]
         )
     # Update dropdown menu
     updateSelectizeInput(
         session,
         "search_platform_name",
-        choices = c(sql_obj$platform_name, input$search_platform_name),
+        choices = c(platform_obj$platform_name, input$search_platform_name),
         selected = input$search_platform_name
     )
-})
-
-# Update experiment types dropdown
-observe({
+    
+    # Update experiment types
     # Query database to find experiment types matching selected other fields
     sql_obj <-
         sql_finding_query(
             fields = "exp_type_id",
             target_table = "platform_signature_view",
-            wheres = list(
-                "species" = input$search_species,
-                "platform_name" = input$search_platform_name,
-                "signature_name" = input$search_signature_name
-            )
+            wheres = wheres[wheres != "exp_type_id"]
         )
     # Update dropdown menu
     updateSelectizeInput(
@@ -109,20 +101,14 @@ observe({
         choices = c(sql_obj$exp_type_id, input$search_experiment_type),
         selected = input$search_experiment_type
     )
-})
-
-# Update signatures names dropdown
-observe({
+    
+    # Update signatures names
     # Query database to find signature names matching selected other fields
     sql_obj <-
         sql_finding_query(
             fields = "signature_name",
             target_table = "platform_signature_view",
-            wheres = list(
-                "species" = input$search_species,
-                "exp_type_id" = input$search_experiment_type,
-                "platform_name" = input$search_platform_name
-            )
+            wheres = wheres[wheres != "signature_name"]
         )
     # Update dropdown menu
     updateSelectizeInput(
@@ -135,8 +121,7 @@ observe({
 
 # Display output and download button after clicking search button
 observeEvent(input$search, {
-    # Construct where clauses for each field
-    wheres = list(
+    wheres <- list(
         "species" = input$search_species,
         "platform_name" = input$search_platform_name,
         "exp_type_id" = input$search_experiment_type,
