@@ -95,4 +95,4 @@ sigCompare_two <- function(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", i
 # test the function:
 # sig1 <- read.table("server_functions/example_sigCompare_1.txt", header = T)
 # sig2 <- read.table("server_functions/example_sigCompare_2.txt", header = T)
-sigCompare_two(sig1, sig2, is.lv2 = T)
+# sigCompare_two(sig1, sig2, is.lv2 = T)

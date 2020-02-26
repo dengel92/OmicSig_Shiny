@@ -95,7 +95,7 @@ output$compare_result <- renderText({
     "<h4>Wilcox rank test for signature with score, if applicable:</h4>",
     "P-value: <b>",
     compare_result_variable()$rank_p.value,
-    "</b>.<br><br>.",
+    "</b>.<br><br>",
     "<p id='ty_bb'><b><i> Thank you for using! </font></b></i></p>",
     "</font>"
   )
