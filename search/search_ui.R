@@ -23,10 +23,26 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE
             ),
             
-            # Dropdown menu for selecting experiment group
+            # Dropdown menu for selecting experiment type
             selectizeInput(
                 inputId = "search_exp_type_id",
                 label = "Choose experiment type(s)",
+                choices = NULL,
+                multiple = TRUE
+            ),
+            
+            # Dropdown menu for selecting cell line
+            selectizeInput(
+                inputId = "search_cell_line",
+                label = "Choose cell line(s)",
+                choices = NULL,
+                multiple = TRUE
+            ),
+            
+            # Dropdown menu for selecting perturbagen
+            selectizeInput(
+                inputId = "search_perturbagen_id",
+                label = "Choose perturbagen(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -37,6 +53,22 @@ search_ui <- tabPanel("Search",
                 label = "Choose signature name(s)",
                 choices = NULL,
                 multiple = TRUE
+            ),
+            
+            # Checkbox to toggle additional search options
+            checkboxInput("more_filters", "Display additional filters"),
+            
+            # Additional search options that appear only when "more_filters"
+            #   is checked
+            conditionalPanel(
+                condition = "input.more_filters >= 1",
+                # Dropdown menu for selecting submitter name
+                selectizeInput(
+                    inputId = "search_submitter_id",
+                    label = "Choose submitter name(s)",
+                    choices = NULL,
+                    multiple = TRUE
+                )
             ),
             
             # Button to submit search terms
@@ -51,5 +83,6 @@ search_ui <- tabPanel("Search",
                 style = "overflow-y: scroll"),
             # Download button will appear only after clicking search button
             conditionalPanel(condition = "input.search >= 1",
-                downloadButton("search_results_download")))
+                downloadButton("search_results_download"))
+        )
     ))
