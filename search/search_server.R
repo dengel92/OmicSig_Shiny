@@ -12,9 +12,9 @@ selected_html <- function(search_id, display_name) {
     } else {
         # Display "<display_name>: <value1>, <value2>, ..." otherwise
         paste0(display_name,
-            ": ",
+            ": <b>",
             paste(input[[search_id]], collapse = ", "),
-            "</br>")
+            "</b></br>")
     }
 }
 
