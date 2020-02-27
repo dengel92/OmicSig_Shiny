@@ -11,11 +11,14 @@ single_quoted <- function(my_string) {
 # Currently actually just does a Google image search for pandas...
 create_link <-
     function(signature_name) {
-        paste0('<a href="https://www.google.com/search?q=pandas&rlz=',
-        '1C1CHBF_enUS807US807&sxsrf=ALeKk01pqP3J6pN-SRsmXkw_zBWDMpke_g:',
-        '1582736800703&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjU_pyG2u_',
-        'nAhUvgnIEHU34AfMQ_AUoAXoECBEQAw&biw=1280&bih=610"',
-        'target="_blank">', signature_name, '</a>')
+        paste0(
+            '<a href="http://sigrepo.bu.edu:3838/signatures/',
+            signature_name,
+            '"',
+            'target="_blank">',
+            signature_name,
+            '</a>'
+        )
     }
 
 # Create a connection to the database
