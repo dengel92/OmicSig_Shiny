@@ -1,6 +1,10 @@
 # Server logic for upload page
 
 upload_root_path <- "/srv/shiny-server/signatures/"
+source('Omic.obj/check_functions/Function_json.R')
+source('Omic.obj/check_functions/Function_objCheck.R')
+source('Omic.obj/check_functions/Function_write_sig.R')
+source('Omic.obj/OmicObj.R')
 
 # QC of rds file to ensure it's not corrupted and in the right format(later)
 checkRDS <- function(rds_file,input_name){
@@ -212,7 +216,7 @@ observeEvent(input$upload_object, {
     signature_name = (input$signature_object_name)
     write_signature_file(input$omicobj_upload, input$omicobj_upload$file$name)
     if( length(signature_object[['difexp']]) > 0){
-        write.table(signature_object[['difexp']], paste(upload_root_path, sig_name, "level_1", input$omicobj_upload$name, sep="/"))
+        write.table(signature_object[['difexp']], paste(upload_root_path, signature_name, "level_1", input$omicobj_upload$name, sep="/"))
     }
     fdr_cutoff = 0.05
     logfc_cutoff = 1
