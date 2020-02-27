@@ -78,7 +78,7 @@ upload_ui <- tabPanel("Upload",
         # 
         mainPanel(
             tags$h2("Upload directly with OmicSig object file"),
-            tags$a(href = "http://sigrepo.bu.edu:3838/example_files/example_lv1.txt", "Example JSON File",download="level1_example.txt"),
+            tags$a(href = "http://sigrepo.bu.edu:3838/example_files/Sum149_AhR_obj.json", "Example JSON File",download="level1_example.txt"),
             fileInput(
                 inputId = "omicobj_upload",
                 label = "Object File",
