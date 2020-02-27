@@ -55,7 +55,7 @@ update_dropdown = function(field, wheres) {
     sql_obj <-
         sql_finding_query(fields = field,
             target_table = "platform_signature_view",
-            wheres = wheres[wheres != field])
+            wheres = wheres[names(wheres) != field])
     # Determine the ID for the dropdown menu that should be updated
     search_id <- paste0("search_", field)
     # Update dropdown menu
