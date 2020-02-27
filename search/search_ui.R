@@ -25,7 +25,7 @@ search_ui <- tabPanel("Search",
             
             # Dropdown menu for selecting experiment group
             selectizeInput(
-                inputId = "search_experiment_type",
+                inputId = "search_exp_type_id",
                 label = "Choose experiment type(s)",
                 choices = NULL,
                 multiple = TRUE

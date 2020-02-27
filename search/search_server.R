@@ -45,6 +45,28 @@ output$search_terms <- renderText(
     )
 )
 
+# General function for updating a dropdown menu
+# Input:
+#   field: the name of the search field whose dropdown menu should be updated
+#   wheres: list of all of the possible where clauses for sql_finding_query()
+update_dropdown = function(field, wheres) {
+    # Query the database to find values of field that match selected values of
+    #   other fields
+    sql_obj <-
+        sql_finding_query(fields = field,
+            target_table = "platform_signature_view",
+            wheres = wheres[wheres != field])
+    # Determine the ID for the dropdown menu that should be updated
+    search_id <- paste0("search_", field)
+    # Update dropdown menu
+    updateSelectizeInput(
+        session,
+        search_id,
+        choices = c(sql_obj[[field]], input[[search_id]]),
+        selected = input[[search_id]]
+    )
+}
+
 observe({
     # Construct list of all possible where clauses for query
     wheres <- list(
@@ -55,106 +77,47 @@ observe({
     )
     
     # Update species
-    # Query database to find species matching selected other fields
-    sql_obj <-
-        sql_finding_query(
-            fields = "species",
-            target_table = "platform_signature_view",
-            wheres = wheres[wheres != "species"]
-        )
-    # Update dropdown menu
-    updateSelectizeInput(
-        session,
-        "search_species",
-        choices = c(sql_obj$species, input$search_species),
-        selected = input$search_species
-    )
+    update_dropdown("species", wheres)
     
     # Update platforms
-    # Query database to find platforms matching selected other fields
-    platform_obj <-
-        sql_finding_query(
-            fields = "platform_name",
-            target_table = "platform_signature_view",
-            wheres = wheres[wheres != "platform_name"]
-        )
-    # Update dropdown menu
-    updateSelectizeInput(
-        session,
-        "search_platform_name",
-        choices = c(platform_obj$platform_name, input$search_platform_name),
-        selected = input$search_platform_name
-    )
+    update_dropdown("platform_name", wheres)
     
     # Update experiment types
-    # Query database to find experiment types matching selected other fields
-    sql_obj <-
-        sql_finding_query(
-            fields = "exp_type_id",
-            target_table = "platform_signature_view",
-            wheres = wheres[wheres != "exp_type_id"]
-        )
-    # Update dropdown menu
-    updateSelectizeInput(
-        session,
-        "search_experiment_type",
-        choices = c(sql_obj$exp_type_id, input$search_experiment_type),
-        selected = input$search_experiment_type
-    )
+    update_dropdown("exp_type_id", wheres)
     
     # Update signatures names
-    # Query database to find signature names matching selected other fields
-    sql_obj <-
-        sql_finding_query(
-            fields = "signature_name",
-            target_table = "platform_signature_view",
-            wheres = wheres[wheres != "signature_name"]
-        )
-    # Update dropdown menu
-    updateSelectizeInput(
-        session,
-        "search_signature_name",
-        choices = c(sql_obj$signature_name, input$search_signature_name),
-        selected = input$search_signature_name
-    )
-})
-
-# Display output and download button after clicking search button
-observeEvent(input$search, {
-    wheres <- list(
-        "species" = input$search_species,
-        "platform_name" = input$search_platform_name,
-        "exp_type_id" = input$search_experiment_type,
-        "signature_name" = input$search_signature_name
-    )
-    # Search database for matching signatures
-    sql_obj <-
-        sql_finding_query(target_table = "platform_signature_view",
-            wheres = wheres)
+    update_dropdown("signature_name", wheres)
     
-    # Display table of search results
-    output$search_results <- renderDataTable({
-        # Ensure that the table updates only once, immediately after clicking
-        isolate(
-            search_table <- sql_obj
+    # Display output and download button after clicking search button
+    observeEvent(input$search, {
+        # Search database for matching signatures
+        sql_obj <-
+            sql_finding_query(target_table = "platform_signature_view",
+                wheres = wheres)
+        
+        # Display table of search results
+        output$search_results <- renderDataTable({
+            # Ensure that the table updates only once, immediately after clicking
+            isolate(search_table <- sql_obj)
+            # Make signature name a link to the corresponding signature directory
+            search_table$signature_name <-
+                create_link(search_table$signature_name)
+            return(search_table)
+        }, escape = FALSE)
+        
+        # Download button for search results
+        output$search_results_download <- downloadHandler(
+            filename = paste("SigRepo_search_results.tsv"),
+            content = function(file) {
+                write.table(
+                    sql_obj,
+                    file,
+                    row.names = FALSE,
+                    quote = FALSE,
+                    col.names = TRUE,
+                    sep = "\t"
+                )
+            }
         )
-        # Make signature name a link to the corresponding signature directory
-        search_table$signature_name <- create_link(search_table$signature_name)
-        return(search_table)
-    }, escape = FALSE)
-    
-    # Download button for search results
-    output$search_results_download <- downloadHandler(
-        filename = paste("SigRepo_search_results.tsv"),
-        content = function(file) {
-            write.table(
-                sql_obj,
-                file,
-                row.names = FALSE,
-                quote = FALSE,
-                col.names = TRUE,
-                sep = "\t"
-            )
-        }
-    )
+    })
 })
