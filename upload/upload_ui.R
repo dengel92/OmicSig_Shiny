@@ -88,6 +88,11 @@ upload_ui <- tabPanel("Upload",
                 buttonLabel = "Browse...",
                 placeholder = "No file selected"
             ),
+            textInput(
+                inputId = "signature_object_name",
+                label = "Signature Name",
+                placeholder = NULL
+            ),
             actionButton("upload_object", "Upload with File")
         )
     ))

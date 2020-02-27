@@ -16,13 +16,24 @@ checkRDS <- function(rds_file,input_name){
     })
 }
 
-#input : file input object, target directory
+#input : file input object, target directory 
 #output : copied file
 copy_file <- function(input_file, destination){
     #check if input is empty or not. if empty, do nothing.
     if(input_file!=""){
         file.copy(input_file,destination)
     }
+}
+
+write_signature_file <- function(file_object, sig_name){
+    sub_dirs = c("level_1","level_2","level_3")
+    sig_dir = paste( upload_root_path, sig_name, sep="")
+    print(sig_dir)
+    if(!dir.exists(sig_dir)){
+        dir.create(sig_dir)
+        lapply(paste(sig_dir,sub_dirs,sep="/"), dir.create)
+    }
+    copy_file(file_object[['datapath']], sig_dir)
 }
 
 # Update options in species dropdown menu with list of species from database
@@ -41,52 +52,63 @@ observe({
 
 
 
-
-
 #function will insert lvl2/3 data into DB
 #inputs: file path to lvl2/3 data file, signature id
 add_lv2 <- function(lv2_file, sid, sig_name){
-  #reading file into a table
-  lv2_table = read.table(lv2_file, header=T)
-  #converting direction to + or -
-  lv2_table$direction = as.character(lv2_table$direction)
-  lv2_table$direction[which(tolower(lv2_table$direction)=="up")]="+"
-  lv2_table$direction[which(tolower(lv2_table$direction)=="dn")]="-"
-  #fetching feature ids corresponding to symbols
-  lv2_feature_ids = (lapply(as.character(lv2_table$symbol), 
-         sql_finding_query,
-         fields="feature_id", 
-         target_table="features", 
-         field_where="feature_name"))
-  fids = bind_rows(lv2_feature_ids)$feature_id
-  #all coming from same signature, hence 'rep'
-  sid_col = rep(sid, length(fids))
-  
-  if(TRUE){
-    print(lv2_feature_ids)
-    print(fids)
-    print(lv2_table$score)
-    print(lv2_table$direction)
-    print(length(fids))
-    print(length(sid_col))
-    print(length(lv2_table$score))
-    print(length(lv2_table$direction))
-  }
-  
-  #dataframe for inserting into db
-  lv2_insert.df = data.frame(
-    signature_id = sid_col,
-    feature_id = fids,
-    weight = lv2_table$score,
-    direction = single_quoted(lv2_table$direction)
-  )
-  #making insert query for all records at once. if transaction fails, 
-  #sql will rollback, which is what we want.
-  insert_records = paste("(",lv2_insert.df$signature_id, ",", lv2_insert.df$feature_id, ",", lv2_insert.df$weight, ",", lv2_insert.df$direction,")",sep="",collapse=",")
-  insert_lv2_query = paste("INSERT INTO feature_signature(signature_id,feature_id,weight,direction) VALUES ",insert_records,sep="")
-  #executes insert
-  sql_generic(insert_lv2_query)
-  write.csv(lv2_table, paste(upload_root_path,"level_2/",sig_name,".csv",sep=""))
+    #reading file into a table
+    #also accounts for uploading from an omicsig object
+    #that object would contain a dataframe(list) representation
+    #of lv2
+    if( typeof(lv2_file) == "list" ){
+        lv2_table = lv2_file
+    }
+    else {
+        lv2_table = read.table(lv2_file, header=T)
+    }
+    if(FALSE){
+        print(lv2_table$signature_symbol)
+    }
+    #converting direction to + or -
+    lv2_table$direction = as.character(lv2_table$signature_direction)
+    lv2_table$direction[which(tolower(lv2_table$direction)=="up")]="+"
+    lv2_table$direction[which(tolower(lv2_table$direction)=="dn")]="-"
+    #fetching feature ids corresponding to symbols
+    lv2_feature_ids = sql_finding_query("features", c("feature_name","feature_id"), wheres=list("feature_name" = c(lv2_table$signature_symbol)))
+    fids = bind_rows(lv2_feature_ids)$feature_id
+    fnames = bind_rows(lv2_feature_ids)$feature_name
+    #all coming from same signature, hence 'rep'
+    sid_col = rep(sid, length(fids))
+    
+    if(FALSE){
+        print(lv2_feature_ids)
+        print(fids)
+        print(lv2_table$score)
+        print(lv2_table$direction)
+        print(length(fids))
+        print(length(sid_col))
+        print(length(lv2_table$signature_score))
+        print(length(lv2_table$direction))
+    }
+    
+    # newtable = subset(lv2_table, lv2_table$signature_symbol %in% fnames)
+    #dataframe for inserting into db
+    lv2_insert.df = merge(lv2_table, lv2_feature_ids, by.x="signature_symbol", by.y="feature_name")
+    #making insert query for all records at once. if transaction fails, 
+    #sql will rollback, which is what we want.
+    insert_records = paste(
+        "(",
+        sid_col, ",", 
+        lv2_insert.df$feature_id, ",", 
+        lv2_insert.df$signature_score, ",", 
+        single_quoted(lv2_insert.df$direction),")",sep="",collapse=","
+    )
+    insert_lv2_query = paste(
+        "INSERT INTO feature_signature(signature_id,feature_id,weight,direction) VALUES ",
+        insert_records,
+        sep="")
+    #executes insert
+    sql_generic(insert_lv2_query)
+    write.csv(lv2_table, paste(upload_root_path,sig_name,"/level_2/",sig_name,".csv",sep=""))
 }
 
 
@@ -134,36 +156,45 @@ add_signature_keywords <- function(keyword_v, sid){
   sql_generic(keyword_signature_insert_query)
 }
 
+add_signature <- function(sig_name, species_name, platform_name, cell_line) {
+    now = Sys.time()
+    signature_name = single_quoted(sig_name)
+    my_species = (species_name)
+    species_id_insert = sql_finding_query("species", c("species_id"), wheres=list("species"=my_species))$species_id[1]
+    platform_id = as.integer(sql_finding_query("assay_platforms", c("platform_id"), wheres=list("platform_name"=platform_name))$platform_id[1])
+    cell_line = cell_line
+    insert_query = paste("insert into signatures(
+                         signature_name,
+                         upload_date,
+                         species_id,
+                         cell_line,
+                         platform_id) values(", paste(signature_name,"now()",species_id_insert,cell_line,platform_id,sep=","),");")
+    if(FALSE){
+        print(insert_query)
+    }
+    insert_signature_conn = new_conn_handle()
+    dbSendQuery(insert_signature_conn, insert_query)
+    dbDisconnect(insert_signature_conn)
+    }
 
 #When you click the 'submit' button...
 observeEvent(input$add_signature, {
     #where will these rds files live?
     #can expand on this function as we become more confident in
     #backend(DB) setup(i.e. hierarchical file system)
-    rds_dir<-"/data_files/rds/"
-    #alerting user about where the file's going.
-    #shinyalert(paste("writing file to ",rds_dir,input$rds_file_1$name,sep=''))
-    #copy_file(input$rds_file_1$datapath,paste(rds_dir,input$rds_file_1$name,sep=''))
-    #need to add a 'hashkey' ability. That is, instead of just copying the file as '/path/to/<filename>', we would either
-    # 1) write as '/path/to/<random hash name of file>' and reflect in DB
-    # 2) write the file with the original name, but have soft links named <hash name> that point to the original file, with the hash key
-    #     also reflected in the DB
-    #also need to add alerts confirming to the user that the operation is/was successful
-    now = Sys.time()
-    signature_name = single_quoted(input$signature_name)
-    my_species = single_quoted(input$species_id)
-    species_tax_id = as.integer(sql_generic(paste("select taxonomic_id from species where species=",(my_species),";",sep=""))$taxonomic_id[1])
-    species_id_insert = sql_finding_query(c("species_id"),"species","taxonomic_id",species_tax_id)$species_id[1]
-    platform_id = as.integer(sql_finding_query(c("platform_id"),"assay_platforms","platform_name",input$platform_name)$platform_id[1])
-    cell_line = input$cell_line
-    insert_query = paste("insert into signatures(
-                              signature_name,
-                              upload_date,
-                              species_id,
-                              platform_id) values(", paste(signature_name,"now()",species_id_insert,platform_id,sep=","),");")
-    insert_signature_conn = new_conn_handle()
-    dbSendQuery(insert_signature_conn, insert_query)
-    dbDisconnect(insert_signature_conn)
+    write_signature_file(input$rds_file_1,input$signature_name)
+    
+    observe(
+        tryCatch(
+            add_signature(input$signature_name, 
+                          input$species_id, 
+                          input$platform_name, 
+                          single_quoted(input$cell_line)),
+            error = function(e){
+                shinyalert("Hm something went wrong while uploading this signature...")
+            }
+        )
+    )
     #since signature is inserted now, we can get its signature id
     #and feed it into the lvl2/3 upload function
     last_sid = as.integer(sql_generic(paste("select signature_id from signatures where signature_name=",(signature_name),";",sep=""))$signature_id[1])
@@ -172,3 +203,46 @@ observeEvent(input$add_signature, {
       add_signature_keywords(input$keywords,last_sid, signature_name)
     }
 })
+
+
+#When you click the 'submit' button...
+#Yeah I click the 'submit' button
+observeEvent(input$upload_object, {
+    signature_object = read_json(input$omicobj_upload$datapath)
+    signature_name = (input$signature_object_name)
+    write_signature_file(input$omicobj_upload, input$omicobj_upload$file$name)
+    if( length(signature_object[['difexp']]) > 0){
+        write.table(signature_object[['difexp']], paste(upload_root_path, sig_name, "level_1", input$omicobj_upload$name, sep="/"))
+    }
+    fdr_cutoff = 0.05
+    logfc_cutoff = 1
+    if(signature_object$metadata$fdr_cutoff!=""){
+        fdr_cutoff = signature_object$metadata$fdr_cutoff 
+    }
+    signature_object$extract.signature(paste("abs(logFC) > ",logfc_cutoff, "; fdr < ", fdr_cutoff,sep=""))
+    sig_meta = signature_object$metadata
+    observe(
+        tryCatch(
+            {
+                add_signature(input$signature_object_name, 
+                          sig_meta$organism, 
+                          sig_meta$platform, 
+                          single_quoted(sig_meta$cell_lines))
+                print("cool")
+                #since signature is inserted now, we can get its signature id
+                #and feed it into the lvl2/3 upload function
+                last_sid = as.integer(sql_finding_query("signatures",c("signature_id"),wheres=list("signature_name"=input$signature_object_name))$signature_id[1])
+                add_lv2(signature_object$signatures,last_sid, signature_name)
+                # if(length(signature_object$metadata$keywords)!=0){
+                #     add_signature_keywords(signature_object$metadata$keywords, last_sid, signature_name)
+                # }
+                shinyalert("Insert Successful")
+            },
+            error = function(e){
+                shinyalert("Hm something went wrong while uploading this signature to the DB...")
+                print(e)
+            }
+        )
+    )
+})
+
