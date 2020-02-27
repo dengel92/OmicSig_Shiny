@@ -34,7 +34,7 @@ output$search_terms <- renderText(
         # Show selected perturbagens
         selected_html("search_perturbagen_id", "perturbagens"),
         # Show selected signature names
-        selected_html("search_signature_names", "signatures"),
+        selected_html("search_signature_name", "signatures"),
         # Show selected submitters
         selected_html("search_submitter_id", "submitters"),
         "</p></font>"
