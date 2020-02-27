@@ -216,7 +216,7 @@ observeEvent(input$upload_object, {
     signature_name = (input$signature_object_name)
     write_signature_file(input$omicobj_upload, input$omicobj_upload$file$name)
     if( length(signature_object[['difexp']]) > 0){
-        write.table(signature_object[['difexp']], paste(upload_root_path, sig_name, "level_1", input$omicobj_upload$name, sep="/"))
+        write.table(signature_object[['difexp']], paste(upload_root_path, signature_name, "level_1", input$omicobj_upload$name, sep="/"))
     }
     fdr_cutoff = 0.05
     logfc_cutoff = 1

@@ -1,5 +1,5 @@
 {
-  "organism": "human",
+  "organism": "Homo sapiens",
   "tissue": "cell",
   "cell_lines": "Sum149",
   "phenotype": "CYP1B1_KO",
