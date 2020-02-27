@@ -1,6 +1,10 @@
 # Server logic for upload page
 
 upload_root_path <- "/srv/shiny-server/signatures/"
+source('Omic.obj/check_functions/Function_json.R')
+source('Omic.obj/check_functions/Function_objCheck.R')
+source('Omic.obj/check_functions/Function_write_sig.R')
+source('Omic.obj/OmicObj.R')
 
 # QC of rds file to ensure it's not corrupted and in the right format(later)
 checkRDS <- function(rds_file,input_name){
