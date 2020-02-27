@@ -18,7 +18,7 @@ search_ui <- tabPanel("Search",
             # Dropdown menu for selecting platform
             selectizeInput(
                 inputId = "search_platform_name",
-                label = "Choose platform",
+                label = "Choose platform(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -26,7 +26,7 @@ search_ui <- tabPanel("Search",
             # Dropdown menu for selecting experiment group
             selectizeInput(
                 inputId = "search_experiment_type",
-                label = "Choose experiment types",
+                label = "Choose experiment type(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -34,20 +34,22 @@ search_ui <- tabPanel("Search",
             # Dropdown menu for selecting signature name
             selectizeInput(
                 inputId = "search_signature_name",
-                label = "Choose signature names",
+                label = "Choose signature name(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
             
             # Button to submit search terms
-            actionButton("search", "Search Signatures"),
-            downloadButton("search_results_table")
+            actionButton("search", "Search Signatures")
         ),
         
         # Add the main panel
         mainPanel(
-            # If the output table is too wide, add a scrollbar
-            style = "overflow-y:scroll",
             # Show table of signatures matching search terms
-            DT::dataTableOutput("search_results"))
+            div(DT::dataTableOutput("search_results"),
+                # If the output table is too wide, add a scrollbar
+                style = "overflow-y: scroll"),
+            # Download button will appear only after clicking search button
+            conditionalPanel(condition = "input.search >= 1",
+                downloadButton("search_results_download")))
     ))
