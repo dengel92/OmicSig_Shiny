@@ -13,7 +13,7 @@ check_difexp(Omic.obj.new)
 # view signatures:
 Omic.obj.new$signatures
 # use new criteria to extract signatures:
-Omic.obj.new$extract.signature("logFC < -1; fdr < 0.05")
+Omic.obj.new$extract.signature("fdr < 0.05")
 
 # write files:
 write_obj(Omic.obj.new,"Omic.obj/example_Omic.obj.json")

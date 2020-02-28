@@ -224,6 +224,12 @@ observeEvent(input$upload_object, {
         fdr_cutoff = signature_object$metadata$fdr_cutoff 
     }
     signature_object$extract.signature(paste("abs(logFC) > ",logfc_cutoff, "; fdr < ", fdr_cutoff,sep=""))
+    # seems the signature is not saved. 
+    # probably should be:
+    # if(is.null(signature_object$signatures)){
+    # signature_object$signatures <- ...
+    # }
+    # then use add_lv2 function to add the signature. 
     sig_meta = signature_object$metadata
     observe(
         tryCatch(

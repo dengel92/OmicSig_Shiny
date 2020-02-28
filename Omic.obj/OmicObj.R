@@ -35,7 +35,15 @@ library(dplyr)
         dplyr::filter(!!!v) #%>%
         #dplyr::pull(symbol)
       res <- res[,c("symbol", "Score")]
-      colnames(res) <- c("signature_symbol", "signature_score")
+      direction<-character()
+      direction[which(res$Score<0)]<-"Dn"
+      direction[which(res$Score>0)]<-"Up"
+      res <- cbind(res, direction)
+      res <- res[order(res$direction, decreasing = FALSE),]
+      # don't know why, but after order() them by "direction", in each direaction, 
+      # it automatically sorted the score from absolute value the highest to the lowest,
+      # which is useful
+      colnames(res) <- c("signature_symbol", "signature_score", "signature_direction")
       return(res)
     }
   ))
