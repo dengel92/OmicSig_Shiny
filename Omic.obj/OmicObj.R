@@ -31,9 +31,12 @@ library(dplyr)
     },
     extract.signature = function(conditions) {
       v <- rlang::parse_exprs(conditions)
-      self$difexp %>%
-        dplyr::filter(!!!v) %>%
-        dplyr::pull(symbol)
+      res <- self$difexp %>%
+        dplyr::filter(!!!v) #%>%
+        #dplyr::pull(symbol)
+      res <- res[,c("symbol", "Score")]
+      colnames(res) <- c("signature_symbol", "signature_score")
+      return(res)
     }
   ))
 }
