@@ -5,6 +5,7 @@ library(shinyjs)
 library(shinyalert)
 library(markdown)
 library(RMySQL)
+library(plotly)
 
 # Source separate UI files for each tab
 source('upload/upload_ui.R')
