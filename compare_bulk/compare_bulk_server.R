@@ -5,6 +5,8 @@ compare_sigs <- function(){
 
 output$compare_table <- compare_sigs()
 
+output$fraction_heatmap <- renderPlotly({compare_heatmap()})
+
 output$download_result <- downloadHandler(
     filename = paste("ree.tsv"),
     content = function(file) {

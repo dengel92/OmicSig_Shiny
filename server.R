@@ -16,6 +16,7 @@ server <- shinyServer(function(input, output, session) {
     # local = TRUE -> objects are inside server function
     source('compare/compare_server.R' , local = TRUE)
     source('compare_bulk/compare_bulk_server.R' , local = TRUE)
+    source('server_functions/comparing/compare_heatmap.R' , local = TRUE)   
     source('upload/upload_server.R', local = TRUE)
     source('search/search_server.R', local = TRUE)
 })

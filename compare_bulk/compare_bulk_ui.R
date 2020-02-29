@@ -11,5 +11,9 @@ compare_bulk_ui <- tabPanel(
       ),
   fluidRow(
       column(2, offset = 6, downloadButton("download_result","Download result"))
+  ),
+  br(),br(),
+  fluidRow(
+      column(10, offset=1,plotlyOutput("fraction_heatmap",height="800px"))
   )
 )
