@@ -2,7 +2,7 @@
 
 # General function for generating html output showing selected search terms
 # Inputs:
-#   search_id: the id of the dropdown menu whose selected values are displayed
+#   search_id: the dropdown menu id whose selected values should be displayed
 #   display_name: the word or phrase to display in the html output representing
 #       the dropdown menu field
 selected_html <- function(search_id, display_name) {
@@ -10,31 +10,39 @@ selected_html <- function(search_id, display_name) {
     if (length(input[[search_id]]) < 1) {
         paste0("no ", display_name, " selected</br>")
     } else {
-        # Display "<display_name>: <value1>, <value2>, ..." otherwise
+        # Otherwise display "<display_name>: <value1>, <value2>, ..."
         paste0(display_name,
-            ": ",
+            ": <b>",
             paste(input[[search_id]], collapse = ", "),
-            "</br>")
+            "</b></br>")
     }
 }
 
 # Show which search terms have been selected so far
 output$search_terms <- renderText(
     c(
+        # Section header
         "<p><font size=3><b>",
         "Selected Search Terms:</b></font></p><p><font size=2>",
+        
         # Show selected species
         selected_html("search_species", "species"),
+        
         # Show selected platforms
         selected_html("search_platform_name", "platforms"),
+        
         # Show selected experiment types
         selected_html("search_exp_type_id", "experiment types"),
+        
         # Show selected cell lines
         selected_html("search_cell_line", "cell lines"),
+        
         # Show selected perturbagens
         selected_html("search_perturbagen_id", "perturbagens"),
+        
         # Show selected signature names
         selected_html("search_signature_name", "signatures"),
+        
         # Show selected submitters
         selected_html("search_submitter_id", "submitters"),
         "</p></font>"
@@ -108,33 +116,44 @@ observeEvent(input$search, {
         "submitter_id" = input$search_submitter_id
     )
     
-    # Search database for matching signatures
-    sql_obj <-
-        sql_finding_query(target_table = "platform_signature_view",
-            wheres = wheres)
-    
-    # Display table of search results
-    output$search_results <- renderDataTable({
-        # Ensure that the table updates only once, immediately after clicking
-        isolate(search_table <- sql_obj)
-        # Make signature name a link to the corresponding signature directory
-        search_table$signature_name <-
-            create_link(search_table$signature_name)
-        return(search_table)
-    }, escape = FALSE)
-    
-    # Download button for search results
-    output$search_results_download <- downloadHandler(
-        filename = paste("SigRepo_search_results.tsv"),
-        content = function(file) {
-            write.table(
-                sql_obj,
-                file,
-                row.names = FALSE,
-                quote = FALSE,
-                col.names = TRUE,
-                sep = "\t"
+    # Make sure at least one search term is selected before querying database
+    if (length(compact(wheres)) < 1) {
+        shinyalert("Please select at least one search term!")
+    } else {
+        # Search database for matching signatures
+        sql_obj <-
+            sql_finding_query(target_table = "platform_signature_view",
+                wheres = wheres)
+        
+        # Display error message instead of table if query produces no results
+        if (dim(sql_obj)[1] < 1) {
+            shinyalert("No results found. Please modify your search.")
+        } else {
+            # Display table of search results
+            output$search_results <- renderDataTable({
+                # Ensure that the table updates only once after clicking search
+                isolate(search_table <- sql_obj)
+                # Make signature name a link to that signature's directory
+                search_table$signature_name <-
+                    create_link(search_table$signature_name)
+                return(search_table)
+            }, escape = FALSE)
+            
+            # Download button for search results
+            output$search_results_download <- downloadHandler(
+                filename = paste("SigRepo_search_results.tsv"),
+                content = function(file) {
+                    write.table(
+                        sql_obj,
+                        file,
+                        row.names = FALSE,
+                        quote = FALSE,
+                        col.names = TRUE,
+                        sep = "\t"
+                    )
+                }
             )
         }
-    )
+    }
+    
 })
