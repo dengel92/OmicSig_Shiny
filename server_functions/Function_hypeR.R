@@ -14,7 +14,6 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
   print(colnames(signature_df))
   if (class(signature_df) == "data.frame") {
     if ("signature_direction" %in% colnames(signature_df) && length(unique(signature_df$signature_direction)) > 1) {
-      print("Jel_pineapple")
       sig_dn <- c()
       sig_up <- c()
       sig_dn <- signature_df$signature_symbol[which(signature_df$signature_direction == "-" | signature_df$signature_direction == "Dn")]
@@ -29,18 +28,14 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
         print(hyp_obj_overrep_dn)
         if (nrow(hyp_obj_overrep_dn$data) != 0) {
           gsea_dn <- cbind(hyp_obj_overrep_dn$data, "direction" = "Dn")
-          print("fish_dn")
         }
-        print("oven_dn")
       }
       # gsea_plot_dn <- hyp_obj_overrep_dn$plots
       if (length(sig_up) > 0) {
         hyp_obj_overrep_up <- try(hypeR::hypeR(sig_up, gsets, test = "hypergeometric", background = 23000, pval = 0.05, plotting = F), silent = TRUE)
         if (nrow(hyp_obj_overrep_up$data) != 0) {
-          gsea_up <- cbind(hyp_obj_overrep_up$data, "direction" = "Dn")
-          print("fish_up")
+          gsea_up <- cbind(hyp_obj_overrep_up$data, "direction" = "Up")
         }
-        print("oven_up")
       }
 
       # gsea_plot_up <- hyp_obj_overrep_up$plots
@@ -57,7 +52,6 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
         sig <- sig_up
       }
     } else if (!signature_direction %in% colnames(signature_df) | length(unique(signature_df$signature_direction)) == 1) {
-      print("Jel_apple")
       sig <- signature_df$signature_symbol
       hyp_obj_overrep <- hypeR::hypeR(signature_df$signature_symbol, gsets, test = "hypergeometric", background = 23000, pval = 0.05, plotting = F)
       gsea <- hyp_obj_overrep$data

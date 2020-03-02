@@ -12,7 +12,10 @@ observe({
 })
 
 output$gsea_introduction <- renderText({
-  c("<p><h4>*Introduction of the test*</h4></p>")
+  c(
+    "<p><h4>*Introduction of the test*</h4></p>",
+    "<br> *suggest use Cal27_CB113 to test.* "
+  )
 })
 
 output$gsea_signature_df <- renderTable({
