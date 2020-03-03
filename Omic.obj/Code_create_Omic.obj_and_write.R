@@ -1,17 +1,18 @@
 source("Omic.obj/OmicObj.R")
-source("Omic.obj/Function_objCheck.R")
-source("Omic.obj/Function_json.R")
+source("Omic.obj/check_functions/Function_objCheck.R")
+source("Omic.obj/check_functions/Function_json.R")
 
-sample_name <- "MDA_CYP1B1"
+sample_name <- "Sum149_CYP1B1"
 {
   metadata <- list(
     "organism" = "human",
     "tissue" = "cell",
-    "cell_lines" = "MDA",
+    "cell_lines" = "Sum149",
     "phenotype" = "CYP1B1_KO",
     "type" = "bi-directional",
     "platform" = "illumina",
-    "fdr_cutoff" = 0.01,
+    "fdr_cutoff" = 0.005,
+    "logFC_cutoff" = 1,
     "keywords" = c("cancer", "KO", "pertubations")
   )
 
@@ -33,15 +34,18 @@ sample_name <- "MDA_CYP1B1"
 
   # Signatures: # a bi-directional example
   temp_upsig <- cbind(
-    filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
-    filter(difexp, Score > 0 & fdr < metadata$fdr_cutoff) %>% pull(Score),
+    filter(difexp, Score > 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(symbol),
+    filter(difexp, Score > 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(Score),
     "Up"
   )
+  temp_upsig
   temp_dnsig <- cbind(
-    filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(symbol),
-    filter(difexp, Score < 0 & fdr < metadata$fdr_cutoff) %>% pull(Score),
+    filter(difexp, Score < 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(symbol),
+    filter(difexp, Score < 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(Score),
     "Dn"
   )
+  temp_dnsig
+  
   signatures <- data.frame(rbind(temp_upsig, temp_dnsig))
   colnames(signatures) <- c("signature_symbol", "signature_score", "signature_direction")
   # signatures$signature_direction <- as.factor(signatures$signature_direction)
@@ -62,11 +66,11 @@ check_signatures(Omic.obj$signatures, signature_type = "bi-directional")
 check_signatures(Omic.obj$signatures, signature_type = "uni-directional")
 
 # write signaure (lv2/lv3) txt file:
-write.table(Omic.obj$signatures, file = paste("Omic.obj/signatures/", sample_name, "_lv2.txt", sep = ""), header = T, row.names = F, quote = F)
-write.table(Omic.obj$signatures[, c("signature_symbol", "signature_direction")], file = paste("Omic.obj/signatures/", sample_name, "_lv2.txt", sep = ""), header = T, row.names = F, quote = F)
+write.table(Omic.obj$signatures, file = paste("Omic.obj/signatures/", sample_name, "_lv2.txt", sep = ""), col.names = T, row.names = F, quote = F)
+write.table(Omic.obj$signatures[, c("signature_symbol", "signature_direction")], file = paste("Omic.obj/signatures/", sample_name, "_lv3.txt", sep = ""), col.names = T, row.names = F, quote = F)
 
 # write Omic.obj json files:
-write_obj(Omic.obj, file = paste("Omic.obj/signatures/", sample_name, "_obj.txt", sep = ""))
+write_obj(Omic.obj, file = paste("Omic.obj/signatures/", sample_name, "_obj.json", sep = ""))
 
 
 # extract more signature function:
