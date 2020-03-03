@@ -36,6 +36,8 @@ library(dplyr)
         #dplyr::pull(symbol)
       res <- res[,c("symbol", "Score")]
       direction<-character()
+      # Callen Comment
+      # Can we instead assign '+' and '-' as direction values?
       direction[which(res$Score<0)]<-"Dn"
       direction[which(res$Score>0)]<-"Up"
       res <- cbind(res, direction)
