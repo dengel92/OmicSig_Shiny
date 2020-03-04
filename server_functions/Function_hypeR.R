@@ -13,12 +13,12 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
   if (species == "Homo sapiens") {
     gsets <- hypeR::msigdb_gsets(species = "Homo sapiens", category = "C2", subcategory = "CP:KEGG")
   }
-  
+
   if (class(signature_df) == "data.frame") {
-      # if signature has direction information and is bi-directional with "+" "-" or "Up" "Dn",
-      # we have to perform GSEA for up and dn signatures respectively:
-    if ("signature_direction" %in% colnames(signature_df) && 
-            (setequal(signature_df$signature_direction,c("-","+")) | setequal(signature_df$signature_direction,c("Dn","Up"))) ) {
+    # if signature has direction information and is bi-directional with "+" "-" or "Up" "Dn",
+    # we have to perform GSEA for up and dn signatures respectively:
+    if ("signature_direction" %in% colnames(signature_df) &&
+      (setequal(signature_df$signature_direction, c("-", "+")) | setequal(signature_df$signature_direction, c("Dn", "Up")))) {
       sig_dn <- c()
       sig_up <- c()
       sig_dn <- signature_df$signature_symbol[which(signature_df$signature_direction == "-" | signature_df$signature_direction == "Dn")]
@@ -39,14 +39,14 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
           gsea_up <- cbind(hyp_obj_overrep_up$data, "direction" = "Up")
         }
       }
-      
-      # note: if set plotting=TRUE in hypeR(), hypeR() function can return a list of Venn diagrams, with length of the genesets that are found to be enriched. 
+
+      # note: if set plotting=TRUE in hypeR(), hypeR() function can return a list of Venn diagrams, with length of the genesets that are found to be enriched.
       # gsea_plot_dn <- hyp_obj_overrep_dn$plots
       # gsea_plot_up <- hyp_obj_overrep_up$plots
-      # hyp_obj_overrep_dn$plots itself is a *list* variable. 
+      # hyp_obj_overrep_dn$plots itself is a *list* variable.
       # each of them, e.g. hyp_obj_overrep_dn$plots[[1]], is a Venn Diagram plot of a gene set, e.g.KEGG_TYROSINE_METABOLISM, and the input signature list
 
-      # combine the GSEA results of dn and up: 
+      # combine the GSEA results of dn and up:
       # can't simply do a rbind(), because if one of them is empty, it will give an error. could have better way to do this.
       if (!is.null(gsea_dn) && !is.null(gsea_up)) {
         gsea <- rbind(gsea_up, gsea_dn)
@@ -58,9 +58,9 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
         gsea <- gsea_up
         sig <- sig_up
       }
-    # end of bi-directional signature case
-    
-    # else if there is no direction information, or there's only one direction:
+      # end of bi-directional signature case
+
+      # else if there is no direction information, or there's only one direction:
     } else if (!signature_direction %in% colnames(signature_df) | length(unique(signature_df$signature_direction)) == 1) {
       sig <- signature_df$signature_symbol
       hyp_obj_overrep <- hypeR::hypeR(signature_df$signature_symbol, gsets, test = "hypergeometric", background = 23000, pval = 0.05, plotting = F)
@@ -84,9 +84,9 @@ gsea_hypeR <- function(signature_df, species = "Homo sapiens") {
 
 
 # code for testing the function: normally need to comment it out so R Shiny won't run these
-#source("Omic.obj/OmicObj.R")
-#source("Omic.obj/check_functions/Function_json.R")
-#test_Omic.obj <- read_json("Omic.obj/signatures/MDA_AhR_obj.json")
-#test_Omic.obj$signatures
-#test_result <- gsea_hypeR(test_Omic.obj$signatures, species = "Homo sapiens")
-#test_result$gsea
+# source("Omic.obj/OmicObj.R")
+# source("Omic.obj/check_functions/Function_json.R")
+# test_Omic.obj <- read_json("Omic.obj/signatures/MDA_AhR_obj.json")
+# test_Omic.obj$signatures
+# test_result <- gsea_hypeR(test_Omic.obj$signatures, species = "Homo sapiens")
+# test_result$gsea
