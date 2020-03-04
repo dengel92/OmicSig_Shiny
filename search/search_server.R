@@ -101,8 +101,6 @@ observe({
     
     # Update submitters dropdown menu
     update_dropdown("submitter_id", wheres)
-    
-    print(input$search_results_rows_selected)
 })
 
 # Display output and download button after clicking search button
@@ -141,9 +139,9 @@ observeEvent(input$search, {
                 return(search_table)
             }, escape = FALSE)
             
-            # Download button for search results
+            # Download button for full search results table
             output$search_results_download <- downloadHandler(
-                filename = paste("SigRepo_search_results.tsv"),
+                filename = paste("SigRepo_search_results_all.tsv"),
                 content = function(file) {
                     write.table(
                         sql_obj,
@@ -151,6 +149,21 @@ observeEvent(input$search, {
                         row.names = FALSE,
                         quote = FALSE,
                         col.names = TRUE,
+                        sep = "\t"
+                    )
+                }
+            )
+            
+            # Download button for selected rows from search results table
+            output$selected_search_results_download <- downloadHandler(
+                filename = paste("SigRepo_search_results_selected.tsv"),
+                content = function(file) {
+                    write.table(
+                        sql_obj[input$search_results_rows_selected, ],
+                        file,
+                        row.names = FALSE,
+                        quote = FALSE,
+                        col.names = FALSE,
                         sep = "\t"
                     )
                 }

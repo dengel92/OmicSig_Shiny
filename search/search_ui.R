@@ -86,6 +86,10 @@ search_ui <- tabPanel("Search",
                 style = "overflow-y: scroll"),
             # Download button will appear only after clicking search button
             conditionalPanel(condition = "input.search >= 1",
-                downloadButton("search_results_download"))
+                # Download button for full search results table
+                downloadButton("search_results_download", "Download Table"),
+                # Download button for selected rows
+                downloadButton("selected_search_results_download",
+                    "Download Selected Signatures"))
         )
     ))
