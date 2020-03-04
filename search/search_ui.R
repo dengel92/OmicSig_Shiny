@@ -77,6 +77,9 @@ search_ui <- tabPanel("Search",
         
         # Add the main panel
         mainPanel(
+            # Show checkbox for selecting/unselecting all rows
+            conditionalPanel(condition = "input.search >= 1",
+                checkboxInput("select_all", "Select/unselect all")),
             # Show table of signatures matching search terms
             div(DT::dataTableOutput("search_results"),
                 # If the output table is too wide, add a scrollbar

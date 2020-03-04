@@ -101,6 +101,8 @@ observe({
     
     # Update submitters dropdown menu
     update_dropdown("submitter_id", wheres)
+    
+    print(input$search_results_rows_selected)
 })
 
 # Display output and download button after clicking search button
@@ -157,3 +159,18 @@ observeEvent(input$search, {
     }
     
 })
+
+# Select/unselect all rows depending on checkbox input
+observeEvent(input$select_all, {
+    # Create an object to manipulate existing table
+    dt_proxy <- dataTableProxy("search_results")
+    if (input$select_all) {
+        # Select all rows
+        DT::selectRows(dt_proxy, input$search_results_rows_all)
+    } else {
+        # Unselect all rows
+        DT::selectRows(dt_proxy, NULL)
+    }
+})
+output$selected_rows <- renderPrint(print(input$search_results_rows_selected))
+
