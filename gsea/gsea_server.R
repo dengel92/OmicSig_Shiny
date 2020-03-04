@@ -18,15 +18,24 @@ output$gsea_introduction <- renderText({
   )
 })
 
-output$gsea_signature_df <- renderTable({
-  sql_generic(
-    paste(
-      "select feature_name, weight, direction from feature_signature_view where signature_name =",
-      single_quoted(input$gsea_signature), ";",
-      sep = ""
-    )
+gsea_signature_df_variable <- reactive(sql_generic(
+  paste(
+    "select feature_name, weight, direction from feature_signature_view where signature_name =",
+    single_quoted(input$gsea_signature), ";",
+    sep = ""
   )
+))
+
+output$gsea_signature_df <- renderTable({
+  gsea_signature_df_variable()
 })
+
+output$gesa_download_signature <- downloadHandler(
+  filename = paste(as.character(input$gsea_signature), "_signature.tsv", sep = ""),
+  content = function(file) {
+    write.table(gsea_signature_df_variable(), file, row.names = F, quote = F, col.names = T, sep = "\t")
+  }
+)
 
 gsea_result_variable <- eventReactive(input$gsea_analysis, {
   sig <- sql_generic(
@@ -47,9 +56,19 @@ gsea_result_variable <- eventReactive(input$gsea_analysis, {
   #    sep = ""
   #  ))
   ##
-  a <- gsea_hypeR(sig, species = "Homo sapiens")
-  return(a)
+  result <- gsea_hypeR(sig, species = "Homo sapiens")
+  result$sig_name <- input$gsea_signature
+  return(result)
 })
+
+output$gsea_success <- renderText({
+  c(
+    "<p><i><font color=\"#008F00\"><b>Success!</b></font>",
+    "Finished the GSEA analysis of", gsea_result_variable()$sig_name, ".",
+    "You can see and download the result shown below.</i></p>"
+  )
+})
+
 
 output$gsea_result <- renderTable({
   if (!is.null(gsea_result_variable()$gsea)) {
@@ -68,3 +87,10 @@ output$gsea_show_features <- renderText({
     "</font></p>"
   )
 })
+
+output$gesa_download <- downloadHandler(
+  filename = paste(gsea_result_variable()$sig_name, "_GSEA.tsv", sep = ""),
+  content = function(file) {
+    write.table(gsea_result_variable()$gsea, file, row.names = F, quote = F, col.names = T, sep = "\t")
+  }
+)
