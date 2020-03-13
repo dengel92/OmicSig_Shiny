@@ -1,8 +1,0 @@
-signature_symbol signature_direction
-DHRS3 Dn
-FAM90A25P Dn
-MSX2P1 Dn
-ALDH3A1 Up
-GCLC Up
-CYP4F11 Up
-LINC01564 Up
