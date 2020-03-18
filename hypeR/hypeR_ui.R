@@ -1,5 +1,5 @@
 gsea_ui <- tabPanel(
-  "GSEA Analysis",
+  "hypeR",
   sidebarLayout(
     sidebarPanel(
       selectizeInput(

@@ -12,7 +12,7 @@ source('upload/upload_ui.R')
 source('search/search_ui.R')
 source('compare/compare_ui.R')
 source('compare_bulk/compare_bulk_ui.R')
-source('gsea/gsea_ui.R')
+source('hypeR/hypeR_ui.R')
 
 # Function that appends elements to a navbar
 # Intended purpose is to add a text search input in navbar,

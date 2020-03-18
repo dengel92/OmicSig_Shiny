@@ -1,3 +1,12 @@
+# 03/05: minor update required: 
+# modify columns better: signature number, background, put direction earlier
+# put up and down in seperate tables?
+# change tab name! Overrepresentative test
+# put download button above the table
+# future: add link to the result of the genesets
+
+# add GSEA test (probably in a seperate tab) to perform enrichment analysis using lv1
+
 source("server_functions/Function_hypeR.R")
 
 observe({
