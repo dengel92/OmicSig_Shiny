@@ -19,5 +19,5 @@ server <- shinyServer(function(input, output, session) {
     source('server_functions/comparing/compare_heatmap.R' , local = TRUE)   
     source('upload/upload_server.R', local = TRUE)
     source('search/search_server.R', local = TRUE)
-    source('hypeR/hypeR_server.R' , local = TRUE)
+    source('hypeR_overrep/hypeR_overrep_server.R' , local = TRUE)
 })
