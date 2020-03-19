@@ -139,9 +139,9 @@ observeEvent(input$search, {
                 return(search_table)
             }, escape = FALSE)
             
-            # Download button for search results
+            # Download button for full search results table
             output$search_results_download <- downloadHandler(
-                filename = paste("SigRepo_search_results.tsv"),
+                filename = paste("SigRepo_search_results_all.tsv"),
                 content = function(file) {
                     write.table(
                         sql_obj,
@@ -153,7 +153,37 @@ observeEvent(input$search, {
                     )
                 }
             )
+            
+            # Download button for selected rows from search results table
+            output$selected_search_results_download <- downloadHandler(
+                filename = paste("SigRepo_search_results_selected.tsv"),
+                content = function(file) {
+                    write.table(
+                        sql_obj[input$search_results_rows_selected, ],
+                        file,
+                        row.names = FALSE,
+                        quote = FALSE,
+                        col.names = FALSE,
+                        sep = "\t"
+                    )
+                }
+            )
         }
     }
     
 })
+
+# Select/unselect all rows depending on checkbox input
+observeEvent(input$select_all, {
+    # Create an object to manipulate existing table
+    dt_proxy <- dataTableProxy("search_results")
+    if (input$select_all) {
+        # Select all rows
+        DT::selectRows(dt_proxy, input$search_results_rows_all)
+    } else {
+        # Unselect all rows
+        DT::selectRows(dt_proxy, NULL)
+    }
+})
+output$selected_rows <- renderPrint(print(input$search_results_rows_selected))
+

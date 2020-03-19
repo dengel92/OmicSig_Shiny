@@ -77,12 +77,19 @@ search_ui <- tabPanel("Search",
         
         # Add the main panel
         mainPanel(
+            # Show checkbox for selecting/unselecting all rows
+            conditionalPanel(condition = "input.search >= 1",
+                checkboxInput("select_all", "Select/unselect all")),
             # Show table of signatures matching search terms
             div(DT::dataTableOutput("search_results"),
                 # If the output table is too wide, add a scrollbar
                 style = "overflow-y: scroll"),
             # Download button will appear only after clicking search button
             conditionalPanel(condition = "input.search >= 1",
-                downloadButton("search_results_download"))
+                # Download button for full search results table
+                downloadButton("search_results_download", "Download Table"),
+                # Download button for selected rows
+                downloadButton("selected_search_results_download",
+                    "Download Selected Signatures"))
         )
     ))
