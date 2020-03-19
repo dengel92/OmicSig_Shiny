@@ -72,7 +72,9 @@ odd_ones_out <- function(your_obj){
     )
 }
 
-
+syno_fetch <- function(symbol_list, organism="Homo sapiens", genome=""){
+    return("")
+}
 
 # Adds signature information to signatures table in the DB
 # Inputs:
@@ -121,6 +123,11 @@ add_lv2 <- function(lv2_file, sid, sig_name){
     if(FALSE){
         print(lv2_table$signature_symbol)
     }
+    
+    #
+    
+    #
+    
     #converting direction to + or -
     lv2_table$signature_direction = as.character(lv2_table$signature_direction)
     lv2_table$signature_direction[which(tolower(lv2_table$signature_direction)=="up")]="+"
@@ -259,7 +266,24 @@ observeEvent(input$add_signature, {
     }
 })
 
+## Checks upon upload if any symbols in signature are missing in our db.
+## outputs message warning user if so.
+## input is OmicSig object
+observeEvent(input$omicobj_upload, {
+    this = read_json(input$omicobj_upload$datapath)
+    this.misfits = odd_ones_out(this)
+    if(length(this.misfits)>0){
+        output$errday=renderText(paste("The following features don't seem to exist
+in our DB: ", paste(this.misfits,collapse=", ")))
+        shinyjs::disable("upload_object")
+    }
+    else{
+        output$errday=renderText("")
+        shinyjs::enable("upload_object")
+    }
+})
 
+##
 
 #When you click the 'submit' button...
 #Yeah I click the 'submit' button

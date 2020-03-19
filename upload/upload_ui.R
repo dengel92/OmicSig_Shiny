@@ -93,6 +93,9 @@ upload_ui <- tabPanel("Upload",
                 label = "Signature Name",
                 placeholder = NULL
             ),
-            actionButton("upload_object", "Upload with File")
+            actionButton("upload_object", "Upload with File"),
+            #if feature symbols in signature don't match up in DB
+            #will get message in this div
+            div(textOutput("errday"))
         )
     ))

@@ -28,6 +28,7 @@ navbarPageWithInputs <- function(..., inputs) {
 
 # Define UI
 ui <- fluidPage(
+    shinyjs::useShinyjs(),
     # Allows for alert feature
     useShinyalert(),
     theme = shinytheme("sandstone"),
