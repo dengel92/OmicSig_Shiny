@@ -278,7 +278,7 @@ in our DB: ", paste(this.misfits,collapse=", ")))
         shinyjs::disable("upload_object")
     }
     else{
-        output$errday=renderText("")
+        output$errday=renderText("signature has the right feature symbols. go for it")
         shinyjs::enable("upload_object")
     }
 })
