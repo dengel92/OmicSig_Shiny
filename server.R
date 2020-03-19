@@ -14,6 +14,7 @@ server <- shinyServer(function(input, output, session) {
     
     # Source separate server files for each tab
     # local = TRUE -> objects are inside server function
+    source('help/help_server.R', local = TRUE)
     source('compare/compare_server.R' , local = TRUE)
     source('compare_bulk/compare_bulk_server.R' , local = TRUE)
     source('server_functions/comparing/compare_heatmap.R' , local = TRUE)   
