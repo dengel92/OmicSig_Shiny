@@ -26,21 +26,17 @@ help_ui <- tabPanel("Help",
         tabPanel(
             "Upload help",
             htmlOutput(outputId = "upload_help"),
-            dq_accordion(
-                "upload_faqs",
+            dq_accordion("upload_faqs",
                 upload_titles,
                 upload_contents,
-                bg_color = "#f8f5f0"
-            )
+                bg_color = "#f8f5f0")
         ),
         tabPanel(
             "Search help",
             htmlOutput(outputId = "search_help"),
-            dq_accordion(
-                "search_faqs",
+            dq_accordion("search_faqs",
                 search_titles,
                 search_contents,
-                bg_color = "#f8f5f0"
-            )
+                bg_color = "#f8f5f0")
         )
     ))
