@@ -1,5 +1,6 @@
 # Load required libraries
 library(shiny)
+library(dqshiny)
 library(shinythemes)
 library(shinyjs)
 library(shinyalert)
