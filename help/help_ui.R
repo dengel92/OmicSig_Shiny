@@ -29,6 +29,7 @@ help_ui <- tabPanel("Help",
             dq_accordion("upload_faqs",
                 upload_titles,
                 upload_contents,
+                options = list(active = FALSE, collapsible = TRUE),
                 bg_color = "#f8f5f0")
         ),
         tabPanel(
@@ -37,6 +38,7 @@ help_ui <- tabPanel("Help",
             dq_accordion("search_faqs",
                 search_titles,
                 search_contents,
+                options = list(active = FALSE, collapsible = TRUE),
                 bg_color = "#f8f5f0")
         )
     ))
