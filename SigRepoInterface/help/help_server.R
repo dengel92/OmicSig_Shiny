@@ -5,7 +5,3 @@ output$upload_help <-
 
 output$search_help <-
     renderText("This is the help page for searching signatures")
-
-observeEvent(input$upload_faqs, print(input$upload_faqs))
-
-observeEvent(input$search_faqs, print(input$search_faqs))
