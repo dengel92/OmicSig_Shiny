@@ -1,9 +1,11 @@
-
+#######################################################################
+## write_json()
+##
 write_json <- function(omic.obj, file)
 {
-  signature_direction <- summary(omic.obj$signatures$signature_direction)
+  signature_direction <- summary(omic.obj$signature$signature_direction)
   # drop the signature_direction column:
-  write_signature <- omic.obj$signatures
+  write_signature <- omic.obj$signature
   write_signature$signature_direction <- NULL
   metadata_length <- length(omic.obj$metadata)
   write_json_obj <- rjson::toJSON(c(
@@ -18,7 +20,9 @@ write_json <- function(omic.obj, file)
   write(write_json_obj, file)
   return("finished")
 }
-
+#######################################################################
+## write_json()
+##
 read_json <- function(filename)
 {
   read_json <- rjson::fromJSON(file = filename)
@@ -26,7 +30,8 @@ read_json <- function(filename)
   lv1_colnames <- read_json$lv1_colnames
   read_lv1 <- as.data.frame(dplyr::bind_rows(read_json[c(lv1_colnames)]))
   read_lv2 <- as.data.frame(dplyr::bind_rows(read_json[c("signature_symbol", "signature_score")]))
-  signature_direction <- rep(read_json$signature_direction_names, unlist(read_json[read_json$signature_direction_names]))
+  signature_direction <- 
+    rep(read_json$signature_direction_names, unlist(read_json[read_json$signature_direction_names]))
   read_lv2 <- cbind(read_lv2, signature_direction)
   read_sig.obj <- OmicSignature$new(read_meta, read_lv2, read_lv1)
   return(read_sig.obj)

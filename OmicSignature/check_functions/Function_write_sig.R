@@ -1,4 +1,4 @@
-# Note: don't need this function anymore after change signature in OmicSig Obj from list to dataframe
+## Note: don't need this function anymore after change signature in OmicSig Obj from list to dataframe
 
 write_sig_bi <- function
 (
@@ -7,12 +7,14 @@ write_sig_bi <- function
     type = Omic.obj$metadata$type,
     address = "OmicSignature/signatures/")
 {
-    signatures <- Omic.obj$signatures
+    signature <- Omic.obj$signature
     temp_upregulated <- data.frame(
-        cbind(signatures$Up_Regulated_Symbol, signatures$Up_Regulated_Score, rep("Up", length(signatures$Up_Regulated_Symbol)))
+        cbind(signature$Up_Regulated_Symbol, 
+              signature$Up_Regulated_Score, 
+              rep("Up", length(signature$Up_Regulated_Symbol)))
     )
     temp_dnregulated <- data.frame(
-        cbind(signatures$Dn_Regulated_Symbol, signatures$Dn_Regulated_Score, rep("Dn", length(signatures$Dn_Regulated_Symbol)))
+        cbind(signature$Dn_Regulated_Symbol, signature$Dn_Regulated_Score, rep("Dn", length(signature$Dn_Regulated_Symbol)))
     )
     example_lv2_df <- data.frame(rbind(temp_upregulated, temp_dnregulated))
     colnames(example_lv2_df) <- c("symbol", "score", "direction")
