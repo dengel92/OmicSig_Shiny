@@ -14,8 +14,8 @@ accordion_contents <- list(
 
 # Make accordion menu
 accordion_menu <- dq_accordion("accordion_menu",
-    upload_titles,
-    upload_contents,
+    accordion_titles,
+    accordion_contents,
     # These options allow all of the panels to be collapsed at once
     options = list(active = FALSE, collapsible = TRUE),
     bg_color = "#f8f5f0")
