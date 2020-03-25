@@ -5,8 +5,7 @@ library(dplyr)
     ## OmicSignature define
     ##
     OmicSignature <-
-        R6Class
-    (
+        R6Class(
         "OmicSignature",
         list(metadata = NULL,
              signatures = NULL,
