@@ -16,7 +16,12 @@ upload_help_tab <- tabPanel(
         upload_titles,
         upload_contents,
         options = list(active = FALSE, collapsible = TRUE),
-        bg_color = "#f8f5f0")
+        bg_color = "#f8f5f0"),
+    bs_accordion(id = "meet_the_beatles") %>%
+        bs_set_opts(panel_type = "success", use_heading_link = TRUE) %>%
+        bs_append(title = "John Lennon", content = "Rhythm guitar, vocals") %>%
+        bs_set_opts(panel_type = "info") %>%
+        bs_append(title = "Paul McCartney", content = "Bass guitar, vocals")
 )
 
 search_titles <-
@@ -35,7 +40,12 @@ search_help_tab <- tabPanel(
         search_titles,
         search_contents,
         options = list(active = FALSE, collapsible = TRUE),
-        bg_color = "#f8f5f0")
+        bg_color = "#f8f5f0"),
+    bs_accordion(id = "meet_the_beatles2") %>%
+        bs_set_opts(panel_type = "success", use_heading_link = TRUE) %>%
+        bs_append(title = "John Lennon", content = "Rhythm guitar, vocals") %>%
+        bs_set_opts(panel_type = "info") %>%
+        bs_append(title = "Paul McCartney", content = "Bass guitar, vocals")
 )
 
 help_ui <- tabPanel("Help",
