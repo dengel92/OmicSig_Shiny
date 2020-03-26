@@ -1,13 +1,13 @@
-compare_ui <- tabPanel(
-  "Compare",
+compare_ui <- tabPanel("Compare",
   # If you guys know a cooler/different layout from sidebarLayout,
   # Please tell me, please
-  tags$style(HTML(
+  tags$style(
+    HTML(
       "
         .result_header {
             font-weight: 4;
         }
-    
+
         #first_sig_compare_header{
             color: #228822;
         }
@@ -20,9 +20,12 @@ compare_ui <- tabPanel(
             color: #AB6611;
         }
       "
-  )),
+    )
+  ),
   sidebarLayout(
     sidebarPanel(
+      # Add some space at the top
+      dq_space(),
       selectizeInput(
         "compare_1",
         label = "Signature 1",
@@ -35,13 +38,18 @@ compare_ui <- tabPanel(
         choices = NULL,
         multiple = FALSE
       ),
-      numericInput("compare_background_number", label = "Background", value = 22000),
+      numericInput(
+        "compare_background_number",
+        label = "Background",
+        value = 22000
+      ),
       actionButton("compare_signatures", "Compare Signatures")
     ),
     mainPanel(
+      # Add some space at the top
+      dq_space(),
       htmlOutput("compare_result"),
       plotOutput("compare_result_Venn"),
       htmlOutput("compare_show_signatures")
     )
-  )
-)
+  ))

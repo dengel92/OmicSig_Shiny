@@ -1,7 +1,9 @@
-hypeR_overrep_ui <- tabPanel(
-  "hypeR_overrep",
+hypeR_overrep_ui <- tabPanel("hypeR_overrep",
   sidebarLayout(
     sidebarPanel(
+      # Add some space at the top
+      dq_space(),
+      
       selectizeInput(
         "overrep_signature",
         label = "select signature",
@@ -11,6 +13,9 @@ hypeR_overrep_ui <- tabPanel(
       actionButton("overrep_analysis", label = "Over-representation analysis")
     ),
     mainPanel(
+      # Add some space at the top
+      dq_space(),
+      
       htmlOutput("overrep_introduction"),
       checkboxInput("overrep_show_signatures", "Display signature table"),
       conditionalPanel(
@@ -27,5 +32,4 @@ hypeR_overrep_ui <- tabPanel(
         htmlOutput("overrep_show_features")
       )
     )
-  )
-)
+  ))

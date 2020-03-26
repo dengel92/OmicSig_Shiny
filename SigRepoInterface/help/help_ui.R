@@ -13,15 +13,17 @@ accordion_contents <- list(
 )
 
 # Make accordion menu
-accordion_menu <- dq_accordion("accordion_menu",
+accordion_menu <- dq_accordion(
+    "accordion_menu",
     accordion_titles,
     accordion_contents,
     # These options allow all of the panels to be collapsed at once
     options = list(active = FALSE, collapsible = TRUE),
-    bg_color = "#f8f5f0")
+    bg_color = "#f8f5f0"
+)
 
 # Help page structure
 help_ui <- tabPanel("Help",
     fluidPage(title = "Help",
-        accordion_menu)
-    )
+        dq_space(),
+        accordion_menu))
