@@ -38,6 +38,8 @@ ui <- fluidPage(
     navbarPageWithInputs(
         # Navbar header
         "SigRepo",
+        # Locks header to top of screen when scrolling
+        position = "fixed-top",
         # UI structure for each separate tab
         help_ui,
         upload_ui,
