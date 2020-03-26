@@ -45,8 +45,10 @@ ui <- fluidPage(
         upload_ui,
         search_ui,
         hypeR_overrep_ui,
-        compare_ui,
-        compare_bulk_ui,
+        # Compare and compare_bulk show up in a dropdown
+        navbarMenu("Compare",
+            compare_ui,
+            compare_bulk_ui),
         # second parameter in navbar appending function above
         inputs = textInput(
             inputId = "search",
