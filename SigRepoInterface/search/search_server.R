@@ -57,26 +57,28 @@ clear_dropdown = function(field) {
 
 # Clear selected terms after clicking clear button
 observeEvent(input$clear, {
-    # Update species dropdown menu
-    clear_dropdown("species")
-    
-    # Update platforms dropdown menu
-    clear_dropdown("platform_name")
-    
-    # Update experiment types dropdown menu
-    clear_dropdown("exp_type_id")
-    
-    # Update cell lines dropdown menu
-    clear_dropdown("cell_line")
-    
-    # Update perturbagens dropdown menu
-    clear_dropdown("perturbagen_id")
-    
-    # Update signatures names dropdown menu
-    clear_dropdown("signature_name")
-    
-    # Update submitters dropdown menu
-    clear_dropdown("submitter_id")
+    isolate({
+        # Update species dropdown menu
+        clear_dropdown("species")
+        
+        # Update platforms dropdown menu
+        clear_dropdown("platform_name")
+        
+        # Update experiment types dropdown menu
+        clear_dropdown("exp_type_id")
+        
+        # Update cell lines dropdown menu
+        clear_dropdown("cell_line")
+        
+        # Update perturbagens dropdown menu
+        clear_dropdown("perturbagen_id")
+        
+        # Update signatures names dropdown menu
+        clear_dropdown("signature_name")
+        
+        # Update submitters dropdown menu
+        clear_dropdown("submitter_id")
+    })
 })
 
 # Show which search terms have been selected so far
@@ -111,37 +113,39 @@ output$search_terms <- renderText(
 )
 
 observe({
-    # Construct list of all possible where clauses for query
-    wheres <- list(
-        "species" = input$search_species,
-        "platform_name" = input$search_platform_name,
-        "exp_type_id" = input$search_experiment_type,
-        "cell_line" = input$search_cell_line,
-        "perturbagen_id" = input$search_perturbagen_id,
-        "signature_name" = input$search_signature_name,
-        "submitter_id" = input$search_submitter_id
-    )
-    
-    # Update species dropdown menu
-    update_dropdown("species", wheres)
-    
-    # Update platforms dropdown menu
-    update_dropdown("platform_name", wheres)
-    
-    # Update experiment types dropdown menu
-    update_dropdown("exp_type_id", wheres)
-    
-    # Update cell lines dropdown menu
-    update_dropdown("cell_line", wheres)
-    
-    # Update perturbagens dropdown menu
-    update_dropdown("perturbagen_id", wheres)
-    
-    # Update signatures names dropdown menu
-    update_dropdown("signature_name", wheres)
-    
-    # Update submitters dropdown menu
-    update_dropdown("submitter_id", wheres)
+    isolate({
+        # Construct list of all possible where clauses for query
+        wheres <- list(
+            "species" = input$search_species,
+            "platform_name" = input$search_platform_name,
+            "exp_type_id" = input$search_experiment_type,
+            "cell_line" = input$search_cell_line,
+            "perturbagen_id" = input$search_perturbagen_id,
+            "signature_name" = input$search_signature_name,
+            "submitter_id" = input$search_submitter_id
+        )
+        
+        # Update species dropdown menu
+        update_dropdown("species", wheres)
+        
+        # Update platforms dropdown menu
+        update_dropdown("platform_name", wheres)
+        
+        # Update experiment types dropdown menu
+        update_dropdown("exp_type_id", wheres)
+        
+        # Update cell lines dropdown menu
+        update_dropdown("cell_line", wheres)
+        
+        # Update perturbagens dropdown menu
+        update_dropdown("perturbagen_id", wheres)
+        
+        # Update signatures names dropdown menu
+        update_dropdown("signature_name", wheres)
+        
+        # Update submitters dropdown menu
+        update_dropdown("submitter_id", wheres)
+    })
 })
 
 # Display output and download button after clicking search button
@@ -196,19 +200,20 @@ observeEvent(input$search, {
             )
             
             # Download button for selected rows from search results table
-            output$selected_search_results_download <- downloadHandler(
-                filename = paste("SigRepo_search_results_selected.tsv"),
-                content = function(file) {
-                    write.table(
-                        sql_obj[input$search_results_rows_selected, ],
-                        file,
-                        row.names = FALSE,
-                        quote = FALSE,
-                        col.names = FALSE,
-                        sep = "\t"
-                    )
-                }
-            )
+            output$selected_search_results_download <-
+                downloadHandler(
+                    filename = paste("SigRepo_search_results_selected.tsv"),
+                    content = function(file) {
+                        write.table(
+                            sql_obj[input$search_results_rows_selected, ],
+                            file,
+                            row.names = FALSE,
+                            quote = FALSE,
+                            col.names = FALSE,
+                            sep = "\t"
+                        )
+                    }
+                )
         }
     }
     
@@ -226,5 +231,5 @@ observeEvent(input$select_all, {
         DT::selectRows(dt_proxy, NULL)
     }
 })
-output$selected_rows <- renderPrint(print(input$search_results_rows_selected))
-
+output$selected_rows <-
+    renderPrint(print(input$search_results_rows_selected))
