@@ -18,6 +18,67 @@ selected_html <- function(search_id, display_name) {
     }
 }
 
+# General function for updating a dropdown menu
+# Input:
+#   field: the name of the search field whose dropdown menu should be updated
+#   wheres: list of all of the possible where clauses for sql_finding_query()
+update_dropdown = function(field, wheres) {
+    # Query the database to find values of field that match selected values of
+    #   other fields
+    sql_obj <-
+        sql_finding_query(fields = field,
+            target_table = "platform_signature_view",
+            wheres = wheres[names(wheres) != field])
+    # Determine the ID for the dropdown menu that should be updated
+    search_id <- paste0("search_", field)
+    # Update dropdown menu
+    updateSelectizeInput(session,
+        search_id,
+        choices = c(sql_obj[[field]], input[[search_id]]),
+        selected = input[[search_id]])
+}
+
+# General function for clearing selections of a dropdown menu
+# Input:
+#   field:the name of the search field whose dropdown menu should be updated
+clear_dropdown = function(field) {
+    # Query the database to find all values of field
+    sql_obj <-
+        sql_finding_query(fields = field,
+            target_table = "platform_signature_view")
+    # Determine the ID for the dropdown menu that should be updated
+    search_id <- paste0("search_", field)
+    # Update dropdown menu
+    updateSelectizeInput(session,
+        search_id,
+        choices = c(sql_obj[[field]]),
+        selected = NULL)
+}
+
+# Clear selected terms after clicking clear button
+observeEvent(input$clear, {
+    # Update species dropdown menu
+    clear_dropdown("species")
+    
+    # Update platforms dropdown menu
+    clear_dropdown("platform_name")
+    
+    # Update experiment types dropdown menu
+    clear_dropdown("exp_type_id")
+    
+    # Update cell lines dropdown menu
+    clear_dropdown("cell_line")
+    
+    # Update perturbagens dropdown menu
+    clear_dropdown("perturbagen_id")
+    
+    # Update signatures names dropdown menu
+    clear_dropdown("signature_name")
+    
+    # Update submitters dropdown menu
+    clear_dropdown("submitter_id")
+})
+
 # Show which search terms have been selected so far
 output$search_terms <- renderText(
     c(
@@ -48,26 +109,6 @@ output$search_terms <- renderText(
         "</p></font>"
     )
 )
-
-# General function for updating a dropdown menu
-# Input:
-#   field: the name of the search field whose dropdown menu should be updated
-#   wheres: list of all of the possible where clauses for sql_finding_query()
-update_dropdown = function(field, wheres) {
-    # Query the database to find values of field that match selected values of
-    #   other fields
-    sql_obj <-
-        sql_finding_query(fields = field,
-            target_table = "platform_signature_view",
-            wheres = wheres[names(wheres) != field])
-    # Determine the ID for the dropdown menu that should be updated
-    search_id <- paste0("search_", field)
-    # Update dropdown menu
-    updateSelectizeInput(session,
-        search_id,
-        choices = c(sql_obj[[field]], input[[search_id]]),
-        selected = input[[search_id]])
-}
 
 observe({
     # Construct list of all possible where clauses for query

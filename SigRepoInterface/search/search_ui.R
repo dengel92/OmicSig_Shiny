@@ -4,8 +4,14 @@ search_ui <- tabPanel("Search",
     sidebarLayout(
         # Add the sidebar
         sidebarPanel(
+            # Add some space at the top
+            dq_space(),
+            
             # Show selected search terms
             htmlOutput(outputId = "search_terms"),
+            
+            # Button for clearing selected terms
+            actionButton("clear", "Clear Search Terms"),
             
             # Dropdown menu for selecting species
             selectizeInput(
@@ -77,19 +83,30 @@ search_ui <- tabPanel("Search",
         
         # Add the main panel
         mainPanel(
+            # Add some space at the top
+            dq_space(),
+            
             # Show checkbox for selecting/unselecting all rows
-            conditionalPanel(condition = "input.search >= 1",
-                checkboxInput("select_all", "Select/unselect all")),
+            conditionalPanel(
+                condition = "input.search >= 1",
+                checkboxInput("select_all", "Select/unselect all")
+            ),
+            
             # Show table of signatures matching search terms
             div(DT::dataTableOutput("search_results"),
                 # If the output table is too wide, add a scrollbar
                 style = "overflow-y: scroll"),
+            
             # Download button will appear only after clicking search button
-            conditionalPanel(condition = "input.search >= 1",
+            conditionalPanel(
+                condition = "input.search >= 1",
                 # Download button for full search results table
                 downloadButton("search_results_download", "Download Table"),
                 # Download button for selected rows
-                downloadButton("selected_search_results_download",
-                    "Download Selected Signatures"))
+                downloadButton(
+                    "selected_search_results_download",
+                    "Download Selected Signatures"
+                )
+            )
         )
     ))
