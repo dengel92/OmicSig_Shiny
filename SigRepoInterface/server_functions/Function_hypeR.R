@@ -2,12 +2,27 @@ library(hypeR)
 library(dplyr)
 library(magrittr)
 
-# hypeR_overrep_function()
-# input: a dataframe with symbol and direction, or character if no direction; no score (weight) involved
-# output: a list: overrep=data.frame of over-representation analysis result; signature=signature features
-
-# NOTE: "pval = 0.05" in all hypeR_overrep_function() should be "fdr = 0.05" instead.
-# but since currently the example signature lists are too short, if we set a normal criteria, it won't be able to get any results
+#' @title hypeR_overrep_function() Perform over-representative analysis using hypeR package
+#' @description Compare two lists of signatures and return Venn diagram and hypergeometric test p-value for intersect.
+#' updated 03/2020
+#' 
+#' NOTE: "pval = 0.05" in all hypeR_overrep_function() should be "fdr = 0.05" instead.
+#' but since currently the example signature lists are too short, if we set a normal criteria, it won't be able to get any results
+#'
+#' @param signature_df A dataframe or character contains signature information. A dataframe with columns "symbol" or "symbol" and "direction", or a character. No score (weight) for each feature is needed for over-representative test.
+#' @param species A string. The species of the input signature. For example, "Homo sapiens".
+#' @return A list with two objects. $overrep is a data.frame of over-representation analysis result. $signature is the input signature features, used for display signature in Shiny interface.
+#'
+#' @example
+#' 
+#' signature_df <- data.frame(cbind(c("DPM1","CFH","FUCA2","MAD1L1","KLHL13","FUCA2"),
+#'                                  c(rep("Up", 3),rep("Dn", 3))))
+#' colnames(signature_df) <- c("signature_symbol", "signature_direction")
+#' signature_df$signature_symbol <- as.character(signature_df$signature_symbol)
+#' overrep_result <- hypeR_overrep_function(signature_df, species = "Homo sapiens")
+#' overrep_result$overrep
+#'  
+#' 
 
 hypeR_overrep_function <- function(signature_df, species = "Homo sapiens") {
   # get KEGG gene set info:
