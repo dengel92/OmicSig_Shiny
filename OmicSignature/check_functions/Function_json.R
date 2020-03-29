@@ -1,6 +1,17 @@
 #######################################################################
 ## write_json()
 ##
+#' @title write OmicSignature object into json txt format
+#' updated 01/2020
+#' 
+#' @param omic.obj A OmicSignature object
+#' @param file export file name
+#' @return a "finished" message
+#'
+#' @example
+#' write_json(Omic.obj, file = "Omic.json")
+#' 
+
 write_json <- function(omic.obj, file)
 {
   signature_direction <- summary(omic.obj$signature$signature_direction)
@@ -21,8 +32,17 @@ write_json <- function(omic.obj, file)
   return("finished")
 }
 #######################################################################
-## write_json()
+## read_json()
 ##
+#' @title read an OmicSignature object from json txt file created by write_json()
+#' updated 01/2020
+#' 
+#' @param filename json file name to read in
+#' @return OmicSignature object
+#'
+#' @example
+#' read_json(filename = "Omic.json")
+#' 
 read_json <- function(filename)
 {
   read_json <- rjson::fromJSON(file = filename)
