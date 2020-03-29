@@ -1,4 +1,25 @@
-# compare two signature dataframes, out put a list:
+#' @title Compare two lists of signatures
+#' @description Compare two lists of signatures and return Venn diagram and hypergeometric test p-value for intersect.
+#' updated 03/2020
+#'
+#' @param sig1 a dataframe or character for signature 1. In dataframe, column "symbol" is required with feature symbol inside. If it's level 2 data (symbol with score), columns "symbol" and "score" are required.
+#' @param sig2 a dataframe or character for signature 2. Requirements are the same as sig1 above.
+#' @param sig1_name string. the name of signature 1. used for display in Venn diagram.
+#' @param sig2_name string. the name of signature 2. used for display in Venn diagram.
+#' @param is.lv2 either TRUE or FALSE. If TRUE, the input sig1 and sig2 should be dataframe with columns "symbol" and "score" available. If FALSE, input sig1 and sig2 can be character, or dataframe with column "symbol" available.
+#' @param background_number a numeric value indicating the total number of features. For example, in microarray, there are usually 22000 genes on a chip.
+#' @return a list of the comparison result of the two signature. including Venn diagram, hypergeometric test p-value.
+#'
+#' @example
+#' 
+#' sig1 <- c("TNMD","DPM1","CFH","FUCA2","HECW1","LASP1","MAD1L1","KLHL13","FUCA2")
+#' sig2 <- c("TNMD","FUCA2","C1orf112","FGR","MAD1L1","NFYA","STPG1","CFTR","LAS1L","ENPP4","SEMA3F","ANKIB1")
+#' compare_result <- sigCompare_two(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", is.lv2 = FALSE, background_number = 22000)
+#' compare_result$Venn
+#' compare_result$sig_both
+#'  
+#' 
+
 sigCompare_two <- function(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", is.lv2 = FALSE, background_number = 22000) {
   # check: should be dataframe with symbol, (score), direction; if it's lv3, can be character:
   if (class(sig1) == "data.frame" && class(sig2) == "data.frame") {
@@ -102,6 +123,6 @@ sigCompare_two <- function(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", i
 }
 
 # test the function: normally the test codes need to be commented out so R Shiny won't run them
-# sig1 <- read.table("server_functions/example_sigCompare_1.txt", header = T)
-# sig2 <- read.table("server_functions/example_sigCompare_2.txt", header = T)
+# sig1 <- read.table("SigRepoInterface/server_functions/example_sigCompare_1.txt", header = T)
+# sig2 <- read.table("SigRepoInterface/server_functions/example_sigCompare_2.txt", header = T)
 # sigCompare_two(sig1, sig2, is.lv2 = T)
