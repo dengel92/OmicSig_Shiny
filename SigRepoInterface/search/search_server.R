@@ -1,10 +1,10 @@
 # Server logic for search page
 
-# General function for generating html output showing selected search terms
-# Inputs:
-#   search_id: the dropdown menu id whose selected values should be displayed
-#   display_name: the word or phrase to display in the html output representing
-#       the dropdown menu field
+#' General function for generating html output showing selected search terms
+#' 
+#' @param search_id the dropdown menu id whose selected values should be displayed
+#' @param display_name the word or phrase to display in the html output representing
+#'       the dropdown menu field
 selected_html <- function(search_id, display_name) {
     # Display "no <display_name> selected" if there is no input to this dropdown
     if (length(input[[search_id]]) < 1) {
@@ -18,10 +18,10 @@ selected_html <- function(search_id, display_name) {
     }
 }
 
-# General function for updating a dropdown menu
-# Input:
-#   field: the name of the search field whose dropdown menu should be updated
-#   wheres: list of all of the possible where clauses for sql_finding_query()
+#' General function for updating a dropdown menu
+#'
+#' @param field the name of the search field whose dropdown menu should be updated
+#' @param wheres list of all of the possible where clauses for sql_finding_query()
 update_dropdown = function(field, wheres) {
     # Query the database to find values of field that match selected values of
     #   other fields
@@ -38,9 +38,9 @@ update_dropdown = function(field, wheres) {
         selected = input[[search_id]])
 }
 
-# General function for clearing selections of a dropdown menu
-# Input:
-#   field:the name of the search field whose dropdown menu should be updated
+#' General function for clearing selections of a dropdown menu
+#'
+#' @param field the name of the search field whose dropdown menu should be updated
 clear_dropdown = function(field) {
     # Query the database to find all values of field
     sql_obj <-
