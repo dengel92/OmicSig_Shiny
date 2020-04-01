@@ -1,0 +1,101 @@
+---
+title: "Derivation of E7386 signature"
+author: "Stefano Monti"
+output:
+  html_notebook:
+    toc: yes
+  html_document:
+    theme: united
+    toc: yes
+---
+
+```{r global, echo=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE,fig.path='../results/figures/')
+```
+
+
+```{r settings}
+require(Biobase)
+require(openxlsx)
+##require(CBMRtools)
+
+PATH <- file.path(Sys.getenv("HOME"),"research/projects/signatures")
+source(file.path(PATH,"scripts/support.functions.R"))
+
+source(file.path(Sys.getenv("CBMRtools"),"CBMRtools/R/misc.R"))
+source(file.path(Sys.getenv("CBMRtools"),"CBMRtools/R/broad.file.formats.R"))
+source(file.path(Sys.getenv("CBMRtools"),"CBMRtools/R/diffanal.scores.R")) 
+```
+
+## Load the data
+
+```{r load.data}
+xls <- read.xlsx( file.path(PATH,"data/e7386_hsc3_cal27_hnsc.xlsx") )
+rawIDX <- matchIndex("log2.(expression)",colnames(xls)):ncol(xls)
+colnames(xls) <- clean.names(xls[1,])
+xls <- xls[-1,]
+fNames <- c("Brainarray.probeset.ID","Entrez.Gene.ID","Symbol","Description")
+
+fdata <- data.frame(xls[,match.nona(fNames,colnames(xls))],
+                    row.names="Entrez.Gene.ID",
+                    stringsAsFactors=FALSE)
+expr <- apply(xls[,rawIDX],2,as.numeric)
+rownames(expr) <- xls[,matchIndex("Entrez.Gene.ID",colnames(xls))]
+if ( any(rownames(fdata)!=rownames(expr)) ) stop( "rownames(fdata)!=rownames(expr)" )
+pdata <- data.frame(t(sapply(colnames(expr),function(X) unlist(strsplit(X,split="\\.")))))
+colnames(pdata) <- c("cell","treatment","replicate") 
+eset <- ExpressionSet(assayData=expr,
+                      phenoData=AnnotatedDataFrame(pdata),
+                      featureData=AnnotatedDataFrame(fdata))
+saveRDS(eset,file=file.path(PATH,"data/e7386_hnsc_eSet.rds"))
+##eset <- readRDS(file=file.path(PATH,"data/e7386_hnsc_eSet.rds"))
+```
+
+## Extract Differential Signatures
+
+```{r extract.signatures}
+xls <- read.xlsx( file.path(PATH,"data/e7386_hsc3_cal27_hnsc.xlsx") )
+hscIdx <- matchIndex("HSC3,.E7386.vs.DMSO",colnames(xls))
+calIdx <- matchIndex("CAL27,.E7386.vs.DMSO",colnames(xls))
+endIdx <- matchIndex("DMSO,.CAL27.vs.HSC3",colnames(xls))
+colnames(xls) <- clean.names(xls[1,])
+xls <- xls[-1,] 
+
+difNames <- c("fold.change","t","p","FDR.q.all","FDR.q.filtered")
+hscDiff <- apply(xls[,hscIdx:(calIdx-1)],2,as.numeric)
+if (any(colnames(hscDiff)!=difNames)) stop("hscDiff mismatch")
+calDiff <- apply(xls[,calIdx:(endIdx-1)],2,as.numeric)
+if (any(colnames(calDiff)!=difNames)) stop("calDiff mismatch")
+
+hscDiff <- data.frame(xls[,match.nona(fNames,colnames(xls))],
+                      hscDiff,row.names="Entrez.Gene.ID",stringsAsFactors=FALSE)
+hscDiff <- hscDiff
+calDiff <- data.frame(xls[,match.nona(fNames,colnames(xls))],
+                      calDiff,row.names="Entrez.Gene.ID",stringsAsFactors=FALSE)
+
+saveRDS(hscDiff,file=file.path(PATH,"results/e7386_hsc3_hnsc_diffanal.RDS"))
+saveRDS(calDiff,file=file.path(PATH,"results/e7386_cal27_hnsc_diffanal.RDS"))
+##hscDiff <- readRDS(file=file.path(PATH,"results/e7386_hsc3_hnsc_diffanal.RDS"))
+##calDiff <- readRDS(file=file.path(PATH,"results/e7386_cal27_hnsc_diffanal.RDS"))
+```
+
+## Summarize and Compare Signatures
+
+```{r summarize.signatures}
+require(tidyr)
+hscSig <- list(up=dplyr::filter(hscDiff, t>0, FDR.q.filtered<=0.01, fold.change> +1.5)
+               %>% drop_na(Symbol) %>% pull(Symbol),
+               dn=dplyr::filter(hscDiff, t<0, FDR.q.filtered<=0.01, fold.change< -1.5)
+               %>% drop_na(Symbol) %>% pull(Symbol))
+sapply(hscSig,length)
+calSig <- list(up=dplyr::filter(calDiff, t>0, FDR.q.filtered<=0.01, fold.change> +1.5)
+               %>% drop_na(Symbol) %>% pull(Symbol),
+               dn=dplyr::filter(calDiff, t<0, FDR.q.filtered<=0.01, fold.change< -1.5)
+               %>% drop_na(Symbol) %>% pull(Symbol))
+sapply(calSig,length)
+allSig <- list(up=intersect(hscSig$up,calSig$up),
+               dn=intersect(hscSig$dn,calSig$dn))
+sapply(allSig,length)
+e7386sig <- list(hsc3=hscSig,cal27=calSig,overlap=allSig)
+saveRDS(e7386sig,file=file.path(PATH,"results/e7386_cal27_hnsc_signatures.RDS"))
+```

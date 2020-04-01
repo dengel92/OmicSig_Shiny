@@ -16,7 +16,7 @@ sample_name <- "Sum149_CYP1B1"
     "keywords" = c("cancer", "KO", "pertubations")
   )
 
-  difexp <- read.table(paste("OmicSignature/diff_exp_analysis/diffmatrix_", sample_name, ".txt", sep = ""), header = TRUE, stringsAsFactors = FALSE)
+  difexp <- read.table(paste("miscellanea/files_diffmatrix/diffmatrix_", sample_name, ".txt", sep = ""), header = TRUE, stringsAsFactors = FALSE)
   # change the column names to the standard names as required in OmicSig Obj lv1:
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "t"), "Score")
   colnames(difexp) <- replace(colnames(difexp), which(colnames(difexp) == "logfc"), "logFC")
@@ -62,8 +62,8 @@ sample_name <- "Sum149_CYP1B1"
 # check-functions:
 check_metadata(Omic.obj)
 check_difexp(Omic.obj$difexp)
-check_signatures(Omic.obj$signatures, signature_type = "bi-directional")
-check_signatures(Omic.obj$signatures, signature_type = "uni-directional")
+check_signature(Omic.obj$signatures, signature_type = "bi-directional")
+check_signature(Omic.obj$signatures, signature_type = "uni-directional")
 
 # write signaure (lv2/lv3) txt file:
 write.table(Omic.obj$signatures, file = paste("OmicSignature/signatures/", sample_name, "_lv2.txt", sep = ""), col.names = T, row.names = F, quote = F)
