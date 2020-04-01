@@ -2,13 +2,16 @@ library(plyr)
 
 # Database related functions
 
-# Add single quotation marks around a string
+#' Add single quotation marks around a string
+#' 
+#' @param my_string the string to add single quotation marks to
 single_quoted <- function(my_string) {
     return(paste0("'", my_string, "'"))
 }
 
-# Create a link to a signature file based on the signature name
-# Currently actually just does a Google image search for pandas...
+#' Create a link to a signature file based on the signature name
+#' 
+#' @param signature_name the name of the signature to link to
 create_link <-
     function(signature_name) {
         paste0(
@@ -21,7 +24,7 @@ create_link <-
         )
     }
 
-# Create a connection to the database
+#' Create a connection to the database
 new_conn_handle <- function() {
     dbConnect(
         drv = RMySQL::MySQL(),
@@ -33,8 +36,11 @@ new_conn_handle <- function() {
     )
 }
 
-# Generic sql function
+#' Submit a query to the database
+#' 
+#' @param query the query to submit
 sql_generic <- function(query) {
+    # Connect to the database
     conn <- new_conn_handle()
     # Disconnect from database when exiting sql_generic()
     on.exit(dbDisconnect(conn), add = TRUE)
@@ -43,11 +49,11 @@ sql_generic <- function(query) {
     return(this_query)
 }
 
-# Assemble part of a where clause of the form "<field> IN (<field_values>)"
-# Inputs:
-#   mylist: named list where the names are fields and the values are values
-#       associated with those fields
-#   list_key: the field name to access from mylist
+#' Assemble part of a where clause of the form "<field> IN (<field_values>)"
+#'
+#' @param mylist named list where the names are fields and the values are values
+#'   associated with those fields
+#' @param list_key the field name to access from mylist
 in_paste <- function(mylist, list_key) {
     in_clause <- paste0(list_key,
         " IN (",
@@ -61,13 +67,13 @@ in_paste <- function(mylist, list_key) {
     return(in_clause)
 }
 
-# Constructs sql query based on where clause, if one is needed,
-#   and executes final query as output
-# Inputs:
-#   fields: character vector, the fields to select from the target table
-#   target_table: string; the table to select from
-#   wheres: named list where the names are the fields to narrow search by and the
-#       values are vectors of the values to look for in those fields
+#' Constructs sql query based on where clause, if one is needed,
+#'   and executes final query as output
+#'
+#' @param fields character vector, the fields to select from the target table
+#' @param target_table string; the table to select from
+#' @param wheres named list where the names are the fields to narrow search by
+#'   and the values are vectors of the values to look for in those fields
 sql_finding_query <-
     function(target_table,
         fields = c("*"),
@@ -110,7 +116,7 @@ sql_finding_query <-
         return(sql_generic(sql))
     }
 
-# Get choices for species
+#' Get choices for species
 get_species <- reactive ({
     # Query database
     species_obj <- sql_generic("
@@ -121,7 +127,7 @@ get_species <- reactive ({
     return(species_obj$species)
 })
 
-# Get choices for signature names
+#' Get choices for signature names
 get_signature_names <- reactive ({
     # Query database
     signature_name_obj <- sql_generic("
@@ -134,7 +140,7 @@ get_signature_names <- reactive ({
 })
 
 
-# Get choices for platforms
+#' Get choices for platforms
 get_platforms <- reactive ({
     # Query database
     platform_obj <- sql_generic("
