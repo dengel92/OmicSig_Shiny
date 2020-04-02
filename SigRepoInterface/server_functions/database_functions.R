@@ -15,8 +15,10 @@ single_quoted <- function(my_string) {
 create_link <-
     function(signature_name) {
         paste0(
-            '<a href="http://sigrepo.bu.edu:3838/signatures/',
+            '<a href="http://sigrepo.bu.edu:3838/challenge_project/',
+            'miscellanea/signatures/',
             signature_name,
+            '_obj.json',
             '"',
             'target="_blank">',
             signature_name,
