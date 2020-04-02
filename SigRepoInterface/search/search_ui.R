@@ -1,3 +1,16 @@
+## Final (?) list of search terms to implement
+# experiment_type
+# feature_name
+# feature_type
+# keyword
+# phenotype (replacing perturbagen)
+# platform_name
+# signature_name
+# source_type (replacing cell_line)
+# species
+# submitter_name
+# upload_date
+
 # Search signatures page structure
 search_ui <- tabPanel("Search",
     # Create a layout with a sidebar and a main panel
@@ -7,8 +20,14 @@ search_ui <- tabPanel("Search",
             # Add some space at the top
             dq_space(),
             
-            # Show selected search terms
-            htmlOutput(outputId = "search_terms"),
+            # Show checkbox for displaying selected search terms
+            checkboxInput("show_selected", "Show selected search terms"),
+            
+            # Show selected search terms if checkbox is checked
+            conditionalPanel(
+                condition = "input.show_selected == 1",
+                htmlOutput(outputId = "search_terms")
+            ),
             
             # Button for clearing selected terms
             actionButton("clear", "Clear Search Terms"),

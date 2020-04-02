@@ -118,7 +118,7 @@ observe({
         wheres <- list(
             "species" = input$search_species,
             "platform_name" = input$search_platform_name,
-            "exp_type_id" = input$search_experiment_type,
+            "exp_type_id" = input$search_exp_type_id,
             "cell_line" = input$search_cell_line,
             "perturbagen_id" = input$search_perturbagen_id,
             "signature_name" = input$search_signature_name,
@@ -154,7 +154,7 @@ observeEvent(input$search, {
     wheres <- list(
         "species" = input$search_species,
         "platform_name" = input$search_platform_name,
-        "exp_type_id" = input$search_experiment_type,
+        "exp_type_id" = input$search_exp_type_id,
         "cell_line" = input$search_cell_line,
         "perturbagen_id" = input$search_perturbagen_id,
         "signature_name" = input$search_signature_name,
