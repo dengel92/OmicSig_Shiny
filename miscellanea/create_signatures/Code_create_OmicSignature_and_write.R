@@ -36,13 +36,13 @@ sample_name <- "Sum149_CYP1B1"
   temp_upsig <- cbind(
     filter(difexp, Score > 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(symbol),
     filter(difexp, Score > 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(Score),
-    "Up"
+    "+"
   )
   temp_upsig
   temp_dnsig <- cbind(
     filter(difexp, Score < 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(symbol),
     filter(difexp, Score < 0 & abs(logFC) > metadata$logFC_cutoff & fdr < metadata$fdr_cutoff) %>% pull(Score),
-    "Dn"
+    "-"
   )
   temp_dnsig
 
@@ -54,6 +54,7 @@ sample_name <- "Sum149_CYP1B1"
   remove(temp_upsig, temp_dnsig)
 
   # Object:
+  source("OmicSignature/OmicSignature.R")
   Omic.obj <- OmicSignature$new(metadata, signatures, difexp)
   print(Omic.obj)
   remove(metadata, signatures, difexp)
