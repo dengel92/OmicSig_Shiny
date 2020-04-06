@@ -55,7 +55,7 @@ sample_name <- "Sum149_CYP1B1"
 
   # Object:
   source("OmicSignature/OmicSignature.R")
-  Omic.obj <- OmicSignature$new(metadata, signatures, difexp)
+  Omic.obj <- OmicSignature$new(metadata, signatures, difexp, print_message = F)
   print(Omic.obj)
   remove(metadata, signatures, difexp)
 }

@@ -11,16 +11,16 @@ library(dplyr)
         metadata = NULL,
         signatures = NULL,
         difexp = NULL,
-        initialize = function(metadata, signatures, difexp = NULL) {
-          metadata <- check_metadata(metadata)
+        initialize = function(metadata, signatures, difexp = NULL, print_message = FALSE) {
+          metadata <- check_metadata(metadata, v = print_message)
           if (!is.null(difexp)) {
-            difexp <- check_difexp(difexp)
+            difexp <- check_difexp(difexp, v = print_message)
           }
-          signatures <- check_signature(signatures, signature_type = metadata$type)
+          signatures <- check_signature(signatures, signature_type = metadata$type, v = print_message)
           self$metadata <- metadata
           self$signatures <- signatures
           self$difexp <- difexp
-          cat("  -------\n  [Success] OmicSignature object created.\n")
+          cat("  [Success] OmicSignature object created.\n")
         },
         print = function(...) {
           cat("Signature Object: \n")
