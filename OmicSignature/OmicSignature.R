@@ -12,13 +12,12 @@ library(dplyr)
         metadata = NULL,
         signatures = NULL,
         difexp = NULL,
-        initialize = function(metadata, signatures, difexp = NULL) {
-          verbose <- F
-          metadata <- check_metadata(metadata, v = verbose)
+        initialize = function(metadata, signatures, difexp = NULL, print_message = FALSE) {
+          metadata <- check_metadata(metadata, v = print_message)
           if (!is.null(difexp)) {
-            difexp <- check_difexp(difexp, v = verbose)
+            difexp <- check_difexp(difexp, v = print_message)
           }
-          signatures <- check_signature(signatures, signature_type = metadata$type, v = verbose)
+          signatures <- check_signature(signatures, signature_type = metadata$type, v = print_message)
           self$metadata <- metadata
           self$signatures <- signatures
           self$difexp <- difexp
