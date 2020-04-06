@@ -1,22 +1,27 @@
+# use verbose() function so the message is optionally printed. default is False
+verbose <- function(v, ...) {
+  if (v) cat(...)
+}
+
 ## check_metadata() -------------------------------------
 ##
-check_metadata <- function(metadata) {
+check_metadata <- function(metadata, v = FALSE) {
   ## metadata should be a list with required attributes
   if (class(metadata)[1] == "OmicSignature") {
     metadata <- metadata$metadata
   }
   if (class(metadata) == "list") {
-    cat(paste("  Metadata: Checked; is a list. \n"))
+    verbose(v, "  Metadata: Checked; is a list. \n")
   }
   else {
     stop("Metadata not found or metadata is not a list. ")
   }
   metadata_required <- c("organism", "platform", "type", "phenotype")
   metadata_missing <- setdiff(metadata_required, names(metadata))
-  cat(paste("  --Required attributes for metadata: ", paste(metadata_required, collapse = ", "), " --\n", sep = ""))
+  verbose(v, paste("  --Required attributes for metadata: ", paste(metadata_required, collapse = ", "), " --\n", sep = ""))
 
   if (length(metadata_missing) == 0) {
-    cat(paste("  Metadata: Checked; contains all the essential attributes. \n"))
+    verbose(v, paste("  Metadata: Checked; contains all the essential attributes. \n"))
   } else {
     stop("Metadata does not contain attribute(s): ",
       paste(metadata_missing, collapse = ", "),
@@ -24,24 +29,21 @@ check_metadata <- function(metadata) {
       sep = ""
     )
   }
-  cat("  [Success] Metadata is valid. \n")
+  verbose(v, "  [Success] Metadata is saved. \n")
   return(metadata)
 }
 ## check_signature()---------------------------------------------
 ## we need the information of "signature_type" in the metadata
 ## so, the input need to either be OmicSignature Obj, or need to specify signature type
-check_signature <- function(omic.obj, signature_type = NULL, sample_number = 0) {
+check_signature <- function(omic.obj, signature_type = NULL, num_categories = 0, v = FALSE) {
+  ## num_categories is used for multi-directional signature to specify
   ## read the signature, and check if it is a dataframe:
   if (class(omic.obj)[1] == "OmicSignature") {
     signature <- omic.obj$signature
     signature_type <- omic.obj$metadata$type
     if (signature_type == "multi-directional") {
-      ## stefano: where does sample_number come from? It's not a required field in metadata
-      ## stefano: and what does it represent? Is it the number of categories of the variable?
-      ## .. If so, rename as num_categories or count
-      ## .. and check that it is a positive integer
-      if (!is.null(omic.obj$metadata$sample_number)) {
-        sample_number <- omic.obj$metadata$sample_number
+      if (!is.null(omic.obj$metadata$num_categories)) {
+        num_categories <- omic.obj$metadata$num_categories
       } else {
         stop("Signature is specified as multi-directional, but sample number not found.")
       }
@@ -69,7 +71,7 @@ check_signature <- function(omic.obj, signature_type = NULL, sample_number = 0) 
     stop("Signature dataframe does not contain \"signature_symbol\" column.")
   }
   if (c("signature_score") %in% colnames(signature)) {
-    cat("  Signature: contains lv2 data. \n")
+    verbose(v, "  Signature: contains lv2 data. \n")
   } else {
     cat("  Warning: Feature score not found, please make sure column \"signature_score\" presents if you have score for the features. \n")
   }
@@ -96,9 +98,9 @@ check_signature <- function(omic.obj, signature_type = NULL, sample_number = 0) 
     ## check direction:
     summary_direction <- summary(signature$signature_direction)
     if (isTRUE(all.equal(c("-", "+"), names(summary(signature$signature_direction))))) {
-      cat("  Signature: Checked, signature is bi-directional with - (Dn) and + (Up) directions. \n")
+      verbose(v, "  Signature: Checked, signature is bi-directional with - (Dn) and + (Up) directions. \n")
     } else if (names(summary_direction) == c("-") | names(summary_direction) == c("+")) {
-      cat("  Signature: Checked, signature is bi-directional, but only one direction is found. \n")
+      verbose(v, "  Signature: Checked, signature is bi-directional, but only one direction is found. \n")
     } else {
       stop("Direction info in bi-directional signature is not valid. Direction should be marked with \"-\" and \"+\".")
     }
@@ -107,19 +109,19 @@ check_signature <- function(omic.obj, signature_type = NULL, sample_number = 0) 
   ## uni-directional signature:
   else if (signature_type == "uni-directional") {
     if (!"signature_direction" %in% colnames(signature)) {
-      cat(paste("  Checked. signature is uni-directional. \n"))
+      verbose(v, "  Checked. signature is uni-directional. \n")
     } else {
-      cat(paste("  Warning: signature is specified as uni-directional but additional direction information found. \n"))
+      verbose(v, "  Warning: signature is specified as uni-directional but additional direction information found. \n")
     }
   }
 
   ## multi-directional signature:
   else if (signature_type == "multi-directional") {
     summary_direction <- summary(signature$signature_direction)
-    if (length(summary_direction) == sample_number) {
-      cat(paste("  Checked. signature is multi-directional with", sample_number, "samples. \n", sep = " "))
-    } else if (length(summary_direction) < sample_number) {
-      cat(paste("  Warning: signature is multi-directional with", sample_number, "samples, but some samples do not have signature. \n"))
+    if (length(summary_direction) == num_categories) {
+      verbose(v, paste("  Checked. signature is multi-directional with", num_categories, "samples. \n", sep = " "))
+    } else if (length(summary_direction) < num_categories) {
+      verbose(v, paste("  Warning: signature is multi-directional with", num_categories, "samples, but some samples do not have signature. \n"))
     } else {
       stop("Signature is specified as multi-directional, but sample number is invalid.")
     }
@@ -129,13 +131,13 @@ check_signature <- function(omic.obj, signature_type = NULL, sample_number = 0) 
   else {
     stop("Error: Signature information invalid.")
   }
-  cat("  [Success] Signature is valid. \n")
+  verbose(v, "  [Success] Signature is valid. \n")
   return(signature)
 }
 
 ## check_difexp()-----------------------------------------
 ## check_difexp() function supports input Obj or dataframe
-check_difexp <- function(omic.obj) {
+check_difexp <- function(omic.obj, v = FALSE) {
   ## should be data frame, contain columns: c("probe_id", "symbol", "logfc", "score", "p.value", "fdr")
   if (class(omic.obj)[1] == "OmicSignature") {
     difexp <- omic.obj$difexp
@@ -151,7 +153,7 @@ check_difexp <- function(omic.obj) {
   if (nrow(difexp) == 0) {
     stop("Differential Express Matrix (lv1 data) is empty. ")
   } else {
-    cat(paste("  difexp: Checked. Differential Express Matrix (lv1 data) is a data frame. \n"))
+    verbose(v, "  difexp: Checked. Differential Express Matrix (lv1 data) is a data frame. \n")
   }
 
   ## check column names:
@@ -160,24 +162,24 @@ check_difexp <- function(omic.obj) {
   difexp_colname_required <- c("probe_id", "symbol", "logfc", "score", "p.value", "fdr")
   difexp_colname_missing <- setdiff(difexp_colname_required, colnames(difexp))
   difexp_colname_additional <- setdiff(colnames(difexp), difexp_colname_required)
-  cat(paste("  --Required columns for Differential Express Matrix (lv1 data): ", paste(difexp_colname_required, collapse = ", "), " --\n", sep = ""))
+  verbose(v, paste("  --Required columns for Differential Express Matrix (lv1 data): ", paste(difexp_colname_required, collapse = ", "), " --\n", sep = ""))
 
   if (length(difexp_colname_missing) == 0) {
-    cat(paste("  difexp: Checked. Differential Express Matrix (lv1 data) contain all the essential columns. \n"))
+    verbose(v, "  difexp: Checked. Differential Express Matrix (lv1 data) contain all the essential columns. \n")
   } else {
     stop("Differential Express Matrix (lv1 data) does not contain required column(s): ", paste(difexp_colname_missing, collapse = ", "), ".", sep = "")
   }
   if (length(difexp_colname_additional) > 0) {
-    cat(paste("  difexp: additional columns found: ", paste(difexp_colname_additional, collapse = ", "), ". \n", sep = ""))
+    verbose(v, paste("  difexp: additional columns found: ", paste(difexp_colname_additional, collapse = ", "), ". \n", sep = ""))
   }
   ## check column type:
   ## "logfc","score","p.value","fdr" should be numerical
   for (numeric_colname in c("logfc", "score", "p.value", "fdr")) {
     if (numeric_colname %in% colnames(difexp)) {
       if (class(difexp[, numeric_colname]) == "numeric") {
-        cat(paste("  difexp: Checked. ", numeric_colname, " is numeric. \n", sep = ""))
+        verbose(v, paste("  difexp: Checked. ", numeric_colname, " is numeric. \n", sep = ""))
       } else {
-        stop(paste("difexp: Warning: ", numeric_colname, " is not numeric."))
+        stop(paste("difexp: ", numeric_colname, " is not numeric."))
       }
     }
   }
@@ -185,11 +187,11 @@ check_difexp <- function(omic.obj) {
   if ("symbol" %in% colnames(difexp)) {
     if (class(difexp$symbol) == "character" | class(difexp$symbol) == "factor") {
       difexp$symbol <- as.character(difexp$symbol)
-      cat("  difexp: Checked. symbol is character. \n")
+      verbose(v, "  difexp: Checked. symbol is character. \n")
     } else {
       stop("difexp: signature symbol is not character.")
     }
   }
-  cat("  [Success] difexp matrix is valid. \n")
+  verbose(v, "  [Success] difexp matrix is valid. \n")
   return(difexp)
 }
