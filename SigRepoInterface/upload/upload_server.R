@@ -344,3 +344,8 @@ observe({
                          "platform_name",
                          choices = c("", get_platforms()))
 })
+
+observeEvent(input$test_multi,{
+    test_reading = lapply(input$test_upload$datapath, read_json)
+    print(test_reading)
+})

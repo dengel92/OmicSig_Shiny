@@ -93,8 +93,8 @@ upload_ui <- tabPanel("Upload",
             fileInput(
                 inputId = "omicobj_upload",
                 label = "Object File",
-                multiple = FALSE,
-                accept = c("text/json", ".json", "text/txt", ".txt"),
+                multiple = TRUE,
+                accept = c("text/json", ".json", "text/txt", ".txt", ".rds", "text/rds"),
                 width = NULL,
                 buttonLabel = "Browse...",
                 placeholder = "No file selected"
@@ -107,6 +107,17 @@ upload_ui <- tabPanel("Upload",
             actionButton("upload_object", "Upload with File"),
             #if feature symbols in signature don't match up in DB
             #will get message in this div
-            div(textOutput("errday"))
+            div(textOutput("errday")),
+            fileInput(
+                inputId = "test_upload",
+                label = "test File(s)",
+                multiple = TRUE,
+                accept = c("text/json", ".json", "text/txt", ".txt", ".rds", "text/rds"),
+                width = NULL,
+                buttonLabel = "Browse...",
+                placeholder = "No file selected"
+            ),
+            actionButton("test_multi", "test multiple"),
+            div(textOutput("test_out"))
         )
     ))
