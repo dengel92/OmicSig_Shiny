@@ -1,3 +1,6 @@
+# Source database functions
+source('../command_line/database_functions.R')
+
 #' Get choices for signature names
 get_signature_names <- reactive ({
     # Query database
