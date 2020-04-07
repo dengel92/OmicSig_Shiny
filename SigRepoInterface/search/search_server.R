@@ -67,8 +67,8 @@ observeEvent(input$clear, {
         # Update experiment types dropdown menu
         clear_dropdown("exp_type_id")
         
-        # Update cell lines dropdown menu
-        clear_dropdown("cell_line")
+        # Update source types dropdown menu
+        clear_dropdown("source_type")
         
         # Update perturbagens dropdown menu
         clear_dropdown("perturbagen_id")
@@ -97,8 +97,8 @@ output$search_terms <- renderText(
         # Show selected experiment types
         selected_html("search_exp_type_id", "experiment types"),
         
-        # Show selected cell lines
-        selected_html("search_cell_line", "cell lines"),
+        # Show selected source types
+        selected_html("search_source_type", "source types"),
         
         # Show selected perturbagens
         selected_html("search_perturbagen_id", "perturbagens"),
@@ -119,7 +119,7 @@ observe({
             "species" = input$search_species,
             "platform_name" = input$search_platform_name,
             "exp_type_id" = input$search_exp_type_id,
-            "cell_line" = input$search_cell_line,
+            "source_type" = input$search_source_type,
             "perturbagen_id" = input$search_perturbagen_id,
             "signature_name" = input$search_signature_name,
             "submitter_id" = input$search_submitter_id
@@ -134,8 +134,8 @@ observe({
         # Update experiment types dropdown menu
         update_dropdown("exp_type_id", wheres)
         
-        # Update cell lines dropdown menu
-        update_dropdown("cell_line", wheres)
+        # Update source types dropdown menu
+        update_dropdown("source_type", wheres)
         
         # Update perturbagens dropdown menu
         update_dropdown("perturbagen_id", wheres)
@@ -155,7 +155,7 @@ observeEvent(input$search, {
         "species" = input$search_species,
         "platform_name" = input$search_platform_name,
         "exp_type_id" = input$search_exp_type_id,
-        "cell_line" = input$search_cell_line,
+        "source_type" = input$search_source_type,
         "perturbagen_id" = input$search_perturbagen_id,
         "signature_name" = input$search_signature_name,
         "submitter_id" = input$search_submitter_id
@@ -204,12 +204,14 @@ observeEvent(input$search, {
                 downloadHandler(
                     filename = paste("SigRepo_search_results_selected.tsv"),
                     content = function(file) {
+                        for (signature in sql_obj[input$search_results_rows_selected, ]) {
+                            print(signature)}
                         write.table(
                             sql_obj[input$search_results_rows_selected, ],
                             file,
                             row.names = FALSE,
                             quote = FALSE,
-                            col.names = FALSE,
+                            col.names = TRUE,
                             sep = "\t"
                         )
                     }
