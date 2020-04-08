@@ -163,7 +163,7 @@ sql_finding_query <-
         # Add where clauses to query
         sql <- paste(sql, where_clauses, ";", sep = " ")
         #Debugging block
-        if (TRUE) {
+        if (FALSE) {
             print(sql)
         }
         # Execute

@@ -49,6 +49,7 @@ search_ui <- tabPanel("Search",
             ),
             
             # Dropdown menu for selecting experiment type
+            # NEED TO CHANGE TO search_experiment_type WHEN VIEW IS UPDATED!
             selectizeInput(
                 inputId = "search_exp_type_id",
                 label = "Choose experiment type(s)",
@@ -65,6 +66,7 @@ search_ui <- tabPanel("Search",
             ),
             
             # Dropdown menu for selecting perturbagen
+            # NEED TO CHANGE TO search_phenotype WHEN VIEW IS UPDATED!
             selectizeInput(
                 inputId = "search_perturbagen_id",
                 label = "Choose perturbagen(s)",
@@ -87,12 +89,20 @@ search_ui <- tabPanel("Search",
             #   is checked
             conditionalPanel(
                 condition = "input.more_filters == 1",
+                
                 # Dropdown menu for selecting submitter name
+                # NEED TO CHANGE TO search_submitter_name WHEN VIEW IS UPDATED!
                 selectizeInput(
                     inputId = "search_submitter_id",
                     label = "Choose submitter name(s)",
                     choices = NULL,
                     multiple = TRUE
+                ),
+                
+                # Date range input for selecting upload date
+                dateRangeInput('search_upload_date',
+                    label = 'Choose upload date range',
+                    start = "2020-01-01", end = Sys.Date()
                 )
             ),
             
@@ -116,7 +126,7 @@ search_ui <- tabPanel("Search",
                 # If the output table is too wide, add a scrollbar
                 style = "overflow-y: scroll"),
             
-            # Download button will appear only after clicking search button
+            # Download buttons will appear only when table is displayed
             conditionalPanel(
                 condition = "output.search_results",
                 # Download button for full search results table
