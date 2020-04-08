@@ -3,7 +3,7 @@
 # Set up accordion menu headers and contents
 accordion_titles <-
     c("About",
-        "Why are these panels all the same length?",
+        "How tall is this panel",
         "Uploading a new signature")
 
 accordion_contents <- list(
@@ -25,9 +25,8 @@ accordion_contents <- list(
         "modular, allowing access and analysis of expression profiles of other ",
         "features (e.g. microbial communities, metabolites)."
     ),
-    paste0("The content of this panel of the accordion menu is very short, ",
-    "but the panel is still very large. :("),
-    "Here's some information on uploading a new signature."
+    paste0("This panel is short now. :)"),
+    paste0("You have several options when uploading a new signature.")
 )
 
 # Make accordion menu
@@ -36,7 +35,7 @@ accordion_menu <- dq_accordion(
     accordion_titles,
     accordion_contents,
     # These options allow all of the panels to be collapsed at once
-    options = list(active = FALSE, collapsible = TRUE),
+    options = list(active = FALSE, collapsible = TRUE, heightStyle = "content"),
     bg_color = "#f8f5f0"
 )
 

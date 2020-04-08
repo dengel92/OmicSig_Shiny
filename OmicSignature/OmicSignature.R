@@ -2,7 +2,6 @@ library(R6)
 library(dplyr)
 
 {
-  source("OmicSignature/check_functions/Function_objCheck.R")
   ## OmicSignature define
   ##
   OmicSignature <-

@@ -1,15 +1,15 @@
 ## Final (?) list of search terms to implement
-# experiment_type
-# feature_name
-# feature_type
-# keyword
+# experiment_type (not currently in platform_signature_view)
+# feature_name (not currently in platform_signature_view)
+# feature_type (not currently in platform_signature_view)
+# keyword (not currently in platform_signature_view)
 # phenotype (replacing perturbagen)
-# platform_name
-# signature_name
-# source_type (replacing cell_line)
-# species
-# submitter_name
-# upload_date
+##### platform_name
+##### signature_name
+##### source_type (replacing cell_line)
+##### species
+# submitter_name (not currently in platform_signature_view)
+##### upload_date
 
 # Search signatures page structure
 search_ui <- tabPanel("Search",
@@ -20,6 +20,9 @@ search_ui <- tabPanel("Search",
             # Add some space at the top
             dq_space(),
             
+            # Button for clearing selected terms
+            actionButton("clear", "Clear Search Terms"),
+            
             # Show checkbox for displaying selected search terms
             checkboxInput("show_selected", "Show selected search terms"),
             
@@ -28,9 +31,6 @@ search_ui <- tabPanel("Search",
                 condition = "input.show_selected == 1",
                 htmlOutput(outputId = "search_terms")
             ),
-            
-            # Button for clearing selected terms
-            actionButton("clear", "Clear Search Terms"),
             
             # Dropdown menu for selecting species
             selectizeInput(
@@ -56,10 +56,10 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE
             ),
             
-            # Dropdown menu for selecting cell line
+            # Dropdown menu for selecting source type
             selectizeInput(
-                inputId = "search_cell_line",
-                label = "Choose cell line(s)",
+                inputId = "search_source_type",
+                label = "Choose source type(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -86,7 +86,7 @@ search_ui <- tabPanel("Search",
             # Additional search options that appear only when "more_filters"
             #   is checked
             conditionalPanel(
-                condition = "input.more_filters >= 1",
+                condition = "input.more_filters == 1",
                 # Dropdown menu for selecting submitter name
                 selectizeInput(
                     inputId = "search_submitter_id",
@@ -107,7 +107,7 @@ search_ui <- tabPanel("Search",
             
             # Show checkbox for selecting/unselecting all rows
             conditionalPanel(
-                condition = "input.search >= 1",
+                condition = "output.search_results",
                 checkboxInput("select_all", "Select/unselect all")
             ),
             
@@ -118,7 +118,7 @@ search_ui <- tabPanel("Search",
             
             # Download button will appear only after clicking search button
             conditionalPanel(
-                condition = "input.search >= 1",
+                condition = "output.search_results",
                 # Download button for full search results table
                 downloadButton("search_results_download", "Download Table"),
                 # Download button for selected rows
