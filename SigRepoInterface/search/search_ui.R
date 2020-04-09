@@ -1,15 +1,15 @@
 ## Final (?) list of search terms to implement
-# experiment_type (not currently in platform_signature_view)
-# feature_name (not currently in platform_signature_view)
-# feature_type (not currently in platform_signature_view)
-# keyword (not currently in platform_signature_view)
-# phenotype (replacing perturbagen)
+##### experiment_type
+##### phenotype
 ##### platform_name
 ##### signature_name
-##### source_type (replacing cell_line)
+##### source_type
 ##### species
-# submitter_name (not currently in platform_signature_view)
+##### submitter_name
 ##### upload_date
+# feature_name
+# feature_type
+# keyword
 
 # Search signatures page structure
 search_ui <- tabPanel("Search",
@@ -49,9 +49,8 @@ search_ui <- tabPanel("Search",
             ),
             
             # Dropdown menu for selecting experiment type
-            # NEED TO CHANGE TO search_experiment_type WHEN VIEW IS UPDATED!
             selectizeInput(
-                inputId = "search_exp_type_id",
+                inputId = "search_experiment_type",
                 label = "Choose experiment type(s)",
                 choices = NULL,
                 multiple = TRUE
@@ -65,11 +64,11 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE
             ),
             
-            # Dropdown menu for selecting perturbagen
+            # Dropdown menu for selecting phenotype
             # NEED TO CHANGE TO search_phenotype WHEN VIEW IS UPDATED!
             selectizeInput(
-                inputId = "search_perturbagen_id",
-                label = "Choose perturbagen(s)",
+                inputId = "search_phenotype_id",
+                label = "Choose phenotype(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -91,9 +90,8 @@ search_ui <- tabPanel("Search",
                 condition = "input.more_filters == 1",
                 
                 # Dropdown menu for selecting submitter name
-                # NEED TO CHANGE TO search_submitter_name WHEN VIEW IS UPDATED!
                 selectizeInput(
-                    inputId = "search_submitter_id",
+                    inputId = "search_submitter",
                     label = "Choose submitter name(s)",
                     choices = NULL,
                     multiple = TRUE

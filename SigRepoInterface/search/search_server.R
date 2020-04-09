@@ -68,19 +68,19 @@ observeEvent(input$clear, {
         clear_dropdown("platform_name")
         
         # Update experiment types dropdown menu
-        clear_dropdown("exp_type_id")
+        clear_dropdown("experiment_type")
         
         # Update source types dropdown menu
         clear_dropdown("source_type")
         
-        # Update perturbagens dropdown menu
-        clear_dropdown("perturbagen_id")
+        # Update phenotypes dropdown menu
+        clear_dropdown("phenotype_id")
         
         # Update signatures names dropdown menu
         clear_dropdown("signature_name")
         
         # Update submitters dropdown menu
-        clear_dropdown("submitter_id")
+        clear_dropdown("submitter")
     })
 })
 
@@ -98,19 +98,19 @@ output$search_terms <- renderText(
         selected_html("search_platform_name", "platforms"),
         
         # Show selected experiment types
-        selected_html("search_exp_type_id", "experiment types"),
+        selected_html("search_experiment_type", "experiment types"),
         
         # Show selected source types
         selected_html("search_source_type", "source types"),
         
-        # Show selected perturbagens
-        selected_html("search_perturbagen_id", "perturbagens"),
+        # Show selected phenotypes
+        selected_html("search_phenotype_id", "phenotypes"),
         
         # Show selected signature names
         selected_html("search_signature_name", "signatures"),
         
         # Show selected submitters
-        selected_html("search_submitter_id", "submitters"),
+        selected_html("search_submitter", "submitters"),
         
         # Show selected upload date range
         selected_html("search_upload_date", "upload date (start, end)"),
@@ -124,11 +124,11 @@ observe({
         ins <- list(
             "species" = input$search_species,
             "platform_name" = input$search_platform_name,
-            "exp_type_id" = input$search_exp_type_id,
+            "experiment_type" = input$search_experiment_type,
             "source_type" = input$search_source_type,
-            "perturbagen_id" = input$search_perturbagen_id,
+            "phenotype_id" = input$search_phenotype_id,
             "signature_name" = input$search_signature_name,
-            "submitter_id" = input$search_submitter_id
+            "submitter" = input$search_submitter
         )
         # Construct list of all possible between clauses for query
         betweens <- list(
@@ -142,19 +142,19 @@ observe({
         update_dropdown("platform_name", ins, betweens)
         
         # Update experiment types dropdown menu
-        update_dropdown("exp_type_id", ins, betweens)
+        update_dropdown("experiment_type", ins, betweens)
         
         # Update source types dropdown menu
         update_dropdown("source_type", ins, betweens)
         
-        # Update perturbagens dropdown menu
-        update_dropdown("perturbagen_id", ins, betweens)
+        # Update phenotypes dropdown menu
+        update_dropdown("phenotype_id", ins, betweens)
         
         # Update signatures names dropdown menu
         update_dropdown("signature_name", ins, betweens)
         
         # Update submitters dropdown menu
-        update_dropdown("submitter_id", ins, betweens)
+        update_dropdown("submitter", ins, betweens)
     })
 })
 
@@ -164,11 +164,11 @@ observeEvent(input$search, {
     ins <- list(
         "species" = input$search_species,
         "platform_name" = input$search_platform_name,
-        "exp_type_id" = input$search_exp_type_id,
+        "experiment_type" = input$search_experiment_type,
         "source_type" = input$search_source_type,
-        "perturbagen_id" = input$search_perturbagen_id,
+        "phenotype_id" = input$search_phenotype_id,
         "signature_name" = input$search_signature_name,
-        "submitter_id" = input$search_submitter_id
+        "submitter" = input$search_submitter
     )
     # Construct list of all possible between clauses for query
     betweens <- list(
