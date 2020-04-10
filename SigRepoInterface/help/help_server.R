@@ -1,7 +1,6 @@
 # Server logic for help page
 
-output$upload_help <-
-    renderText("This is the help page for uploading signatures")
-
-output$search_help <-
-    renderText("This is the help page for searching signatures")
+output$about_text <-
+  renderUI({
+    HTML(paste(readLines("help/about.txt"), collapse = "</br></br>"))
+  })

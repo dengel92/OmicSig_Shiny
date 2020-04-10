@@ -50,7 +50,7 @@ library(dplyr)
             dplyr::select(symbol, score) %>%
             dplyr::mutate(direction = ifelse(score < 0, "-", "+")) %>%
             dplyr::arrange(direction) %>%
-            dplyr::rename(symbol = signature_symbol, score = signature_score, direction = signature_direction)
+            dplyr::rename(symbol = symbol, score = score, direction = direction)
           return(res)
         }
       )
