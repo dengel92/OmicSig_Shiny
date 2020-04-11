@@ -21,7 +21,8 @@ observe({
 output$overrep_introduction <- renderText({
   c(
     "<p><h4>*Introduction of the test*</h4></p>",
-    "<br> *suggest use Cal27_CB113 to test.* "
+    "<br> *suggest use Cal27_CB113 and KEGG, BIOCARTA to test.* 
+    <br> run hypeR::msigdb_info() to learn more about the available species and gene sets."
   )
 })
 
@@ -31,7 +32,7 @@ overrep_signature_df_variable <- reactive({
     single_quoted(input$overrep_signature), ";",
     sep = ""
   ))
-  df <- df[order(df$weight, decreasing = T),]
+  df <- df[order(df$weight, decreasing = T), ]
   colnames(df) <- c("signature_symbol", "signature_score", "signature_direction")
   return(df)
 })
@@ -49,17 +50,16 @@ output$overrep_download_signature <- downloadHandler(
 
 overrep_result_variable <- eventReactive(input$overrep_analysis, {
   sig <- overrep_signature_df_variable()
-
-  ## species??
-  ## also how is species named? need to update overrep_hypeR() function in Function_hypeR.R
-  # sig_species <- sql_generic(
-  #  paste(
-  #    "select feature_name, weight from feature_signature_view where signature_name =",
-  #    single_quoted(input$overrep_signature), ";",
-  #    sep = ""
-  #  ))
-  ##
-  result <- hypeR_overrep_function(sig, species = "Homo sapiens")
+  gset_names <- data.frame(
+    species = character(0),
+    category = character(0),
+    subcategory = character(0)
+  )
+  for (i in c(input$overrep_gsets)) {
+    gset_names <- rbind(gset_names, c(input$overrep_species, unlist(strsplit(i, "_"))[1:2]), stringsAsFactors = FALSE)
+  }
+  colnames(gset_names) <- c("species", "category", "subcategory")
+  result <- hypeR_overrep_server_function(sig, gset_names)
   result$sig_name <- input$overrep_signature
   return(result)
 })
@@ -71,13 +71,15 @@ output$overrep_success <- renderText({
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#008F00\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Mar2020. </p>",
     "<p>The meaning of each column:",
-      "<br> direction: the direction of the feature (genes) in the given signature, if available.",
-      "<br> label: pathway or geneset names.",
-      "<br> pval: p-value of the over-representation of that pathway or geneset.",
-      "<br> fdr: p-value after fdr correction.",
-      "<br> geneset: total amount of genes in that pathway or geneset.",
-      "<br> overlap: the number of significant overlapping genes between the signature and the geneset.", 
-      "<br> hits: symbol of the significant overlapping genes.",
+    "<br> direction: the direction of the feature (genes) in the given signature, if available.
+    <br> category: category of the gene set (e.g. C2). Source: http://software.broadinstitute.org/gsea/msigdb.
+    <br> subcategory: subcategory of the gene set (e.g. KEGG). Source: http://software.broadinstitute.org/gsea/msigdb.
+    <br> label: pathway or geneset names.
+    <br> pval: p-value of the over-representation of that pathway or geneset.
+    <br> fdr: p-value after fdr correction.
+    <br> geneset: total amount of genes in that pathway or geneset.
+    <br> overlap: the number of significant overlapping genes between the signature and the geneset.
+    <br> hits: symbol of the significant overlapping genes.",
     "</p>"
   )
 })
