@@ -1,18 +1,17 @@
-hypeR_overrep_ui <- tabPanel(
-  "hypeR_overrep",
+hypeR_ui <- tabPanel(
+  "hypeR_analysis",
   sidebarLayout(
     sidebarPanel(
       # Add some space at the top
       dq_space(),
-
       selectizeInput(
-        "overrep_signature",
+        "hypeR_signature",
         label = "select a signature",
         choices = NULL,
         multiple = FALSE
       ),
       selectizeInput(
-        "overrep_species",
+        "hypeR_species",
         label = "select a species",
         choices = c(
           "Homo sapiens", "Mus musculus", "Drosophila melanogaster", "Gallus gallus",
@@ -22,7 +21,7 @@ hypeR_overrep_ui <- tabPanel(
         multiple = FALSE, selected = "Homo sapiens"
       ),
       selectizeInput(
-        "overrep_gsets",
+        "hypeR_gsets",
         label = "select gene set(s)",
         choices = c(
           "C1__[Positional]", "C2_CGP_[Chemical and Genetic Perturbations]",
@@ -36,27 +35,36 @@ hypeR_overrep_ui <- tabPanel(
         ),
         multiple = TRUE
       ),
-
-      actionButton("overrep_analysis", label = "Over-representation analysis")
+      actionButton("hypeR_overrep_analysis", label = "Over-representation analysis"),
+      dq_space(),
+      actionButton("hypeR_enrich_analysis", label = "Enrichment analysis")
     ),
     mainPanel(
       # Add some space at the top
       dq_space(),
 
-      htmlOutput("overrep_introduction"),
-      checkboxInput("overrep_show_signatures", "Display signature table"),
+      htmlOutput("hypeR_introduction"),
+      checkboxInput("hypeR_show_signatures", "Display signature table"),
       conditionalPanel(
-        condition = "input.overrep_show_signatures >= 1",
+        condition = "input.hypeR_show_signatures >= 1",
         c("Signature you selected:"),
-        downloadButton("overrep_download_signature", "Download signature table"),
-        tableOutput("overrep_signature_df")
+        downloadButton("hypeR_download_signature", "Download signature table"),
+        tableOutput("hypeR_signature_df")
       ),
-      htmlOutput("overrep_success"),
+
+      htmlOutput("hypeR_overrep_success"),
       conditionalPanel(
-        condition = "output.overrep_success",
-        downloadButton("overrep_download", label = "Download overrep result"),
-        tableOutput("overrep_result"),
-        htmlOutput("overrep_show_features")
+        condition = "output.hypeR_overrep_success",
+        downloadButton("hypeR_overrep_download", label = "Download Overrep result"),
+        tableOutput("hypeR_overrep_result")
+      ),
+      "---------------------------------------------------------------------\n",
+      htmlOutput("hypeR_enrich_introduction"),
+      htmlOutput("hypeR_enrich_success"),
+      conditionalPanel(
+        condition = "output.hypeR_enrich_success",
+        downloadButton("hypeR_enrich_download", label = "Download Enrichment result"),
+        tableOutput("hypeR_enrich_result")
       )
     )
   )
