@@ -34,27 +34,11 @@ anotb_length_check <- function(c_vector_name, empty_message = "*Nothing found*")
 }
 
 
+
 # results of compare signatures:
 # Tuturu~ Meow!
 compare_result_variable <- eventReactive(input$compare_signatures, {
-  sig1 <- sql_generic(
-    paste(
-      "select feature_name, weight from feature_signature_view where signature_name =",
-      single_quoted(input$compare_1), ";",
-      sep = ""
-    )
-  )
-  colnames(sig1)=c("symbol","score")
-  sig2 <- sql_generic(
-    paste(
-      "select feature_name, weight from feature_signature_view where signature_name =",
-      single_quoted(input$compare_2), ";",
-      sep = ""
-    )
-  )
-  colnames(sig2)=c("symbol","score")
-  return(sigCompare_two(sig1, sig2, sig1_name = input$compare_1, sig2_name = input$compare_2, is.lv2 = TRUE, background_number = input$compare_background_number))
-  # available names: c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_name", "sig2_name", "sig1_symbol", "sig2_symbol")
+    return(compare_signatures(input$compare_1, input$compare_2, input$compare_background_number))
 })
 
 # output Venn diagram:

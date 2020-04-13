@@ -126,3 +126,30 @@ sigCompare_two <- function(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", i
 # sig1 <- read.table("SigRepoInterface/server_functions/example_sigCompare_1.txt", header = T)
 # sig2 <- read.table("SigRepoInterface/server_functions/example_sigCompare_2.txt", header = T)
 # sigCompare_two(sig1, sig2, is.lv2 = T)
+
+
+## implementation by getting feature sets from db
+## compare signature function
+compare_signatures <- function(sig1_name,sig2_name,background=22000){
+    sig1 = sql_generic(
+        paste(
+            "select feature_name, weight from feature_signature_view where signature_name =",
+            single_quoted(sig1_name), ";",
+            sep = ""
+        )
+    )
+    colnames(sig1)=c("symbol","score")
+    sig2=sql_generic(
+        paste(
+            "select feature_name, weight from feature_signature_view where signature_name =",
+            single_quoted(sig2_name), ";",
+            sep = ""
+        )
+    )
+    colnames(sig2)=c("symbol","score")
+    return(sigCompare_two(sig1, sig2, sig1_name = sig1_name, sig2_name = sig2_name, is.lv2 = TRUE, background_number = background))
+    # available names: c("Venn", "only_sig1", "only_sig2", "sig_both", "hyper_p.value", "sig1_name", "sig2_name", "sig1_symbol", "sig2_symbol")
+}
+
+
+

@@ -16,7 +16,7 @@ if(!in_studio){
     setwd(script.dirname)
 }
 source("database_functions.R")
-
+source("../SigRepoInterface/server_functions/Function_sigCompare.R")
 #' Really nice way to construct name-value pairs when calling 
 #' Rscript to execute this file(cli) to pass easily to downstream functions.
 #' parameters with multiple values declared will have those values
@@ -76,6 +76,15 @@ if(length(commandArgs(trailingOnly = TRUE))>0){
                 target_table=input_groups$table,
                 fields=input_groups$fields
             )
-        }      
+        },
+        "show_fields" = {
+            sql_generic(paste("SHOW COLUMNS FROM", input_groups$table, ";"))
+        },
+        "show_tables" = {
+            sql_generic(paste("SHOW TABLES;"))
+        },
+        "compare" = {
+            compare_signatures(input_groups$signatures[1], input_groups$signatures[2])
+        }
     )
 }
