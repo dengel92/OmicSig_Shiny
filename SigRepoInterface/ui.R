@@ -13,7 +13,7 @@ source('upload/upload_ui.R')
 source('search/search_ui.R')
 source('compare/compare_ui.R')
 source('compare_bulk/compare_bulk_ui.R')
-source('hypeR_overrep/hypeR_overrep_ui.R')
+source('hypeR/hypeR_ui.R')
 source('help/help_ui.R')
 
 # Function that appends elements to a navbar
@@ -44,7 +44,7 @@ ui <- fluidPage(
         help_ui,
         upload_ui,
         search_ui,
-        hypeR_overrep_ui,
+        hypeR_ui,
         # Compare and compare_bulk show up in a dropdown
         navbarMenu("Compare",
             compare_ui,
