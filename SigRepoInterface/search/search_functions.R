@@ -57,7 +57,7 @@ update_dropdown <- function(field, db_table, ins, betweens) {
     # Update dropdown menu
     updateSelectizeInput(session,
         search_id,
-        choices = c(field_values, input[[search_id]]),
+        choices = sort(c(field_values, input[[search_id]])),
         selected = input[[search_id]])
 }
 

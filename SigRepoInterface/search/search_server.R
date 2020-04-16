@@ -117,7 +117,7 @@ observe({
     # Update feature names dropdown
     updateSelectizeInput(session,
         "search_feature_name",
-        choices = c(feature_names, input[["search_feature_name"]]),
+        choices = sort(c(feature_names, input[["search_feature_name"]])),
         selected = input[["search_feature_name"]])
     
     # Get list of feature types corresponding to signatures
@@ -126,7 +126,7 @@ observe({
     # Update feature types dropdown
     updateSelectizeInput(session,
         "search_feature_type",
-        choices = c(feature_types, input[["search_feature_type"]]),
+        choices = sort(c(feature_types, input[["search_feature_type"]])),
         selected = input[["search_feature_type"]])
     
     # Re-enable widgets
