@@ -115,12 +115,18 @@ construct_between_clause <- function(mylist, list_key) {
 #'     ins = list("species" = c("Homo sapiens"),
 #'         "signature_name" = c("Cal27_BaP", "Cal27_PYO")),
 #'     betweens = list("upload_date" = c("2020-01-01", "2020-03-01")))
+#'     order_fields = c("field1",..."fieldn")
 sql_finding_query <-
     function(target_table,
         fields = c("*"),
         ins = NULL,
-        betweens = NULL) {
+        betweens = NULL,
+        order_fields = NULL) {
         # Query construction
+        order_sub = ""
+        if(!is.null(order_fields)){
+            order_sub = paste("ORDER BY", paste(order_fields, sep=","))
+        }
         sql <- paste("SELECT ",
             paste(fields, collapse = ","),
             " FROM ",
@@ -161,7 +167,7 @@ sql_finding_query <-
                 paste("WHERE", paste(c(ins, betweens), collapse = " AND "))
         }
         # Add where clauses to query
-        sql <- paste(sql, where_clauses, ";", sep = " ")
+        sql <- paste(sql, where_clauses, order_sub, ";", sep = " ")
         #Debugging block
         if (FALSE) {
             print(sql)
