@@ -7,8 +7,8 @@
 ##### species
 ##### submitter_name
 ##### upload_date
-# feature_name
-# feature_type
+##### feature_name
+##### feature_type
 # keyword
 
 # Search signatures page structure
@@ -89,6 +89,22 @@ search_ui <- tabPanel("Search",
             conditionalPanel(
                 condition = "input.more_filters == 1",
                 
+                # Dropdown menu for selecting feature type
+                selectizeInput(
+                    inputId = "search_feature_type",
+                    label = "Choose feature type(s)",
+                    choices = NULL,
+                    multiple = TRUE
+                ),
+                
+                # Dropdown menu for selecting feature names
+                selectizeInput(
+                    inputId = "search_feature_name",
+                    label = "Choose feature name(s)",
+                    choices = NULL,
+                    multiple = TRUE
+                ),
+                
                 # Dropdown menu for selecting submitter name
                 selectizeInput(
                     inputId = "search_submitter",
@@ -98,8 +114,8 @@ search_ui <- tabPanel("Search",
                 ),
                 
                 # Date range input for selecting upload date
-                dateRangeInput('search_upload_date',
-                    label = 'Choose upload date range',
+                dateRangeInput("search_upload_date",
+                    label = "Choose upload date range",
                     start = "2020-01-01", end = Sys.Date()
                 )
             ),
@@ -127,8 +143,10 @@ search_ui <- tabPanel("Search",
             # Download buttons will appear only when table is displayed
             conditionalPanel(
                 condition = "output.search_results",
+                
                 # Download button for full search results table
                 downloadButton("search_results_download", "Download Table"),
+                
                 # Download button for selected rows
                 downloadButton(
                     "selected_search_results_download",
