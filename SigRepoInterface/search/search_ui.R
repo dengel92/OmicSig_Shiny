@@ -7,8 +7,8 @@
 ##### species
 ##### submitter_name
 ##### upload_date
-# feature_name
-# feature_type
+##### feature_name
+##### feature_type
 # keyword
 
 # Search signatures page structure
@@ -89,10 +89,18 @@ search_ui <- tabPanel("Search",
             conditionalPanel(
                 condition = "input.more_filters == 1",
                 
+                # Dropdown menu for selecting feature type
+                selectizeInput(
+                    inputId = "search_feature_type",
+                    label = "Choose feature type(s)",
+                    choices = NULL,
+                    multiple = TRUE
+                ),
+                
                 # Dropdown menu for selecting feature names
                 selectizeInput(
                     inputId = "search_feature_name",
-                    label = "Choose features",
+                    label = "Choose feature name(s)",
                     choices = NULL,
                     multiple = TRUE
                 ),

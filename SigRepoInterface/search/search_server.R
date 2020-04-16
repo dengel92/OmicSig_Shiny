@@ -13,6 +13,7 @@ widgets <-
         c("search_phenotype_id", "phenotype_id", "phenotypes", "dropdown"),
         c("search_signature_name", "signature_name", "signatures", "dropdown"),
         c("search_submitter", "submitter", "submitters", "dropdown"),
+        c("search_feature_type", "feature_type", "feature types", "dropdown_special"),
         c("search_feature_name", "feature_name", "feature names", "dropdown_special"),
         c("search_upload_date", "upload_date", "upload date (start, end)", "date"),
         stringsAsFactors = FALSE
@@ -20,7 +21,8 @@ widgets <-
 colnames(widgets) <- c("id", "name", "display", "type")
 
 # Extract the row numbers containing the information for the dropdown menus
-dropdown_rows = which(widgets$type == "dropdown")
+dropdown_rows <- which(widgets$type == "dropdown")
+dropdown_special_rows <- which(widgets$type == "dropdown_special")
 
 # Clear selected terms after clicking clear button
 observeEvent(input$clear, {
@@ -29,7 +31,9 @@ observeEvent(input$clear, {
         for (dropdown in widgets[dropdown_rows, ]$name) {
             clear_dropdown(dropdown, "platform_signature_view")
         }
-        clear_dropdown("feature_name", "feature_signature_view")
+        for (dropdown in widgets[dropdown_special_rows, ]$name) {
+            clear_dropdown(dropdown, "feature_signature_view")
+        }
         
         # Reset date range to default
         updateDateRangeInput(session, "search_upload_date",
@@ -55,7 +59,7 @@ output$search_terms <- renderText(
 ins <- reactive({
     # Initialize list to store result
     ins_list <- list()
-    dropdowns = widgets[dropdown_rows, ]
+    dropdowns <- widgets[dropdown_rows, ]
     # Loop through rows of dropdowns dataframe
     for (row in 1:dim(dropdowns)[1]) {
         # Extract field name and dropdown id
@@ -63,7 +67,7 @@ ins <- reactive({
         id <- dropdowns[row, ]$id
         # Add an element whose name is the field and whose value is the
         #   input from the dropdown
-        ins_list[[name]] = input[[id]]
+        ins_list[[name]] <- input[[id]]
     }
     return(ins_list)
 })
@@ -75,10 +79,11 @@ betweens <- reactive({
     )
 })
 
-# Construct list of features
+# Construct list of feature types and names
 features <- reactive({
     list(
-        "feature_name" = input[["search_feature_name"]]
+        "feature_name" = input[["search_feature_name"]],
+        "feature_type" = input[["search_feature_type"]]
     )
 })
 
@@ -91,7 +96,7 @@ observe({
         update_dropdown(dropdown, "platform_signature_view", ins(), betweens())
     }
     
-    # Update feature names dropdown menu
+    # Get list of signature names for updating feature names and feature types
     signatures <- list()
     if (length(input[["search_signature_name"]]) == 0) {
         # If search_signature_name is blank, get a list of all its choices
@@ -105,13 +110,24 @@ observe({
         # If signature names are selected, get the list of selected signatures
         signatures <- list("signature_name" = input[["search_signature_name"]])
     }
-    # Get list of features corresponding to currently available signature names
-    features <- get_field_values("feature_name", "feature_signature_view",
+    
+    # Get list of feature names corresponding to signatures
+    feature_names <- get_field_values("feature_name", "feature_signature_view",
         signatures, NULL)
+    # Update feature names dropdown
     updateSelectizeInput(session,
         "search_feature_name",
-        choices = c(features, input[["search_feature_name"]]),
+        choices = c(feature_names, input[["search_feature_name"]]),
         selected = input[["search_feature_name"]])
+    
+    # Get list of feature types corresponding to signatures
+    feature_types <- get_field_values("feature_type", "feature_signature_view",
+        signatures, NULL)
+    # Update feature types dropdown
+    updateSelectizeInput(session,
+        "search_feature_type",
+        choices = c(feature_types, input[["search_feature_type"]]),
+        selected = input[["search_feature_type"]])
     
     # Re-enable widgets
     lapply(widgets$id, enable)
