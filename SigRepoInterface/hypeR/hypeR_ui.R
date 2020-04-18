@@ -73,7 +73,7 @@ hypeR_ui <- tabPanel(
         tabPanel(
           title = "Enrichment result",
 	  value = "enrichment_tab",
-            shinycssloaders::withSpinner(textOutput("hypeR_enrich_success")),
+            shinycssloaders::withSpinner(htmlOutput("hypeR_enrich_success")),
           conditionalPanel(
             condition = "output.hypeR_enrich_success",
             checkboxInput("hypeR_enrich_show_description", "Show result description"),
