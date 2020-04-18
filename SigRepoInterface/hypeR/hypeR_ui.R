@@ -53,8 +53,10 @@ hypeR_ui <- tabPanel(
       ),
 
       tabsetPanel(
+	id = "hypeR_tabs",
         tabPanel(
-          "Overrep result",
+          title = "Overrep result",
+	  value = "overrep_tab",
             shinycssloaders::withSpinner(htmlOutput("hypeR_overrep_success")),
           conditionalPanel(
             condition = "output.hypeR_overrep_success",
@@ -65,12 +67,13 @@ hypeR_ui <- tabPanel(
             ),
             downloadButton("hypeR_overrep_download", label = "Download Overrep result"),
             dq_space(),
-            DT::dataTableOutput("hypeR_overrep_result")
+            shinycssloaders::withSpinner(DT::dataTableOutput("hypeR_overrep_result"))
           )
         ),
         tabPanel(
-          "Enrich result",
-            shinycssloaders::withSpinner(htmlOutput("hypeR_enrich_success")),
+          title = "Enrichment result",
+	  value = "enrichment_tab",
+            shinycssloaders::withSpinner(textOutput("hypeR_enrich_success")),
           conditionalPanel(
             condition = "output.hypeR_enrich_success",
             checkboxInput("hypeR_enrich_show_description", "Show result description"),
@@ -80,7 +83,7 @@ hypeR_ui <- tabPanel(
             ),
             downloadButton("hypeR_enrich_download", label = "Download Enrichment result"),
             dq_space(),
-            DT::dataTableOutput("hypeR_enrich_result")
+            shinycssloaders::withSpinner(DT::dataTableOutput("hypeR_enrich_result"))
           )
         )
       )

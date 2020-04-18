@@ -12,16 +12,20 @@ observe({
 
 output$hypeR_introduction <- renderText({
   c(
-    "<p><h4>*Introduction of the test*</h4></p>",
+    "<p><h2>Over-representation/Enrichment Tests</h2></p>",
+    "<h3>Suggested Example Uses :</h3>",
     "<br> *suggest use Sum149_CYP1B1 and C2_CP Canonical Pathways and/or Hallmark to test overrep.*
-     <br> *suggest use Sum149_CYP1B1 and C2_CP Canonical Pathways and/or Hallmark to test enrichment.*
      <br> run hypeR::msigdb_info() to learn more about the available species and gene sets."
   )
 })
 
 hypeR_signature_df_variable <- reactive({
   df <- sql_generic(paste(
-    "select feature_name, weight, direction from feature_signature_view where signature_name =",
+    "select feature_name, 
+    weight, 
+    direction 
+    from feature_signature_view 
+    where signature_name =",
     single_quoted(input$hypeR_signature), ";",
     sep = ""
   ))
@@ -41,7 +45,11 @@ output$hypeR_download_signature <- downloadHandler(
   }
 )
 
+
+
+
 hypeR_overrep_result_variable <- eventReactive(input$hypeR_overrep_analysis, {
+
   sig <- hypeR_signature_df_variable()
   gset_names <- data.frame(
     species = character(0),
@@ -75,8 +83,12 @@ hypeR_enrich_result_variable <- eventReactive(input$hypeR_enrich_analysis, {
 
 output$hypeR_overrep_success <- renderText({
   c(
-    "<p><i><font color=\"#BF4422\"><b>Success!</b></font>",
-    "Finished the Over-representation analysis result of", hypeR_overrep_result_variable()$sig_name, "from", input$hypeR_species, input$hypeR_gsets, ".",
+    "<h2>Sample: ", 
+    hypeR_overrep_result_variable()$sig_name, 
+    "</h2><h3>Species: ", 
+    input$hypeR_species,
+   "</h3> <h3>Gene Sets : </h3><h4>",
+    input$hypeR_gsets, "</h4>",
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#BF4422\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>"
   )
@@ -100,8 +112,12 @@ output$hypeR_overrep_description <- renderText({
 
 output$hypeR_enrich_success <- renderText({
   c(
-    "<p><i><font color=\"#BF4422\"><b>Success!</b></font>",
-    "Finished the Enrichment analysis result of", hypeR_enrich_result_variable()$sig_name, "from", input$hypeR_species, input$hypeR_gsets, ".",
+    "<h2>Sample: ", 
+    hypeR_overrep_result_variable()$sig_name, 
+    "</h2><h3>Species: ", 
+    input$hypeR_species,
+   "</h3> <h3>Gene Sets : </h3><h4>",
+    input$hypeR_gsets, "</h4>",     
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#BF4422\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>"
   )
