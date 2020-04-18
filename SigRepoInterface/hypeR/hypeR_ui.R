@@ -55,7 +55,7 @@ hypeR_ui <- tabPanel(
       tabsetPanel(
         tabPanel(
           "Overrep result",
-          htmlOutput("hypeR_overrep_success"),
+            shinycssloaders::withSpinner(htmlOutput("hypeR_overrep_success")),
           conditionalPanel(
             condition = "output.hypeR_overrep_success",
             checkboxInput("hypeR_overrep_show_description", "Show result description"),
@@ -70,7 +70,7 @@ hypeR_ui <- tabPanel(
         ),
         tabPanel(
           "Enrich result",
-          htmlOutput("hypeR_enrich_success"),
+            shinycssloaders::withSpinner(htmlOutput("hypeR_enrich_success")),
           conditionalPanel(
             condition = "output.hypeR_enrich_success",
             checkboxInput("hypeR_enrich_show_description", "Show result description"),

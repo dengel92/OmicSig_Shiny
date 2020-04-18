@@ -5,6 +5,7 @@ library(dplyr)
 library(DBI)
 library(DT)
 library(stringr)
+library(shinycssloaders)
 
 # Define server logic
 server <- shinyServer(function(input, output, session) {
