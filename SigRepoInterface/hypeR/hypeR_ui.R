@@ -46,25 +46,43 @@ hypeR_ui <- tabPanel(
       htmlOutput("hypeR_introduction"),
       checkboxInput("hypeR_show_signatures", "Display signature table"),
       conditionalPanel(
-        condition = "input.hypeR_show_signatures >= 1",
+        condition = "input.hypeR_show_signatures > 0",
         c("Signature you selected:"),
         downloadButton("hypeR_download_signature", "Download signature table"),
         tableOutput("hypeR_signature_df")
       ),
 
-      htmlOutput("hypeR_overrep_success"),
-      conditionalPanel(
-        condition = "output.hypeR_overrep_success",
-        downloadButton("hypeR_overrep_download", label = "Download Overrep result"),
-        tableOutput("hypeR_overrep_result")
-      ),
-      "---------------------------------------------------------------------\n",
-      htmlOutput("hypeR_enrich_introduction"),
-      htmlOutput("hypeR_enrich_success"),
-      conditionalPanel(
-        condition = "output.hypeR_enrich_success",
-        downloadButton("hypeR_enrich_download", label = "Download Enrichment result"),
-        tableOutput("hypeR_enrich_result")
+      tabsetPanel(
+        tabPanel(
+          "Overrep result",
+          htmlOutput("hypeR_overrep_success"),
+          conditionalPanel(
+            condition = "output.hypeR_overrep_success",
+            checkboxInput("hypeR_overrep_show_description", "Show result description"),
+            conditionalPanel(
+              condition = "input.hypeR_overrep_show_description > 0",
+              htmlOutput("hypeR_overrep_description")
+            ),
+            downloadButton("hypeR_overrep_download", label = "Download Overrep result"),
+            dq_space(),
+            DT::dataTableOutput("hypeR_overrep_result")
+          )
+        ),
+        tabPanel(
+          "Enrich result",
+          htmlOutput("hypeR_enrich_success"),
+          conditionalPanel(
+            condition = "output.hypeR_enrich_success",
+            checkboxInput("hypeR_enrich_show_description", "Show result description"),
+            conditionalPanel(
+              condition = "input.hypeR_enrich_show_description > 0",
+              htmlOutput("hypeR_enrich_description")
+            ),
+            downloadButton("hypeR_enrich_download", label = "Download Enrichment result"),
+            dq_space(),
+            DT::dataTableOutput("hypeR_enrich_result")
+          )
+        )
       )
     )
   )

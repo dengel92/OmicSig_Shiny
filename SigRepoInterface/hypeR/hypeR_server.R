@@ -75,30 +75,40 @@ hypeR_enrich_result_variable <- eventReactive(input$hypeR_enrich_analysis, {
 
 output$hypeR_overrep_success <- renderText({
   c(
-    "<p><i><font color=\"#008F00\"><b>Success!</b></font>",
-    "Finished the Over-representation analysis result of", hypeR_overrep_result_variable()$sig_name, "from", input$hypeR_gsets, ".",
+    "<p><i><font color=\"#BF4422\"><b>Success!</b></font>",
+    "Finished the Over-representation analysis result of", hypeR_overrep_result_variable()$sig_name, "from", input$hypeR_species, input$hypeR_gsets, ".",
     "You can see and download the result shown below.</i></p>",
-    "<p><font color=\"#008F00\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>",
+    "<p><font color=\"#BF4422\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>"
+  )
+})
+
+output$hypeR_overrep_description <- renderText({
+  c(
     "<p>The meaning of each column:",
     "<br> direction: the direction of the feature (genes) in the given signature, if available.
-    <br> category: category of the gene set (e.g. C2). Source: http://software.broadinstitute.org/gsea/msigdb.
-    <br> subcategory: subcategory of the gene set (e.g. KEGG). Source: http://software.broadinstitute.org/gsea/msigdb.
-    <br> label: pathway or geneset names.
-    <br> pval: p-value of the over-representation of that pathway or geneset.
-    <br> fdr: p-value after fdr correction.
-    <br> geneset: total amount of genes in that pathway or geneset.
-    <br> overlap: the number of significant overlapping genes between the signature and the geneset.
-    <br> hits: symbol of the significant overlapping genes.",
+        <br> category: category of the gene set (e.g. C2). Source: http://software.broadinstitute.org/gsea/msigdb.
+        <br> subcategory: subcategory of the gene set (e.g. KEGG). Source: http://software.broadinstitute.org/gsea/msigdb.
+        <br> label: pathway or geneset names.
+        <br> pval: p-value of the over-representation of that pathway or geneset.
+        <br> fdr: p-value after fdr correction.
+        <br> geneset: total amount of genes in that pathway or geneset.
+        <br> overlap: the number of significant overlapping genes between the signature and the geneset.
+        <br> hits: symbol of the significant overlapping genes.",
     "</p>"
   )
 })
 
 output$hypeR_enrich_success <- renderText({
   c(
-    "<p><i><font color=\"#008F00\"><b>Success!</b></font>",
-    "Finished the Enrichment analysis result of", hypeR_enrich_result_variable()$sig_name, "from", input$hypeR_gsets, ".",
+    "<p><i><font color=\"#BF4422\"><b>Success!</b></font>",
+    "Finished the Enrichment analysis result of", hypeR_enrich_result_variable()$sig_name, "from", input$hypeR_species, input$hypeR_gsets, ".",
     "You can see and download the result shown below.</i></p>",
-    "<p><font color=\"#008F00\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>",
+    "<p><font color=\"#BF4422\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>"
+  )
+})
+
+output$hypeR_enrich_description <- renderText({
+  c(
     "<p>The meaning of each column:",
     "<br> direction: the direction of the feature (genes) in the given signature, if available.
         <br> category: category of the gene set (e.g. C2). Source: http://software.broadinstitute.org/gsea/msigdb.
@@ -113,13 +123,13 @@ output$hypeR_enrich_success <- renderText({
   )
 })
 
-output$hypeR_overrep_result <- renderTable({
+output$hypeR_overrep_result <- DT::renderDataTable({
   if (!is.null(hypeR_overrep_result_variable()$result)) {
     hypeR_overrep_result_variable()$result
   }
 })
 
-output$hypeR_enrich_result <- renderTable({
+output$hypeR_enrich_result <- DT::renderDataTable({
   if (!is.null(hypeR_enrich_result_variable()$result)) {
     hypeR_enrich_result_variable()$result
   }
