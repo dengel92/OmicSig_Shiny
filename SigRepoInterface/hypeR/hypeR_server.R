@@ -45,9 +45,6 @@ output$hypeR_download_signature <- downloadHandler(
   }
 )
 
-
-
-
 hypeR_overrep_result_variable <- eventReactive(input$hypeR_overrep_analysis, {
 
   sig <- hypeR_signature_df_variable()
@@ -137,6 +134,18 @@ output$hypeR_enrich_description <- renderText({
         <br> score: enrichment score.",
     "</p>"
   )
+})
+
+observeEvent(input$hypeR_overrep_analysis, {
+    updateTabsetPanel(session, "hypeR_tabs",
+        selected = "overrep_tab"
+    )
+})
+
+observeEvent(input$hypeR_enrich_analysis, {
+    updateTabsetPanel(session, "hypeR_tabs",
+        selected = "enrichment_tab"
+    )
 })
 
 output$hypeR_overrep_result <- DT::renderDataTable({
