@@ -26,7 +26,7 @@ write_json <- function(omic.obj, file) {
     write_signature,
     list("lv1_colnames" = colnames(omic.obj$difexp)),
     omic.obj$difexp
-  ), na = NULL)
+  ), na = NULL, pretty = T)
   write(write_json_obj, file)
   return("finished")
 }
