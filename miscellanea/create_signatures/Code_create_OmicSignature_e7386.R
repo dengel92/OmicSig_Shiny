@@ -3,7 +3,10 @@ source("OmicSignature/check_functions/Function_objCheck.R")
 source("OmicSignature/check_functions/Function_json.R")
 
 {
+  sample_name <- "cal27_e7386"
+    
   metadata <- list(
+    "signature_name" = sample_name,
     "organism" = "human",
     "tissue" = "cell",
     "cell_lines" = "Cal27",
@@ -14,8 +17,6 @@ source("OmicSignature/check_functions/Function_json.R")
     "logfc_cutoff" = 1,
     "keywords" = c("cancer", "pertubations")
   )
-
-  sample_name <- "cal27_e7386"
 
   diffexp <- readRDS("miscellanea/files_diffmatrix/e7386_cal27_hnsc_diffanal.RDS")
   diffexp$logfc <- log2(abs(diffexp$fold.change)) * sign(diffexp$fold.change)
