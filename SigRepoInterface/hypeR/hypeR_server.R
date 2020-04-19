@@ -14,7 +14,7 @@ output$hypeR_introduction <- renderText({
   c(
     "<p><h2>Over-representation/Enrichment Tests</h2></p>",
     "<h3>Suggested Example Uses :</h3>",
-    "<br> *suggest use Sum149_CYP1B1 and C2_CP Canonical Pathways and/or Hallmark to test overrep.*
+    "<br> *Sum149_CYP1B1 and C2_CP Canonical Pathways and/or Hallmark*
      <br> run hypeR::msigdb_info() to learn more about the available species and gene sets."
   )
 })
@@ -113,7 +113,7 @@ output$hypeR_overrep_description <- renderText({
 output$hypeR_enrich_success <- renderText({
   c(
     "<h2>Sample: ", 
-    hypeR_overrep_result_variable()$sig_name, 
+    hypeR_enrich_result_variable()$sig_name, 
     "</h2><h3>Species: ", 
     input$hypeR_species,
    "</h3> <h3>Gene Sets : </h3><h4>",

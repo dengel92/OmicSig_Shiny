@@ -48,7 +48,7 @@ compare_ui <- tabPanel("Compare",
     mainPanel(
       # Add some space at the top
       dq_space(),
-      htmlOutput("compare_result"),
+        shinycssloaders::withSpinner(htmlOutput("compare_result")),
       plotOutput("compare_result_Venn"),
       htmlOutput("compare_show_signatures")
     )
