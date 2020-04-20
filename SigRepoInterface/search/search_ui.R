@@ -105,6 +105,14 @@ search_ui <- tabPanel("Search",
                     multiple = TRUE
                 ),
                 
+                # Dropdown menu for selecting keywords
+                selectizeInput(
+                    inputId = "search_keyword",
+                    label = "Choose keyword(s)",
+                    choices = NULL,
+                    multiple = TRUE
+                ),
+                
                 # Dropdown menu for selecting submitter name
                 selectizeInput(
                     inputId = "search_submitter",

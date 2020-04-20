@@ -13,8 +13,9 @@ widgets <-
         c("search_phenotype_id", "phenotype_id", "phenotypes", "dropdown"),
         c("search_signature_name", "signature_name", "signatures", "dropdown"),
         c("search_submitter", "submitter", "submitters", "dropdown"),
-        c("search_feature_type", "feature_type", "feature types", "dropdown_special"),
-        c("search_feature_name", "feature_name", "feature names", "dropdown_special"),
+        c("search_feature_type", "feature_type", "feature types", "dropdown_feature"),
+        c("search_feature_name", "feature_name", "feature names", "dropdown_feature"),
+        c("search_keyword", "keyword", "keywords", "dropdown_keyword"),
         c("search_upload_date", "upload_date", "upload date (start, end)", "date"),
         stringsAsFactors = FALSE
     )
@@ -22,7 +23,8 @@ colnames(widgets) <- c("id", "name", "display", "type")
 
 # Extract the row numbers containing the information for the dropdown menus
 dropdown_rows <- which(widgets$type == "dropdown")
-dropdown_special_rows <- which(widgets$type == "dropdown_special")
+dropdown_feature_rows <- which(widgets$type == "dropdown_feature")
+dropdown_keyword_rows <- which(widgets$type == "dropdown_keyword")
 
 # Clear selected terms after clicking clear button
 observeEvent(input$clear, {
@@ -31,8 +33,11 @@ observeEvent(input$clear, {
         for (dropdown in widgets[dropdown_rows, ]$name) {
             clear_dropdown(dropdown, "platform_signature_view")
         }
-        for (dropdown in widgets[dropdown_special_rows, ]$name) {
+        for (dropdown in widgets[dropdown_feature_rows, ]$name) {
             clear_dropdown(dropdown, "feature_signature_view")
+        }
+        for (dropdown in widgets[dropdown_keyword_rows, ]$name) {
+            clear_dropdown(dropdown, "keyword_signature_view")
         }
         
         # Reset date range to default
@@ -87,6 +92,13 @@ features <- reactive({
     )
 })
 
+# Construct list of keywords
+keywords <- reactive({
+    list(
+        "keyword" = input[["search_keyword"]]
+    )
+})
+
 observe({
     # Disable widgets until they finish updating
     lapply(widgets$id, disable)
@@ -96,7 +108,7 @@ observe({
         update_dropdown(dropdown, "platform_signature_view", ins(), betweens())
     }
     
-    # Get list of signature names for updating feature names and feature types
+    # Get list of signature names for updating feature and keyword dropdowns
     signatures <- list()
     if (length(input[["search_signature_name"]]) == 0) {
         # If search_signature_name is blank, get a list of all its choices
@@ -111,23 +123,15 @@ observe({
         signatures <- list("signature_name" = input[["search_signature_name"]])
     }
     
-    # Get list of feature names corresponding to signatures
-    feature_names <- get_field_values("feature_name", "feature_signature_view",
-        signatures, NULL)
-    # Update feature names dropdown
-    updateSelectizeInput(session,
-        "search_feature_name",
-        choices = sort(c(feature_names, input[["search_feature_name"]])),
-        selected = input[["search_feature_name"]])
+    # Update features dropdown menus
+    for (dropdown in widgets[dropdown_feature_rows, ]$name) {
+        update_dropdown(dropdown, "feature_signature_view", signatures, NULL)
+    }
     
-    # Get list of feature types corresponding to signatures
-    feature_types <- get_field_values("feature_type", "feature_signature_view",
-        signatures, NULL)
-    # Update feature types dropdown
-    updateSelectizeInput(session,
-        "search_feature_type",
-        choices = sort(c(feature_types, input[["search_feature_type"]])),
-        selected = input[["search_feature_type"]])
+    # Update keyword dropdown menu
+    for (dropdown in widgets[dropdown_keyword_rows, ]$name) {
+        update_dropdown(dropdown, "keyword_signature_view", signatures, NULL)
+    }
     
     # Re-enable widgets
     lapply(widgets$id, enable)
@@ -140,36 +144,22 @@ observeEvent(input$search, {
         shinyalert("Please select at least one search term!")
         return()
     }
+    
+    # Get list of in clauses from reactive function
     ins <- ins()
-    # If any features are selected, handle them first
+    
+    # If any features are selected, update signature_name in list of in clauses
     if (length(compact(features())) > 0) {
-        # Get the list of signature names corresponding to selected features
-        feature_signatures <-
-            get_field_values(
-                "signature_name",
-                "feature_signature_view",
-                ins = features(),
-                betweens = NULL
-            )
-        # Get the list of selected signature names
-        selected_signatures <- ins$signature_name
-        # Get the intersection of the two lists of signature names
-        intersect_signatures <-
-            intersect(feature_signatures, selected_signatures)
-        if (length(intersect_signatures) < 1 & length(selected_signatures) >= 1) {
-            # If the intersection is empty and signature names are selected
-            #   then set signature_name to an empty string for sql_finding_query()
-            ins$signature_name = ""
-        } else if (length(intersect_signatures) < 1 & length(selected_signatures) < 1) {
-            # If the intersection is empty and no signature names are selected
-            #   then set signature_name to the signatures corresponding to the
-            #   selected features for sql_finding_query()
-            ins$signature_name = feature_signatures
-        } else {
-            # Otherwise set signature_name to the intersection for sql_finding_query()
-            ins$signature_name = intersect_signatures
-        }
+        ins <- get_intersection("signature_name", "feature_signature_view",
+            features(), ins)
     }
+    
+    # If any keywords are selected, update signature_name in list of in clauses
+    if (length(compact(keywords())) > 0) {
+        ins <- get_intersection("signature_name", "keyword_signature_view",
+            keywords(), ins)
+    }
+    
     # Search database for matching signatures
     sql_obj <-
         sql_finding_query(target_table = "platform_signature_view",
@@ -240,5 +230,6 @@ observeEvent(input$select_all, {
     }
 })
 
+# Update displayed table with list of selected rows
 output$selected_rows <-
     renderPrint(print(input$search_results_rows_selected))
