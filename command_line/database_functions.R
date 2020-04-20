@@ -30,6 +30,26 @@ create_link <-
         )
     }
 
+## retrieve_omicsig()
+##
+#' @title retrieve OmicSig obj from VM file system; hard coded
+#'
+#' @param signature_name 
+#' @return OmicSignature object
+#'
+#' @example
+#' retrieve_omicsig(signature_name = "Cal27_BaP")
+#'
+retrieve_omicsig <-
+    function(signature_name) {
+        return(read_json(paste0(
+            'http://sigrepo.bu.edu:3838/challenge_project/',
+            'miscellanea/signatures/',
+            signature_name,
+            '_obj.json'
+        )))
+    }
+
 #' Create a connection to the database
 new_conn_handle <- function() {
     dbConnect(
