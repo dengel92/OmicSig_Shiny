@@ -46,7 +46,6 @@ output$hypeR_download_signature <- downloadHandler(
 )
 
 hypeR_overrep_result_variable <- eventReactive(input$hypeR_overrep_analysis, {
-
   sig <- hypeR_signature_df_variable()
   gset_names <- data.frame(
     species = character(0),
@@ -63,7 +62,14 @@ hypeR_overrep_result_variable <- eventReactive(input$hypeR_overrep_analysis, {
 })
 
 hypeR_enrich_result_variable <- eventReactive(input$hypeR_enrich_analysis, {
-  sig <- hypeR_signature_df_variable()
+  # retrieve lv1 signature and add direction:
+  sig <- retrieve_omicsig(input$hypeR_signature)$difexp[, c("symbol", "score")]
+  direction <- rep("+", nrow(sig))
+  direction[which(sig$score < 0)] <- "-"
+  sig <- cbind(sig, direction)
+  colnames(sig) <- c("signature_symbol", "signature_score", "signature_direction")
+  
+  # load genesets:
   gset_names <- data.frame(
     species = character(0),
     category = character(0),
@@ -73,6 +79,8 @@ hypeR_enrich_result_variable <- eventReactive(input$hypeR_enrich_analysis, {
     gset_names <- rbind(gset_names, c(input$hypeR_species, unlist(strsplit(i, "_"))[1:2]), stringsAsFactors = FALSE)
   }
   colnames(gset_names) <- c("species", "category", "subcategory")
+  
+  # perform hypeR analysis:
   result <- hypeR_overrep_enrich_server_function(sig, gset_names, test = "enrich")
   result$sig_name <- input$hypeR_signature
   return(result)
@@ -80,12 +88,12 @@ hypeR_enrich_result_variable <- eventReactive(input$hypeR_enrich_analysis, {
 
 output$hypeR_overrep_success <- renderText({
   c(
-    "<h2>Sample: ", 
-    hypeR_overrep_result_variable()$sig_name, 
-    "</h2><h3>Species: ", 
+    "<h2>Sample: ",
+    hypeR_overrep_result_variable()$sig_name,
+    "</h2><h3>Species: ",
     input$hypeR_species,
-   "</h3> <h3>Gene Sets : </h3><h4>",
-    input$hypeR_gsets, "</h4>",
+    "</h3><h3>Gene Sets: ",
+    input$hypeR_gsets, "</h3>",
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#BF4422\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>"
   )
@@ -109,12 +117,12 @@ output$hypeR_overrep_description <- renderText({
 
 output$hypeR_enrich_success <- renderText({
   c(
-    "<h2>Sample: ", 
-    hypeR_enrich_result_variable()$sig_name, 
-    "</h2><h3>Species: ", 
+    "<h2>Sample: ",
+    hypeR_enrich_result_variable()$sig_name,
+    "</h2><h3>Species: ",
     input$hypeR_species,
-   "</h3> <h3>Gene Sets : </h3><h4>",
-    input$hypeR_gsets, "</h4>",     
+    "</h3><h3>Gene Sets: ",
+    input$hypeR_gsets, "</h3>",
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#BF4422\"><b>NOTICE</b></font> at this moment, the p-value cutoff of the analysis is very non-stringent, so it's probably outputing all the genesets that are found to have any overlap with the given signature list. - at Apr 2020. </p>"
   )
@@ -137,15 +145,15 @@ output$hypeR_enrich_description <- renderText({
 })
 
 observeEvent(input$hypeR_overrep_analysis, {
-    updateTabsetPanel(session, "hypeR_tabs",
-        selected = "overrep_tab"
-    )
+  updateTabsetPanel(session, "hypeR_tabs",
+    selected = "overrep_tab"
+  )
 })
 
 observeEvent(input$hypeR_enrich_analysis, {
-    updateTabsetPanel(session, "hypeR_tabs",
-        selected = "enrichment_tab"
-    )
+  updateTabsetPanel(session, "hypeR_tabs",
+    selected = "enrichment_tab"
+  )
 })
 
 output$hypeR_overrep_result <- DT::renderDataTable({
