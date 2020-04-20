@@ -77,3 +77,43 @@ clear_dropdown <- function(field, db_table) {
         choices = c(field_values),
         selected = NULL)
 }
+
+#' General function for updating the values of a field in a list of in clauses
+#'   based on the intersection of two lists of possible values for that field
+#'   
+#' @param field the field to update in the list of in clauses
+#' @param db_table the database table to query to get a list of possible values
+#'   for field
+#' @param query_ins the list of in clauses to use in the sql query to get a list
+#'   of possible values for field
+#' @param ins_list the list of in clauses containing the original list of
+#'   possible values for field
+get_intersection <- function(field, db_table, query_ins, ins_list) {
+    # Get the list of field values corresponding to query_ins
+    corresponding_values <-
+        get_field_values(
+            field,
+            db_table,
+            ins = query_ins,
+            betweens = NULL
+        )
+    # Get the list of selected field values
+    selected_values <- ins_list[[field]]
+    # Get the intersection of the two lists of field values
+    intersect_values <-
+        intersect(corresponding_values, selected_values)
+    if (length(intersect_values) < 1 & length(selected_values) >= 1) {
+        # If the intersection is empty and field values are selected
+        #   then set the field value to an empty string for sql_finding_query()
+        ins_list[[field]] = ""
+    } else if (length(intersect_values) < 1 & length(selected_values) < 1) {
+        # If the intersection is empty and no field values are selected
+        #   then set the field value to the values corresponding to the
+        #   selected ins_query for sql_finding_query()
+        ins_list[[field]] = corresponding_values
+    } else {
+        # Otherwise set field values to the intersection for sql_finding_query()
+        ins_list[[field]] = intersect_values
+    }
+    return(ins_list)
+}
