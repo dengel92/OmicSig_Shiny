@@ -34,7 +34,11 @@ hypeR_overrep_ui <- tabPanel(
         ),
         multiple = TRUE
       ),
-      actionButton("hypeR_overrep_analysis", label = "Over-representation analysis")
+      actionButton("hypeR_overrep_analysis", label = "Over-representation analysis"),
+      dq_space(),
+      fileInput("hypeR_overrep_cust_gset", label = "Upload customize geneset:"),
+      textInput("hypeR_overrep_cust_gset_name", label = "geneset name", value = "customize_gset"),
+      actionButton("hypeR_overrep_cust_analysis", label = "Over-representation analysis using customized geneset")
     ),
     mainPanel(
       dq_space(),
@@ -46,19 +50,25 @@ hypeR_overrep_ui <- tabPanel(
         downloadButton("hypeR_download_signature", "Download signature table"),
         DT::dataTableOutput("hypeR_signature_df")
       ),
-
-
       shinycssloaders::withSpinner(htmlOutput("hypeR_overrep_success")),
       conditionalPanel(
         condition = "output.hypeR_overrep_success",
-        checkboxInput("hypeR_overrep_show_description", "Show result description"),
-        conditionalPanel(
-          condition = "input.hypeR_overrep_show_description",
-          htmlOutput("hypeR_overrep_description")
-        ),
         downloadButton("hypeR_overrep_download", label = "Download Overrep result"),
         dq_space(),
         shinycssloaders::withSpinner(DT::dataTableOutput("hypeR_overrep_result"))
+      ),
+      shinycssloaders::withSpinner(htmlOutput("hypeR_overrep_cust_success")),
+      conditionalPanel(
+        condition = "output.hypeR_overrep_cust_success",
+        downloadButton("hypeR_overrep_cust_download", label = "Download Overrep result"),
+        dq_space(),
+        shinycssloaders::withSpinner(DT::dataTableOutput("hypeR_overrep_cust_result"))
+      ),
+      dq_space(),
+      checkboxInput("hypeR_overrep_show_description", "Show result description"),
+      conditionalPanel(
+        condition = "input.hypeR_overrep_show_description",
+        htmlOutput("hypeR_overrep_description")
       )
     )
   )

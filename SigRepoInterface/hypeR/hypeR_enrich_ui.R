@@ -34,10 +34,13 @@ hypeR_enrich_ui <- tabPanel(
         ),
         multiple = TRUE
       ),
-      actionButton("hypeR_enrich_analysis", label = "Enrichment analysis")
+      actionButton("hypeR_enrich_analysis", label = "Rank-based enrichment analysis"),
+      dq_space(),
+      fileInput("hypeR_enrich_cust_gset", label = "Upload customize geneset:"),
+      textInput("hypeR_enrich_cust_gset_name", label = "geneset name", value = "customize_gset"),
+      actionButton("hypeR_enrich_cust_analysis", label = "Rank-based enrichment analysis using customized geneset")
     ),
     mainPanel(
-      # Add some space at the top
       dq_space(),
       htmlOutput("hypeR_enrich_introduction"),
       checkboxInput("hypeR_show_all_features", "Display all features table"),
@@ -50,14 +53,22 @@ hypeR_enrich_ui <- tabPanel(
       shinycssloaders::withSpinner(htmlOutput("hypeR_enrich_success")),
       conditionalPanel(
         condition = "output.hypeR_enrich_success",
-        checkboxInput("hypeR_enrich_show_description", "Show result description"),
-        conditionalPanel(
-          condition = "input.hypeR_enrich_show_description > 0",
-          htmlOutput("hypeR_enrich_description")
-        ),
         downloadButton("hypeR_enrich_download", label = "Download Enrichment result"),
         dq_space(),
         shinycssloaders::withSpinner(DT::dataTableOutput("hypeR_enrich_result"))
+      ),
+      shinycssloaders::withSpinner(htmlOutput("hypeR_enrich_cust_success")),
+      conditionalPanel(
+        condition = "output.hypeR_enrich_cust_success",
+        downloadButton("hypeR_enrich_cust_download", label = "Download Enrichment result"),
+        dq_space(),
+        shinycssloaders::withSpinner(DT::dataTableOutput("hypeR_enrich_cust_result"))
+      ),
+      dq_space(),
+      checkboxInput("hypeR_enrich_show_description", "Show result description"),
+      conditionalPanel(
+        condition = "input.hypeR_enrich_show_description",
+        htmlOutput("hypeR_enrich_description")
       )
     )
   )
