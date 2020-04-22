@@ -12,7 +12,6 @@ server <- shinyServer(function(input, output, session) {
   # Source database related functions
   # local = TRUE -> objects are inside server function
   source("../command_line/database_functions.R", local = TRUE)
-  source("server_functions/database_functions_interface.R")
   # Source hypeR Function Files
   source("server_functions/Function_hypeR.R")
   # Source OmicSignature Function Files

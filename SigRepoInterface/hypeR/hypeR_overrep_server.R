@@ -26,12 +26,13 @@ output$hypeR_overrep_description <- renderText({
 
 #----signature table----
 observe({
+  signature_list <- sql_finding_query("signatures", "signature_name")[["signature_name"]]
   updateSelectizeInput(
     session,
     "hypeR_overrep_signature",
     choices = c(
       "",
-      get_signature_names()
+      signature_list
     )
   )
 })

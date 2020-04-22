@@ -2,15 +2,15 @@
 # if you guys know a more generic/one shot way of updating all selectize inputs at once,
 # please let me know. Although, later on, we'll need to update the selectize inputs downstream
 # to not include the name(s) of the other selectize inputs
-source("server_functions/Function_sigCompare.R")
 
 observe({
+  signature_list <- sql_finding_query("signatures", "signature_name")[["signature_name"]]
   updateSelectizeInput(
     session,
     "compare_1",
     choices = c(
       "",
-      get_signature_names()
+      signature_list
     )
   )
   updateSelectizeInput(
@@ -18,7 +18,7 @@ observe({
     "compare_2",
     choices = c(
       "",
-      get_signature_names()
+      signature_list
     )
   )
 })

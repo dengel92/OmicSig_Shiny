@@ -333,16 +333,18 @@ observeEvent(input$upload_object, {
 
 # Update options in species dropdown menu with list of species from database
 observe({
+    species_list <- sql_finding_query("species", "species")[["species"]]
     updateSelectizeInput(session,
                          "species_id",
-                         choices = c("", get_species()))
+                         choices = c("", species_list))
 })
 
 # Update options in platform dropdown menu with list of platforms from database
 observe({
+    platform_list <- sql_finding_query("assay_platforms", "platform_name")[["platform_name"]]
     updateSelectizeInput(session,
                          "platform_name",
-                         choices = c("", get_platforms()))
+                         choices = c("", platform_list))
 })
 
 observeEvent(input$test_multi,{
