@@ -110,9 +110,8 @@ observe({
     
     # Get list of in clauses from reactive function
     ins <- ins()
-    features <- features()
-    feature_signatures <- ins
-    keyword_signatures <- ins
+    feature_signatures <- list("signature_name" = ins[["signature_name"]])
+    keyword_signatures <- feature_signatures
     
     # If any features are selected, update signature_name in list of in clauses
     # Also get list of all signature names corresponding to selected feature
@@ -121,6 +120,7 @@ observe({
         feature_signatures <- get_intersection("signature_name", "feature_signature_view",
             features(), ins())
         ins <- feature_signatures
+        feature_signatures <- list("signature_name" = feature_signatures[["signature_name"]])
     }
     
     # If any keywords are selected, update signature_name in list of in clauses
@@ -131,13 +131,31 @@ observe({
             keywords(), ins())
         ins <- get_intersection("signature_name", "keyword_signature_view",
             keywords(), ins)
+        keyword_signatures <- list("signature_name" = keyword_signatures[["signature_name"]])
     }
     
     # Update signature name dropdown menu
-    updateSelectizeInput(session,
-        "search_signature_name",
-        choices = c(ins[["signature_name"]], input[["search_signature_name"]]),
-        selected = input[["search_signature_name"]])
+    if (length(ins[["signature_name"]]) > 0) {
+        updateSelectizeInput(
+            session,
+            "search_signature_name",
+            choices = c(ins[["signature_name"]], input[["search_signature_name"]]),
+            selected = input[["search_signature_name"]]
+        )
+    } else {
+        signatures <- get_field_values("signature_name",
+            "platform_signature_view", ins, betweens())
+        updateSelectizeInput(
+            session,
+            "search_signature_name",
+            choices = c(signatures, input[["search_signature_name"]]),
+            selected = input[["search_signature_name"]]
+        )
+        # Also update list of signature names to use when updating feature and
+        #   keyword dropdowns
+        feature_signatures <- list("signature_name" = signatures)
+        keyword_signatures <- feature_signatures
+    }
     
     # Update features dropdown menus
     for (dropdown in widgets[dropdown_feature_rows, ]$name) {
