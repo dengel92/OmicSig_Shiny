@@ -4,25 +4,30 @@
 source("search/search_functions.R", local = TRUE)
 
 # Make a data frame storing all the relevant information about each input widget
+# id = the input ID of the widget
+# name = the name of the database field corresponding to the widget
+# display = the text to display in the selected search terms section of the app
+# type = the type of widget (i.e. dropdown)
 widgets <-
     rbind.data.frame(
+        c("search_signature_name", "signature_name", "signatures", "dropdown_signature"),
         c("search_species", "species", "species", "dropdown"),
-        c("search_platform_name", "platform_name", "platforms", "dropdown"),
         c("search_experiment_type", "experiment_type", "experiment types", "dropdown"),
+        c("search_platform_name", "platform_name", "platforms", "dropdown"),
         c("search_source_type", "source_type", "source types", "dropdown"),
         c("search_phenotype_id", "phenotype_id", "phenotypes", "dropdown"),
-        c("search_signature_name", "signature_name", "signatures", "dropdown"),
-        c("search_submitter", "submitter", "submitters", "dropdown"),
         c("search_feature_type", "feature_type", "feature types", "dropdown_feature"),
         c("search_feature_name", "feature_name", "feature names", "dropdown_feature"),
         c("search_keyword", "keyword", "keywords", "dropdown_keyword"),
+        c("search_submitter", "submitter", "submitters", "dropdown"),
         c("search_upload_date", "upload_date", "upload date (start, end)", "date"),
         stringsAsFactors = FALSE
     )
 colnames(widgets) <- c("id", "name", "display", "type")
 
-# Extract the row numbers containing the information for the dropdown menus
+# Extract the row numbers for each type of dropdown menu
 dropdown_rows <- which(widgets$type == "dropdown")
+dropdown_signature_rows <- which(widgets$type == "dropdown_signature")
 dropdown_feature_rows <- which(widgets$type == "dropdown_feature")
 dropdown_keyword_rows <- which(widgets$type == "dropdown_keyword")
 
@@ -30,7 +35,7 @@ dropdown_keyword_rows <- which(widgets$type == "dropdown_keyword")
 observeEvent(input$clear, {
     isolate({
         # Clear all dropdowns
-        for (dropdown in widgets[dropdown_rows, ]$name) {
+        for (dropdown in widgets[c(dropdown_signature_rows, dropdown_rows), ]$name) {
             clear_dropdown(dropdown, "platform_signature_view")
         }
         for (dropdown in widgets[dropdown_feature_rows, ]$name) {
@@ -60,11 +65,11 @@ output$search_terms <- renderText(
     )
 )
 
-# Construct list of all possible in clauses for query
+# Construct list of in clauses
 ins <- reactive({
     # Initialize list to store result
     ins_list <- list()
-    dropdowns <- widgets[dropdown_rows, ]
+    dropdowns <- widgets[c(dropdown_signature_rows, dropdown_rows), ]
     # Loop through rows of dropdowns dataframe
     for (row in 1:dim(dropdowns)[1]) {
         # Extract field name and dropdown id
@@ -77,7 +82,7 @@ ins <- reactive({
     return(ins_list)
 })
 
-# Construct list of all possible between clauses for query
+# Construct list of between clauses
 betweens <- reactive({
     list(
         "upload_date" = input[["search_upload_date"]]
@@ -103,34 +108,52 @@ observe({
     # Disable widgets until they finish updating
     lapply(widgets$id, disable)
     
-    # Update dropdown menus
-    for (dropdown in widgets[dropdown_rows, ]$name) {
-        update_dropdown(dropdown, "platform_signature_view", ins(), betweens())
+    # Get list of in clauses from reactive function
+    ins <- ins()
+    features <- features()
+    feature_signatures <- ins
+    keyword_signatures <- ins
+    
+    # If any features are selected, update signature_name in list of in clauses
+    # Also get list of all signature names corresponding to selected feature
+    #   names and types to use when updating keyword dropdown menu
+    if (length(compact(features())) > 0) {
+        feature_signatures <- get_intersection("signature_name", "feature_signature_view",
+            features(), ins())
+        ins <- feature_signatures
     }
     
-    # Get list of signature names for updating feature and keyword dropdowns
-    signatures <- list()
-    if (length(input[["search_signature_name"]]) == 0) {
-        # If search_signature_name is blank, get a list of all its choices
-        signatures <-
-            get_field_values("signature_name",
-                "platform_signature_view",
-                ins(),
-                betweens())
-        signatures <- list("signature_name" = signatures)
-    } else {
-        # If signature names are selected, get the list of selected signatures
-        signatures <- list("signature_name" = input[["search_signature_name"]])
+    # If any keywords are selected, update signature_name in list of in clauses
+    # Also get list of all signature names corresponding to selected keywords
+    #   to use when updating feature name and type dropdown menus
+    if (length(compact(keywords())) > 0) {
+        keyword_signatures <- get_intersection("signature_name", "keyword_signature_view",
+            keywords(), ins())
+        ins <- get_intersection("signature_name", "keyword_signature_view",
+            keywords(), ins)
     }
+    
+    # Update signature name dropdown menu
+    updateSelectizeInput(session,
+        "search_signature_name",
+        choices = c(ins[["signature_name"]], input[["search_signature_name"]]),
+        selected = input[["search_signature_name"]])
     
     # Update features dropdown menus
     for (dropdown in widgets[dropdown_feature_rows, ]$name) {
-        update_dropdown(dropdown, "feature_signature_view", signatures, NULL)
+        update_dropdown(dropdown, "feature_signature_view",
+            c(keyword_signatures, features()), NULL)
     }
     
     # Update keyword dropdown menu
     for (dropdown in widgets[dropdown_keyword_rows, ]$name) {
-        update_dropdown(dropdown, "keyword_signature_view", signatures, NULL)
+        update_dropdown(dropdown, "keyword_signature_view", feature_signatures,
+            NULL)
+    }
+    
+    # Update remaining dropdown menus
+    for (dropdown in widgets[dropdown_rows, ]$name) {
+        update_dropdown(dropdown, "platform_signature_view", ins, betweens())
     }
     
     # Re-enable widgets
@@ -162,9 +185,20 @@ observeEvent(input$search, {
     
     # Search database for matching signatures
     sql_obj <-
-        sql_finding_query(target_table = "platform_signature_view",
+        sql_finding_query(
+            fields = c(
+                "signature_name",
+                "species",
+                "experiment_type",
+                "platform_name",
+                "source_type",
+                "submitter",
+                "upload_date"
+            ),
+            target_table = "platform_signature_view",
             ins = ins,
-            betweens = betweens())
+            betweens = betweens()
+        )
     
     # Display error message instead of table if query produces no results
     if (dim(sql_obj)[1] < 1) {

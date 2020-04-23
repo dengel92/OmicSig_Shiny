@@ -1,17 +1,4 @@
-## Final (?) list of search terms to implement
-##### experiment_type
-##### phenotype
-##### platform_name
-##### signature_name
-##### source_type
-##### species
-##### submitter_name
-##### upload_date
-##### feature_name
-##### feature_type
-# keyword
-
-# Search signatures page structure
+# Search page structure
 search_ui <- tabPanel("Search",
     # Create a layout with a sidebar and a main panel
     sidebarLayout(
@@ -32,6 +19,14 @@ search_ui <- tabPanel("Search",
                 htmlOutput(outputId = "search_terms")
             ),
             
+            # Dropdown menu for selecting signature name
+            selectizeInput(
+                inputId = "search_signature_name",
+                label = "Choose signature name(s)",
+                choices = NULL,
+                multiple = TRUE
+            ),
+            
             # Dropdown menu for selecting species
             selectizeInput(
                 "search_species",
@@ -40,18 +35,18 @@ search_ui <- tabPanel("Search",
                 multiple = TRUE
             ),
             
-            # Dropdown menu for selecting platform
-            selectizeInput(
-                inputId = "search_platform_name",
-                label = "Choose platform(s)",
-                choices = NULL,
-                multiple = TRUE
-            ),
-            
             # Dropdown menu for selecting experiment type
             selectizeInput(
                 inputId = "search_experiment_type",
                 label = "Choose experiment type(s)",
+                choices = NULL,
+                multiple = TRUE
+            ),
+            
+            # Dropdown menu for selecting platform
+            selectizeInput(
+                inputId = "search_platform_name",
+                label = "Choose platform(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
@@ -69,14 +64,6 @@ search_ui <- tabPanel("Search",
             selectizeInput(
                 inputId = "search_phenotype_id",
                 label = "Choose phenotype(s)",
-                choices = NULL,
-                multiple = TRUE
-            ),
-            
-            # Dropdown menu for selecting signature name
-            selectizeInput(
-                inputId = "search_signature_name",
-                label = "Choose signature name(s)",
                 choices = NULL,
                 multiple = TRUE
             ),
