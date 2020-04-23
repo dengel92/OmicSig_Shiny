@@ -208,7 +208,7 @@ hypeR_overrep_enrich_server_function <- function(signature_df, gset_names = NULL
       signature_df$signature_direction <- replace(signature_df$signature_direction, which(signature_df$signature_direction == "dn"), "-")
       # order features in signature according to score:
       # (over-rep analysis does not need this though but no harm for doing this)
-      if (signature_score %in% colnames(signature_df)) {
+      if ("signature_score" %in% colnames(signature_df)) {
         signature_df <- signature_df[order(abs(signature_df$signature_score), decreasing = T), ]
       } else if (test == "enrich") {
         stop("when performing rank-based enichment analysis, input signature need to have signature_score column available. 
