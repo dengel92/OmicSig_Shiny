@@ -128,6 +128,8 @@ construct_between_clause <- function(mylist, list_key) {
 #' @param betweens named list where the names are the fields to narrow search by
 #'   and the values are vectors of length 2 containing the endpoints of the
 #'   range to consider in those fields
+#' @param order_fields a vector of fields to order the query results by
+#' @param distinct a boolean indicating whether to return unique results
 #'
 #' @example
 #' 
@@ -141,13 +143,15 @@ sql_finding_query <-
         fields = c("*"),
         ins = NULL,
         betweens = NULL,
-        order_fields = NULL) {
+        order_fields = NULL,
+        distinct = TRUE) {
         # Query construction
         order_sub = ""
         if(!is.null(order_fields)){
             order_sub = paste("ORDER BY", paste(order_fields, sep=","))
         }
         sql <- paste("SELECT ",
+            ifelse(distinct, "DISTINCT ", ""),
             paste(fields, collapse = ","),
             " FROM ",
             target_table,
