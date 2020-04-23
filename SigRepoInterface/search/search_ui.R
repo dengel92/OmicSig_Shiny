@@ -60,9 +60,8 @@ search_ui <- tabPanel("Search",
             ),
             
             # Dropdown menu for selecting phenotype
-            # NEED TO CHANGE TO search_phenotype WHEN VIEW IS UPDATED!
             selectizeInput(
-                inputId = "search_phenotype_id",
+                inputId = "search_phenotype",
                 label = "Choose phenotype(s)",
                 choices = NULL,
                 multiple = TRUE

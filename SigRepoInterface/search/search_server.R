@@ -15,7 +15,7 @@ widgets <-
         c("search_experiment_type", "experiment_type", "experiment types", "dropdown"),
         c("search_platform_name", "platform_name", "platforms", "dropdown"),
         c("search_source_type", "source_type", "source types", "dropdown"),
-        c("search_phenotype_id", "phenotype_id", "phenotypes", "dropdown"),
+        c("search_phenotype", "phenotype", "phenotypes", "dropdown"),
         c("search_feature_type", "feature_type", "feature types", "dropdown_feature"),
         c("search_feature_name", "feature_name", "feature names", "dropdown_feature"),
         c("search_keyword", "keyword", "keywords", "dropdown_keyword"),
@@ -215,6 +215,7 @@ observeEvent(input$search, {
                 "experiment_type",
                 "platform_name",
                 "source_type",
+                "phenotype",
                 "submitter",
                 "upload_date"
             ),
