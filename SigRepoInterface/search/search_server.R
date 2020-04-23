@@ -136,12 +136,17 @@ observe({
     
     # Update signature name dropdown menu
     if (length(ins[["signature_name"]]) > 0) {
-        updateSelectizeInput(
-            session,
-            "search_signature_name",
-            choices = c(ins[["signature_name"]], input[["search_signature_name"]]),
-            selected = input[["search_signature_name"]]
-        )
+        if (length(compact(c(features(), keywords()))) > 0) {
+            updateSelectizeInput(
+                session,
+                "search_signature_name",
+                choices = c(ins[["signature_name"]], input[["search_signature_name"]]),
+                selected = input[["search_signature_name"]]
+            )
+        } else {
+            update_dropdown("signature_name", "platform_signature_view",
+                ins, betweens())
+        }
     } else {
         signatures <- get_field_values("signature_name",
             "platform_signature_view", ins, betweens())
