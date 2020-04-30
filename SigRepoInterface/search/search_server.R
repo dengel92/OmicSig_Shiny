@@ -1,215 +1,308 @@
-# Server logic for search page
+## Server logic for search page
 
-# Source file containing general functions for the search page
-source("search/search_functions.R", local = TRUE)
+## Source file containing general functions for the search page
+source("search/search_functions.R", local=TRUE)
 
-# Make a data frame storing all the relevant information about each input widget
-# id = the input ID of the widget
-# name = the name of the database field corresponding to the widget
-# display = the text to display in the selected search terms section of the app
-# type = the type of widget (i.e. dropdown)
+## Make a dataframe storing all the relevant information about each input widget
+## id = the input ID of the widget
+## field = the name of the database field corresponding to the widget
+## display = the text to display in the selected search terms section of the app
+## type = the type of widget (i.e. dropdown)
+## dbTable = the default table in the database to query for this field
 widgets <-
     rbind.data.frame(
-        c("search_signature_name", "signature_name", "signatures", "dropdown_signature"),
-        c("search_species", "species", "species", "dropdown"),
-        c("search_experiment_type", "experiment_type", "experiment types", "dropdown"),
-        c("search_platform_name", "platform_name", "platforms", "dropdown"),
-        c("search_source_type", "source_type", "source types", "dropdown"),
-        c("search_phenotype", "phenotype", "phenotypes", "dropdown"),
-        c("search_feature_type", "feature_type", "feature types", "dropdown_feature"),
-        c("search_feature_name", "feature_name", "feature names", "dropdown_feature"),
-        c("search_keyword", "keyword", "keywords", "dropdown_keyword"),
-        c("search_submitter", "submitter", "submitters", "dropdown"),
-        c("search_upload_date", "upload_date", "upload date (start, end)", "date"),
-        stringsAsFactors = FALSE
+        c("searchSignatureName",
+            "signature_name",
+            "signatures",
+            "dropdownSig",
+            "platform_signature_view"),
+        c("searchSpecies",
+            "species",
+            "species",
+            "dropdown",
+            "platform_signature_view"), 
+        c("searchExperimentType",
+            "experiment_type",
+            "experiment types",
+            "dropdown",
+            "platform_signature_view"),
+        c("searchPlatformName",
+            "platform_name",
+            "platforms",
+            "dropdown",
+            "platform_signature_view"),
+        c("searchSourceType",
+            "source_type",
+            "source types",
+            "dropdown",
+            "platform_signature_view"),
+        c("searchPhenotype",
+            "phenotype",
+            "phenotypes",
+            "dropdown",
+            "platform_signature_view"),
+        c("searchFeatureType",
+            "feature_type",
+            "feature types",
+            "dropdownFeat",
+            "feature_signature_view"),
+        c("searchFeatureName",
+            "feature_name",
+            "feature names",
+            "dropdownFeat",
+            "feature_signature_view"),
+        c("searchKeyword",
+            "keyword",
+            "keywords",
+            "dropdownKey",
+            "keyword_signature_view"),
+        c("searchSubmitter",
+            "submitter",
+            "submitters",
+            "dropdown",
+            "platform_signature_view"),
+        c("searchUploadDate",
+            "upload_date",
+            "upload date (start, end)",
+            "date",
+            "platform_signature_view"),
+        stringsAsFactors=FALSE
     )
-colnames(widgets) <- c("id", "name", "display", "type")
+## Set column names of dataframe
+colnames(widgets) <- c("id", "field", "display", "type", "dbTable")
 
-# Extract the row numbers for each type of dropdown menu
-dropdown_rows <- which(widgets$type == "dropdown")
-dropdown_signature_rows <- which(widgets$type == "dropdown_signature")
-dropdown_feature_rows <- which(widgets$type == "dropdown_feature")
-dropdown_keyword_rows <- which(widgets$type == "dropdown_keyword")
+## Extract the row numbers for each type of dropdown menu
+dropdownRows <- which(widgets$type == "dropdown")
+sigRows <- which(widgets$type == "dropdownSig")
+featRows <- which(widgets$type == "dropdownFeat")
+keyRows <- which(widgets$type == "dropdownKey")
 
-# Clear selected terms after clicking clear button
+## Clear selected terms after clicking clear button
 observeEvent(input$clear, {
     isolate({
-        # Clear all dropdowns
-        for (dropdown in widgets[c(dropdown_signature_rows, dropdown_rows), ]$name) {
-            clear_dropdown(dropdown, "platform_signature_view")
-        }
-        for (dropdown in widgets[dropdown_feature_rows, ]$name) {
-            clear_dropdown(dropdown, "feature_signature_view")
-        }
-        for (dropdown in widgets[dropdown_keyword_rows, ]$name) {
-            clear_dropdown(dropdown, "keyword_signature_view")
-        }
+        ## Clear all dropdown menus
+        apply(widgets[c(dropdownRows, sigRows, featRows, keyRows), ],
+            1,
+            function(x) {
+                clearDropdown(x[[1]], x[[2]], x[[5]])
+            })
         
-        # Reset date range to default
-        updateDateRangeInput(session, "search_upload_date",
-            start = "2020-01-01", end = Sys.Date())
+        ## Reset date range to default
+        updateDateRangeInput(session,
+            "searchUploadDate",
+            start="2020-01-01",
+            end=Sys.Date())
     })
 })
 
-# Show which search terms have been selected so far
-output$search_terms <- renderText(
+## Show which search terms have been selected so far
+output$searchTerms <- renderText(
     c(
-        # Section header
+        ## Section header
         "<p><font size=3><b>",
         "Selected Search Terms:</b></font></p><p><font size=2>",
         
-        # Show selected terms for each dropdown menu
-        apply(widgets, 1, function(x) {selected_html(x[1], x[3])}),
+        ## Show selected terms for each dropdown menu
+        apply(widgets, 1, function(x) {
+            selectedHTML(x[1], x[3])
+        }),
         
         "</p></font>"
     )
 )
 
-# Construct list of in clauses
+## Construct list of in clauses
 ins <- reactive({
-    # Initialize list to store result
-    ins_list <- list()
-    dropdowns <- widgets[c(dropdown_signature_rows, dropdown_rows), ]
-    # Loop through rows of dropdowns dataframe
+    ## Initialize list to store result
+    insList <- list()
+    dropdowns <- widgets[c(sigRows, dropdownRows), ]
+    ## Loop through rows of dropdowns dataframe
     for (row in 1:dim(dropdowns)[1]) {
-        # Extract field name and dropdown id
-        name <- dropdowns[row, ]$name
+        ## Extract field name and dropdown id
+        field <- dropdowns[row, ]$field
         id <- dropdowns[row, ]$id
-        # Add an element whose name is the field and whose value is the
-        #   input from the dropdown
-        ins_list[[name]] <- input[[id]]
+        ## Add an element whose name is the field and whose value is the
+        ##   input from the dropdown
+        insList[[field]] <- input[[id]]
     }
-    return(ins_list)
+    return(insList)
 })
 
-# Construct list of between clauses
+## Construct list of between clauses
 betweens <- reactive({
     list(
-        "upload_date" = input[["search_upload_date"]]
+        "upload_date"=input[["searchUploadDate"]]
     )
 })
 
-# Construct list of feature types and names
+## Construct list of feature types and names
 features <- reactive({
     list(
-        "feature_name" = input[["search_feature_name"]],
-        "feature_type" = input[["search_feature_type"]]
+        "feature_name"=input[["searchFeatureName"]],
+        "feature_type"=input[["searchFeatureType"]]
     )
 })
 
-# Construct list of keywords
+## Construct list of keywords
 keywords <- reactive({
     list(
-        "keyword" = input[["search_keyword"]]
+        "keyword"=input[["searchKeyword"]]
     )
 })
 
 observe({
-    # Disable widgets until they finish updating
+    ## Disable widgets until they finish updating
     lapply(widgets$id, disable)
     
-    # Get list of in clauses from reactive function
+    ## Get list of in clauses from reactive function
     ins <- ins()
-    feature_signatures <- list("signature_name" = ins[["signature_name"]])
-    keyword_signatures <- feature_signatures
     
-    # If any features are selected, update signature_name in list of in clauses
-    # Also get list of all signature names corresponding to selected feature
-    #   names and types to use when updating keyword dropdown menu
+    ## Extract signature names in clause for updating features and keywords
+    featureSignatures <- list("signature_name"=ins[["signature_name"]])
+    keywordSignatures <- featureSignatures
+    
+    ## If any features are selected, update signature_name in list of in clauses
+    ## Also get list of all signature names corresponding to selected feature
+    ##   names and types for updating keyword dropdown menu
     if (length(compact(features())) > 0) {
-        feature_signatures <- get_intersection("signature_name", "feature_signature_view",
-            features(), ins())
-        ins <- feature_signatures
-        feature_signatures <- list("signature_name" = feature_signatures[["signature_name"]])
+        ## Get the list of signature names for the in clause
+        featureSignatures <-
+            getIntersection("signature_name",
+                "feature_signature_view",
+                features(),
+                ins())
+        ## Update the list of in clauses
+        ins <- featureSignatures
+        ## Extract signature names from updated list of in clauses
+        featureSignatures <-
+            list("signature_name"=featureSignatures[["signature_name"]])
     }
     
-    # If any keywords are selected, update signature_name in list of in clauses
-    # Also get list of all signature names corresponding to selected keywords
-    #   to use when updating feature name and type dropdown menus
+    ## If any keywords are selected, update signature_name in list of in clauses
+    ## Also get list of all signature names corresponding to selected keywords
+    ##   for updating feature name and type dropdown menus
     if (length(compact(keywords())) > 0) {
-        keyword_signatures <- get_intersection("signature_name", "keyword_signature_view",
-            keywords(), ins())
-        ins <- get_intersection("signature_name", "keyword_signature_view",
-            keywords(), ins)
-        keyword_signatures <- list("signature_name" = keyword_signatures[["signature_name"]])
+        ## Get the list of signature names for the in clause
+        keywordSignatures <-
+            getIntersection("signature_name",
+                "keyword_signature_view",
+                keywords(),
+                ins())
+        ## Update the list of in clauses
+        ins <-
+            getIntersection("signature_name",
+                "keyword_signature_view",
+                keywords(),
+                ins)
+        ## Extract signature names from updated list of in clauses
+        keywordSignatures <-
+            list("signature_name"=keywordSignatures[["signature_name"]])
     }
     
-    # Update signature name dropdown menu
+    ## Update signature name dropdown menu
     if (length(ins[["signature_name"]]) > 0) {
         if (length(compact(c(features(), keywords()))) > 0) {
+            ## If the list of in clauses contains signature_name AND features
+            ##   or keywords are selected, then the signature_name in clause
+            ##   will contain the remaining options for signature_name
             updateSelectizeInput(
                 session,
-                "search_signature_name",
-                choices = c(ins[["signature_name"]], input[["search_signature_name"]]),
-                selected = input[["search_signature_name"]]
+                "searchSignatureName",
+                choices=c(ins[["signature_name"]],
+                    input[["searchSignatureName"]]),
+                selected=input[["searchSignatureName"]]
             )
         } else {
-            update_dropdown("signature_name", "platform_signature_view",
-                ins, betweens())
+            ## If the list of in clauses contains signature_name but NO features
+            ##   or keywords are selected, then the signature_name in clause
+            ##   will contain the already selected options for signature_name,
+            ##   and the signature_name dropdown can be updated like the other
+            ##   dropdowns (besides the feature and keyword dropdowns)
+            updateDropdown(
+                "searchSignatureName",
+                "signature_name",
+                "platform_signature_view",
+                ins,
+                betweens()
+            )
         }
     } else {
-        signatures <- get_field_values("signature_name",
+        ## If the list of in clauses does not contain signature_name, then no
+        ##   signatures, features, or keywords are selected, and we need to get
+        ##   the list of all signatures available (based on other inputs) for
+        ##   updating the signature, feature, and keyword dropdown menus
+        signatures <- getFieldValues("signature_name",
             "platform_signature_view", ins, betweens())
         updateSelectizeInput(
             session,
-            "search_signature_name",
-            choices = c(signatures, input[["search_signature_name"]]),
-            selected = input[["search_signature_name"]]
+            "searchSignatureName",
+            choices=c(signatures, input[["searchSignatureName"]]),
+            selected=input[["searchSignatureName"]]
         )
-        # Also update list of signature names to use when updating feature and
-        #   keyword dropdowns
-        feature_signatures <- list("signature_name" = signatures)
-        keyword_signatures <- feature_signatures
+        ## Also update list of signature names for updating feature and
+        ##   keyword dropdowns
+        featureSignatures <- list("signature_name"=signatures)
+        keywordSignatures <- featureSignatures
     }
     
-    # Update features dropdown menus
-    for (dropdown in widgets[dropdown_feature_rows, ]$name) {
-        update_dropdown(dropdown, "feature_signature_view",
-            c(keyword_signatures, features()), NULL)
-    }
-    
-    # Update keyword dropdown menu
-    for (dropdown in widgets[dropdown_keyword_rows, ]$name) {
-        update_dropdown(dropdown, "keyword_signature_view", feature_signatures,
+    ## Update features dropdown menus
+    apply(widgets[featRows, ], 1, function(x) {
+        updateDropdown(x[[1]],
+            x[[2]],
+            x[[5]],
+            c(keywordSignatures, features()),
             NULL)
-    }
+    })
     
-    # Update remaining dropdown menus
-    for (dropdown in widgets[dropdown_rows, ]$name) {
-        update_dropdown(dropdown, "platform_signature_view", ins, betweens())
-    }
+    ## Update keyword dropdown menu
+    apply(widgets[keyRows, ], 1, function(x) {
+        updateDropdown(x[[1]],
+            x[[2]],
+            x[[5]],
+            featureSignatures,
+            NULL)
+    })
     
-    # Re-enable widgets
+    ## Update remaining dropdown menus
+    apply(widgets[dropdownRows, ], 1, function(x) {
+        updateDropdown(x[[1]],
+            x[[2]],
+            x[[5]],
+            ins,
+            betweens())
+    })
+    
+    ## Re-enable widgets
     lapply(widgets$id, enable)
 })
 
-# Display output and download button after clicking search button
+## Display output and download button after clicking search button
 observeEvent(input$search, {
-    # Make sure at least one search term is selected before querying database
+    ## Make sure at least one search term is selected before querying database
     if (length(compact(c(ins(), betweens(), features()))) < 1) {
         shinyalert("Please select at least one search term!")
         return()
     }
     
-    # Get list of in clauses from reactive function
+    ## Get list of in clauses from reactive function
     ins <- ins()
     
-    # If any features are selected, update signature_name in list of in clauses
+    ## If any features are selected, update signature_name in list of in clauses
     if (length(compact(features())) > 0) {
-        ins <- get_intersection("signature_name", "feature_signature_view",
+        ins <- getIntersection("signature_name", "feature_signature_view",
             features(), ins)
     }
     
-    # If any keywords are selected, update signature_name in list of in clauses
+    ## If any keywords are selected, update signature_name in list of in clauses
     if (length(compact(keywords())) > 0) {
-        ins <- get_intersection("signature_name", "keyword_signature_view",
+        ins <- getIntersection("signature_name", "keyword_signature_view",
             keywords(), ins)
     }
     
-    # Search database for matching signatures
-    sql_obj <-
+    ## Search database for matching signatures
+    sqlObj <-
         sql_finding_query(
-            fields = c(
+            fields=c(
                 "signature_name",
                 "species",
                 "experiment_type",
@@ -219,75 +312,75 @@ observeEvent(input$search, {
                 "submitter",
                 "upload_date"
             ),
-            target_table = "platform_signature_view",
-            ins = ins,
-            betweens = betweens()
+            target_table="platform_signature_view",
+            ins=ins,
+            betweens=betweens()
         )
     
-    # Display error message instead of table if query produces no results
-    if (dim(sql_obj)[1] < 1) {
+    ## Display error message instead of table if query produces no results
+    if (dim(sqlObj)[1] < 1) {
         shinyalert("No results found. Please modify your search.")
         return()
     }
     
-    # Display table of search results
-    output$search_results <- renderDataTable({
-        # Ensure that the table updates only once after clicking search
-        isolate(search_table <- sql_obj)
-        # Make signature name a link to that signature's directory
-        search_table$signature_name <-
-            create_link(search_table$signature_name)
-        return(search_table)
-    }, escape = FALSE)
+    ## Display table of search results
+    output$searchResults <- renderDataTable({
+        ## Ensure that the table updates only once after clicking search
+        isolate(searchTable <- sqlObj)
+        ## Make signature name a link to that signature's directory
+        searchTable$signature_name <-
+            create_link(searchTable$signature_name)
+        return(searchTable)
+    }, escape=FALSE)
     
-    # Download button for full search results table
-    output$search_results_download <- downloadHandler(
-        filename = paste("SigRepo_search_results_all.tsv"),
-        content = function(file) {
+    ## Download button for full search results table
+    output$searchResultsDownload <- downloadHandler(
+        filename=paste("SigRepo_search_results_all.tsv"),
+        content=function(file) {
             write.table(
-                sql_obj,
+                sqlObj,
                 file,
-                row.names = FALSE,
-                quote = FALSE,
-                col.names = TRUE,
-                sep = "\t"
+                row.names=FALSE,
+                quote=FALSE,
+                col.names=TRUE,
+                sep="\t"
             )
         }
     )
     
-    # Download button for selected rows from search results table
-    output$selected_search_results_download <-
+    ## Download button for selected rows from search results table
+    output$selectedSearchResultsDownload <-
         downloadHandler(
-            filename = paste("SigRepo_search_results_selected.tsv"),
-            content = function(file) {
-                for (signature in sql_obj[input$search_results_rows_selected, ]) {
+            filename=paste("SigRepo_search_results_selected.tsv"),
+            content=function(file) {
+                for (signature in sqlObj[input$searchResultsRowsSelected, ]) {
                     print(signature)
                 }
                 write.table(
-                    sql_obj[input$search_results_rows_selected, ],
+                    sqlObj[input$searchResultsRowsSelected, ],
                     file,
-                    row.names = FALSE,
-                    quote = FALSE,
-                    col.names = TRUE,
-                    sep = "\t"
+                    row.names=FALSE,
+                    quote=FALSE,
+                    col.names=TRUE,
+                    sep="\t"
                 )
             }
         )
 })
 
-# Select/unselect all rows depending on checkbox input
-observeEvent(input$select_all, {
-    # Create an object to manipulate existing table
-    dt_proxy <- dataTableProxy("search_results")
-    if (input$select_all) {
-        # Select all rows
-        DT::selectRows(dt_proxy, input$search_results_rows_all)
+## Select/unselect all rows depending on checkbox input
+observeEvent(input$selectAll, {
+    ## Create an object to manipulate existing table
+    dtProxy <- dataTableProxy("searchResults")
+    if (input$selectAll) {
+        ## Select all rows
+        DT::selectRows(dtProxy, input$searchResults_rows_all)
     } else {
-        # Unselect all rows
-        DT::selectRows(dt_proxy, NULL)
+        ## Unselect all rows
+        DT::selectRows(dtProxy, NULL)
     }
 })
 
-# Update displayed table with list of selected rows
-output$selected_rows <-
-    renderPrint(print(input$search_results_rows_selected))
+## Update displayed table with list of selected rows
+output$selectedRows <-
+    renderPrint(print(input$searchResults_rows_selected))

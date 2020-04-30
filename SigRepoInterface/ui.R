@@ -44,7 +44,7 @@ ui <- fluidPage(
         # UI structure for each separate tab
         help_ui,
         upload_ui,
-        search_ui,
+        searchUI,
         # Compare and compare_bulk show up in a dropdown
         navbarMenu("Compare",
             compare_ui,

@@ -1,20 +1,20 @@
-# General functions used by search page
+## General functions used by search page
 
 #' General function for generating html output showing selected search terms
 #'
-#' @param search_id the dropdown menu id whose selected values should be
+#' @param searchID the dropdown menu id whose selected values should be
 #'   displayed
-#' @param display_name the word or phrase to display in the html output
+#' @param displayName the word or phrase to display in the html output
 #'   representing the dropdown menu field
-selected_html <- function(search_id, display_name) {
-    # Display "no <display_name> selected" if there is no input to this dropdown
-    if (length(input[[search_id]]) < 1) {
-        paste0("no ", display_name, " selected</br>")
+selectedHTML <- function(searchID, displayName) {
+    ## Display "no <displayName> selected" if there is no input to this dropdown
+    if (length(input[[searchID]]) < 1) {
+        paste0("no ", displayName, " selected</br>")
     } else {
-        # Otherwise display "<display_name>: <value1>, <value2>, ..."
-        paste0(display_name,
+        ## Otherwise display "<displayName>: <value1>, <value2>, ..."
+        paste0(displayName,
             ": <b>",
-            paste(input[[search_id]], collapse = ", "),
+            paste(input[[searchID]], collapse=", "),
             "</b></br>")
     }
 }
@@ -23,97 +23,95 @@ selected_html <- function(search_id, display_name) {
 #' 
 #' @param field the name of the search field whose dropdown menu should be
 #'   updated
-#' @param db_table the database table to query
+#' @param dbTable the database table to query
 #' @param ins list of all of the possible in clauses for sql_finding_query()
 #' @param betweens list of all of the possible between clauses for
 #'   sql_finding_query()
-get_field_values <- function(field, db_table, ins, betweens) {
-    # Query the database
-    sql_obj <-
+getFieldValues <- function(field, dbTable, ins, betweens) {
+    ## Query the database
+    sqlObj <-
         sql_finding_query(
-            fields = field,
-            target_table = db_table,
-            ins = ins[names(ins) != field],
-            betweens = betweens[names(betweens) != field]
+            fields=field,
+            target_table=dbTable,
+            ins=ins[names(ins)!=field],
+            betweens=betweens[names(betweens)!=field]
         )
-    # Return the list of possible values for the given field
-    return(sql_obj[[field]])
+    ## Return the list of possible values for the given field
+    return(sqlObj[[field]])
 }
 
 #' General function for updating a dropdown menu
 #'
+#' @param dropdown the id of the dropdown menu to update
 #' @param field the name of the search field whose dropdown menu should be
 #'   updated
-#' @param db_table the database table to query
+#' @param dbTable the database table to query
 #' @param ins list of all of the possible in clauses for sql_finding_query()
 #' @param betweens list of all of the possible between clauses for
 #'   sql_finding_query()
-update_dropdown <- function(field, db_table, ins, betweens) {
-    # Query the database to find values of field that match selected values of
-    #   other fields
-    field_values <- get_field_values(field, db_table, ins, betweens)
-    # Determine the ID for the dropdown menu that should be updated
-    search_id <- paste0("search_", field)
-    # Update dropdown menu
+updateDropdown <- function(dropdown, field, dbTable, ins, betweens) {
+    ## Query the database to find values of field that match selected values of
+    ##   other fields
+    fieldValues <- getFieldValues(field, dbTable, ins, betweens)
+    ## Update dropdown menu
     updateSelectizeInput(session,
-        search_id,
-        choices = sort(c(field_values, input[[search_id]])),
-        selected = input[[search_id]])
+        dropdown,
+        choices=sort(c(fieldValues, input[[dropdown]])),
+        selected=input[[dropdown]])
 }
 
 #' General function for clearing selections of a dropdown menu
 #'
+#' @param dropdown the id of the dropdown menu to update
 #' @param field the name of the search field whose dropdown menu should be
 #'   cleared
-#' @param db_table the database table to query
-clear_dropdown <- function(field, db_table) {
-    # Query the database to find all values of field
-    field_values = get_field_values(field, db_table, NULL, NULL)
-    # Determine the ID for the dropdown menu that should be updated
-    search_id <- paste0("search_", field)
-    # Update dropdown menu
+#' @param dbTable the database table to query
+clearDropdown <- function(dropdown, field, dbTable) {
+    ## Query the database to find all values of field
+    fieldValues <- getFieldValues(field, dbTable, NULL, NULL)
+    ## Update dropdown menu
     updateSelectizeInput(session,
-        search_id,
-        choices = c(field_values),
-        selected = NULL)
+        dropdown,
+        choices=c(fieldValues),
+        selected=NULL)
 }
 
 #' General function for updating the values of a field in a list of in clauses
 #'   based on the intersection of two lists of possible values for that field
 #'   
 #' @param field the field to update in the list of in clauses
-#' @param db_table the database table to query to get a list of possible values
+#' @param dbTable the database table to query to get a list of possible values
 #'   for field
-#' @param query_ins the list of in clauses to use in the sql query to get a list
+#' @param queryIns the list of in clauses to use in the sql query to get a list
 #'   of possible values for field
-#' @param ins_list the list of in clauses containing the original list of
+#' @param insList the list of in clauses containing the original list of
 #'   possible values for field
-get_intersection <- function(field, db_table, query_ins, ins_list) {
-    # Get the list of field values corresponding to query_ins
-    corresponding_values <-
-        get_field_values(
+getIntersection <- function(field, dbTable, queryIns, insList) {
+    ## Get the list of field values corresponding to query_ins
+    correspondingValues <-
+        getFieldValues(
             field,
-            db_table,
-            ins = query_ins,
+            dbTable,
+            ins = queryIns,
             betweens = NULL
         )
-    # Get the list of selected field values
-    selected_values <- ins_list[[field]]
-    # Get the intersection of the two lists of field values
-    intersect_values <-
-        intersect(corresponding_values, selected_values)
-    if (length(intersect_values) < 1 & length(selected_values) >= 1) {
-        # If the intersection is empty and field values are selected
-        #   then set the field value to an empty string for sql_finding_query()
-        ins_list[[field]] = ""
-    } else if (length(intersect_values) < 1 & length(selected_values) < 1) {
-        # If the intersection is empty and no field values are selected
-        #   then set the field value to the values corresponding to the
-        #   selected ins_query for sql_finding_query()
-        ins_list[[field]] = corresponding_values
+    ## Get the list of selected field values
+    selectedValues <- insList[[field]]
+    ## Get the intersection of the two lists of field values
+    intersectValues <-
+        intersect(correspondingValues, selectedValues)
+    if (length(intersectValues) < 1 & length(selectedValues) >= 1) {
+        ## If the intersection is empty and field values are selected
+        ##   then set the field value to an empty string for sql_finding_query()
+        insList[[field]] <- ""
+    } else if (length(intersectValues) < 1 & length(selectedValues) < 1) {
+        ## If the intersection is empty and no field values are selected
+        ##   then set the field value to the values corresponding to the
+        ##   selected ins_query for sql_finding_query()
+        insList[[field]] <- correspondingValues
     } else {
-        # Otherwise set field values to the intersection for sql_finding_query()
-        ins_list[[field]] = intersect_values
+        ## Otherwise set field values to the intersection for sql_finding_query()
+        insList[[field]] <- intersectValues
     }
-    return(ins_list)
+    return(insList)
 }
