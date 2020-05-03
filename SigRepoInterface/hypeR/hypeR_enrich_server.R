@@ -38,7 +38,7 @@ observe({
 })
 
 hypeREnrichAllFeaturesDFVariable <- reactive({
-  sig <- retrieveOmicSigObj(signatureName=input$hypeREnrichSignature)$difexp[, c("symbol", "score")]
+  sig <- retrieveOmicSigObj(signatureName = input$hypeREnrichSignature)$difexp[, c("symbol", "score")]
   direction <- rep("+", nrow(sig))
   direction[which(sig$score < 0)] <- "-"
   sig <- cbind(sig, direction)
