@@ -18,7 +18,7 @@ writeJson <- function(OmicObj, file) {
   writeSignature <- OmicObj$signatures
   writeSignature$signatureDirection <- NULL
   metadataLength <- length(OmicObj$metadata)
-  writeJson_obj <- jsonlite::toJSON(c(
+  writeJsonObj <- jsonlite::toJSON(c(
     OmicObj$metadata,
     "metadataLength" = metadataLength,
     list("signatureDirectionNames" = names(signatureDirection)),
@@ -27,7 +27,7 @@ writeJson <- function(OmicObj, file) {
     list("lv1Colnames" = colnames(OmicObj$difexp)),
     OmicObj$difexp
   ), na = NULL, pretty = T)
-  write(writeJson_obj, file)
+  write(writeJsonObj, file)
   return("finished")
 }
 
