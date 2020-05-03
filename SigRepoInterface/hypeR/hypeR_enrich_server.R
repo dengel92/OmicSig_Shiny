@@ -127,7 +127,7 @@ output$hypeREnrichCustomGsetResult <- DT::renderDataTable({
   }
 })
 
-output$hypeREnrichResultDownload <- downloadHandler(
+output$hypeREnrichCustomGsetResultDownload <- downloadHandler(
   filename = paste(hypeREnrichCustomGsetResultVariable()$sigName, input$hypeREnrichCustomGsetName, "_enrich.tsv", sep = ""),
   content = function(file) {
     write.table(hypeREnrichCustomGsetResultVariable()$result, file, row.names = F, quote = F, col.names = T, sep = "\t")

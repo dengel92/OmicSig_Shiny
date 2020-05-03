@@ -38,7 +38,7 @@ hypeREnrichUI <- tabPanel(
       dq_space(),
       fileInput("hypeREnrichCustomGset", label = "Upload customize geneset:"),
       textInput("hypeREnrichCustomGsetName", label = "geneset name", value = "CustomizeGeneSet"),
-      actionButton("hypeREnrichCustomGsetAnalysis", label = "Rank-based enrichment analysis using customized geneset")
+      actionButton("hypeREnrichCustomGsetAnalysis", label = "Using customized geneset")
     ),
     mainPanel(
       dq_space(),
