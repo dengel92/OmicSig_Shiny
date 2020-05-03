@@ -51,8 +51,8 @@ ui <- fluidPage(
             compare_bulk_ui),
         # hypeR overrep and enrichment show up in a dropdown
         navbarMenu("hypeR",
-            hypeR_overrep_ui,
-            hypeR_enrich_ui),
+            hypeROverrepUI,
+            hypeREnrichUI),
         # second parameter in navbar appending function above
         inputs = textInput(
             inputId = "search",

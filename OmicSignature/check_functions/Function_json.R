@@ -13,18 +13,18 @@
 #'
 
 writeJson <- function(OmicObj, file) {
-  signatureDirection <- summary(OmicObj$signatures$signatureDirection)
-  # drop the signatureDirection column:
+  signature_direction <- summary(OmicObj$signatures$signature_direction)
+  # drop the signature_direction column:
   writeSignature <- OmicObj$signatures
-  writeSignature$signatureDirection <- NULL
-  metadataLength <- length(OmicObj$metadata)
+  writeSignature$signature_direction <- NULL
+  metadata_length <- length(OmicObj$metadata)
   writeJsonObj <- jsonlite::toJSON(c(
     OmicObj$metadata,
-    "metadataLength" = metadataLength,
-    list("signatureDirectionNames" = names(signatureDirection)),
-    signatureDirection,
+    "metadata_length" = metadata_length,
+    list("signature_direction_names" = names(signature_direction)),
+    signature_direction,
     writeSignature,
-    list("lv1Colnames" = colnames(OmicObj$difexp)),
+    list("lv1_colnames" = colnames(OmicObj$difexp)),
     OmicObj$difexp
   ), na = NULL, pretty = T)
   write(writeJsonObj, file)
@@ -45,13 +45,13 @@ writeJson <- function(OmicObj, file) {
 #'
 readJson <- function(filename) {
   readJson <- jsonlite::fromJSON(txt = filename)
-  readMetadata <- readJson[c(1:readJson$metadataLength)]
-  lv1Colnames <- readJson$lv1Colnames
-  readLv1 <- data.frame(dplyr::bind_rows(readJson[c(lv1Colnames)]))
+  readMetadata <- readJson[c(1:readJson$metadata_length)]
+  lv1_colnames <- readJson$lv1_colnames
+  readLv1 <- data.frame(dplyr::bind_rows(readJson[c(lv1_colnames)]))
   readLv2 <- data.frame(dplyr::bind_rows(readJson[c("signature_symbol", "signature_score")]))
-  signatureDirection <-
-    rep(readJson$signatureDirectionNames, unlist(readJson[readJson$signatureDirectionNames]))
-  readLv2 <- cbind(readLv2, signatureDirection)
+  signature_direction <-
+    rep(readJson$signature_direction_names, unlist(readJson[readJson$signature_direction_names]))
+  readLv2 <- cbind(readLv2, signature_direction)
   readSigObj <- OmicSignature$new(readMetadata, readLv2, readLv1)
   return(readSigObj)
 }

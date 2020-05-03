@@ -30,7 +30,7 @@ create_link <-
         )
     }
 
-## retrieve_omicsig()
+## retrieveOmicSigObj()
 ##
 #' @title retrieve OmicSig obj from VM file system; hard coded
 #'
@@ -38,14 +38,14 @@ create_link <-
 #' @return OmicSignature object
 #'
 #' @example
-#' retrieve_omicsig(signature_name = "Cal27_BaP")
+#' retrieveOmicSigObj(signatureName = "Cal27_BaP")
 #'
-retrieve_omicsig <-
-    function(signature_name) {
-        return(read_json(paste0(
+retrieveOmicSigObj <-
+    function(signatureName) {
+        return(readJson(paste0(
             'http://sigrepo.bu.edu:3838/challenge_project/',
             'miscellanea/signatures/',
-            signature_name,
+            signatureName,
             '_obj.json'
         )))
     }

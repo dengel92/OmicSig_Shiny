@@ -1,5 +1,5 @@
 #----intro & description----
-output$hypeR_overrep_introduction <- renderText({
+output$hypeROverrepIntro <- renderText({
   c(
     "<p><h2>Over-representation Tests</h2></p>",
     "<h3>Suggested Example Uses :</h3>",
@@ -8,7 +8,7 @@ output$hypeR_overrep_introduction <- renderText({
   )
 })
 
-output$hypeR_overrep_description <- renderText({
+output$hypeROverrepDescription <- renderText({
   c(
     "<p>The meaning of each column:",
     "<br> direction: the direction of the feature (genes) in the given signature, if available.
@@ -29,7 +29,7 @@ observe({
   signature_list <- sql_finding_query("signatures", "signature_name")[["signature_name"]]
   updateSelectizeInput(
     session,
-    "hypeR_overrep_signature",
+    "hypeROverrepSignature",
     choices = c(
       "",
       signature_list
@@ -37,14 +37,14 @@ observe({
   )
 })
 
-hypeR_signature_df_variable <- reactive({
+hypeROverrepSignatureDFVariable <- reactive({
   df <- sql_generic(paste(
     "select feature_name, 
     weight, 
     direction 
     from feature_signature_view 
     where signature_name =",
-    single_quoted(input$hypeR_overrep_signature), ";",
+    single_quoted(input$hypeROverrepSignature), ";",
     sep = ""
   ))
   df <- df[order(df$weight, decreasing = T), ]
@@ -52,90 +52,90 @@ hypeR_signature_df_variable <- reactive({
   return(df)
 })
 
-output$hypeR_signature_df <- DT::renderDataTable({
-  hypeR_signature_df_variable()
+output$hypeROverrepSignatureDF <- DT::renderDataTable({
+  hypeROverrepSignatureDFVariable()
 })
 
-output$hypeR_download_signature <- downloadHandler(
-  filename = paste(as.character(input$hypeR_overrep_signature), "_signature.tsv", sep = ""),
+output$hypeROverrepDownloadSignature <- downloadHandler(
+  filename = paste(as.character(input$hypeROverrepSignature), "_signature.tsv", sep = ""),
   content = function(file) {
-    write.table(hypeR_signature_df_variable(), file, row.names = F, quote = F, col.names = T, sep = "\t")
+    write.table(hypeROverrepSignatureDFVariable(), file, row.names = F, quote = F, col.names = T, sep = "\t")
   }
 )
 
 #----msigDB geneset----
-hypeR_overrep_result_variable <- eventReactive(input$hypeR_overrep_analysis, {
-  sig <- hypeR_signature_df_variable()
-  gset_names <- NULL
-  gset_names <- data.frame(
+hypeROverrepResultVariable <- eventReactive(input$hypeROverrepAnalysis, {
+  sig <- hypeROverrepSignatureDFVariable()
+  gsetNames <- NULL
+  gsetNames <- data.frame(
     species = character(0),
     category = character(0),
     subcategory = character(0)
   )
-  for (i in c(input$hypeR_overrep_gsets)) {
-    gset_names <- rbind(gset_names, c(input$hypeR_overrep_species, unlist(strsplit(i, "_"))[1:2]), stringsAsFactors = FALSE)
+  for (i in c(input$hypeROverrepGsets)) {
+    gsetNames <- rbind(gsetNames, c(input$hypeROverrepSpecies, unlist(strsplit(i, "_"))[1:2]), stringsAsFactors = FALSE)
   }
-  colnames(gset_names) <- c("species", "category", "subcategory")
-  result <- hypeR_overrep_enrich_server_function(sig, gset_names = gset_names, gset_list = NULL, test = "overrep")
-  result$sig_name <- input$hypeR_overrep_signature
+  colnames(gsetNames) <- c("species", "category", "subcategory")
+  result <- hypeROverrepEnrichServerFunction(sig, gsetNames = gsetNames, gsetList = NULL, test = "overrep")
+  result$sigName <- input$hypeROverrepSignature
   return(result)
 })
 
-output$hypeR_overrep_success <- renderText({
+output$hypeROverrepSuccess <- renderText({
   c(
     "<h2>Signature: ",
-    hypeR_overrep_result_variable()$sig_name,
+    hypeROverrepResultVariable()$gsetNames,
     "</h2><h3>Species: ",
-    input$hypeR_overrep_species,
+    input$hypeROverrepSpecies,
     "</h3><h3>Gene Sets: ",
-    input$hypeR_overrep_gsets, "</h3>",
+    input$hypeROverrepGsets, "</h3>",
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#BF4422\"><b>NOTICE</b></font> Result is shown with fdr cutoff 0.05. It's possible to have no data available if no significantly enriched gene set is found. - at Apr 2020. </p>"
   )
 })
 
-output$hypeR_overrep_result <- DT::renderDataTable({
-  if (!is.null(hypeR_overrep_result_variable()$result)) {
-    hypeR_overrep_result_variable()$result
+output$hypeROverrepResult <- DT::renderDataTable({
+  if (!is.null(hypeROverrepResultVariable()$result)) {
+    hypeROverrepResultVariable()$result
   }
 })
 
-output$hypeR_overrep_download <- downloadHandler(
-  filename = paste(hypeR_overrep_result_variable()$sig_name, "_overrep.tsv", sep = ""),
+output$hypeROverrepResultDownload <- downloadHandler(
+  filename = paste(hypeROverrepResultVariable()$sigName, "_overrep.tsv", sep = ""),
   content = function(file) {
-    write.table(hypeR_overrep_result_variable()$result, file, row.names = F, quote = F, col.names = T, sep = "\t")
+    write.table(hypeROverrepResultVariable()$result, file, row.names = F, quote = F, col.names = T, sep = "\t")
   }
 )
 
 #----customized upload geneset----
-hypeR_overrep_cust_result_variable <- eventReactive(input$hypeR_overrep_cust_analysis, {
-  sig <- hypeR_signature_df_variable()
-  gset_list <- read_gset_list(input$hypeR_overrep_cust_gset$datapath)
-  result <- hypeR_overrep_enrich_server_function(sig, gset_names = NULL, gset_list = gset_list, gset_list_category = as.character(input$hypeR_overrep_cust_gset_name), gset_list_subcategory = "/", test = "overrep")
-  result$sig_name <- input$hypeR_overrep_signature
+hypeROverrepCustomGsetResultVariable <- eventReactive(input$hypeROverrepCustomGsetAnalysis, {
+  sig <- hypeROverrepSignatureDFVariable()
+  gsetList <- readGsetList(input$hypeROverrepCustomGset$datapath)
+  result <- hypeROverrepEnrichServerFunction(sig, gsetNames = NULL, gsetList = gsetList, gsetListCategory = as.character(input$hypeROverrepCustomGsetName), gsetListSubCategory = "/", test = "overrep")
+  result$sigName <- input$hypeROverrepSignature
   return(result)
 })
 
-output$hypeR_overrep_cust_success <- renderText({
+output$hypeROverrepCustomGsetSuccess <- renderText({
   c(
     "<h2>Signature: ",
-    hypeR_overrep_cust_result_variable()$sig_name,
+    hypeROverrepCustomGsetResultVariable()$sigName,
     "</h2><h3>Gene Sets: ",
-    input$hypeR_overrep_cust_gset_name, "</h3>",
+    input$hypeROverrepCustomGsetName, "</h3>",
     "You can see and download the result shown below.</i></p>",
     "<p><font color=\"#BF4422\"><b>NOTICE</b></font> Result is shown with fdr cutoff 0.05. It's possible to have no data available if no significantly enriched gene set is found. - at Apr 2020. </p>"
   )
 })
 
-output$hypeR_overrep_cust_result <- DT::renderDataTable({
-  if (!is.null(hypeR_overrep_cust_result_variable()$result)) {
-    hypeR_overrep_cust_result_variable()$result
+output$hypeROverrepCustomGsetResult <- DT::renderDataTable({
+  if (!is.null(hypeROverrepCustomGsetResultVariable()$result)) {
+    hypeROverrepCustomGsetResultVariable()$result
   }
 })
 
-output$hypeR_overrep_cust_download <- downloadHandler(
-  filename = paste(hypeR_overrep_cust_result_variable()$sig_name, input$hypeR_overrep_cust_gset_name, "_overrep.tsv", sep = ""),
+output$hypeROverrepCustomGsetResultDownload <- downloadHandler(
+  filename = paste(hypeROverrepCustomGsetResultVariable()$sigName, input$hypeROverrepCustomGsetName, "_overrep.tsv", sep = ""),
   content = function(file) {
-    write.table(hypeR_overrep_cust_result_variable()$result, file, row.names = F, quote = F, col.names = T, sep = "\t")
+    write.table(hypeROverrepCustomGsetResultVariable()$result, file, row.names = F, quote = F, col.names = T, sep = "\t")
   }
 )
