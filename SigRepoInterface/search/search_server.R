@@ -411,6 +411,8 @@ output$selectedSearchResultsDownload <-
                 ## Write each signature to a json file and save the filename
                 fileName <- paste0(signature, ".json")
                 writeJson(retrieveOmicSigObj(signature), fileName)
+                # or we can directly specify the file path here; 
+                # the path is hard-coded in retrieveOmicSigObj() function
                 files <- c(fileName, files)
             }
             
