@@ -123,9 +123,11 @@ searchUI <- tabPanel("Search",
             ## Add some space at the top
             dq_space(),
             
-            ## Show checkbox for selecting/unselecting all rows
+            ## Panel appears only when results table is displayed
             conditionalPanel(
                 condition="output.searchResults",
+                
+                ## Show checkbox for selecting/unselecting all rows
                 checkboxInput("selectAll", "Select/unselect all")
             ),
             
@@ -134,14 +136,14 @@ searchUI <- tabPanel("Search",
                 ## If the output table is too wide, add a scrollbar
                 style="overflow-y: scroll"),
             
-            ## Download buttons will appear only when table is displayed
+            ## Panel appears only when results table is displayed
             conditionalPanel(
                 condition="output.searchResults",
                 
-                ## Download button for full search results table
+                ## Show download button for full search results table
                 downloadButton("searchResultsDownload", "Download Table"),
                 
-                ## Download button for selected rows
+                ## Show download button for selected signatures
                 downloadButton(
                     "selectedSearchResultsDownload",
                     "Download Selected Signatures"

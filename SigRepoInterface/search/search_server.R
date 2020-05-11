@@ -8,6 +8,7 @@ source("search/search_functions.R", local=TRUE)
 ## field = the name of the database field corresponding to the widget
 ## display = the text to display in the selected search terms section of the app
 ## type = the type of widget (i.e. dropdown)
+##      type is used to determine how to update the widget
 ## dbTable = the default table in the database to query for this field
 widgets <-
     rbind.data.frame(
@@ -115,16 +116,21 @@ output$searchTerms <- renderText(
 ins <- reactive({
     ## Initialize list to store result
     insList <- list()
+    
+    ## Pull out relevant rows of widgets dataframe
     dropdowns <- widgets[c(sigRows, dropdownRows), ]
+    
     ## Loop through rows of dropdowns dataframe
     for (row in 1:dim(dropdowns)[1]) {
         ## Extract field name and dropdown id
         field <- dropdowns[row, ]$field
         id <- dropdowns[row, ]$id
+        
         ## Add an element whose name is the field and whose value is the
         ##   input from the dropdown
         insList[[field]] <- input[[id]]
     }
+    
     return(insList)
 })
 
@@ -171,8 +177,10 @@ observe({
                 "feature_signature_view",
                 features(),
                 ins())
+        
         ## Update the list of in clauses
         ins <- featureSignatures
+        
         ## Extract signature names from updated list of in clauses
         featureSignatures <-
             list("signature_name"=featureSignatures[["signature_name"]])
@@ -188,12 +196,14 @@ observe({
                 "keyword_signature_view",
                 keywords(),
                 ins())
+        
         ## Update the list of in clauses
         ins <-
             getIntersection("signature_name",
                 "keyword_signature_view",
                 keywords(),
                 ins)
+        
         ## Extract signature names from updated list of in clauses
         keywordSignatures <-
             list("signature_name"=keywordSignatures[["signature_name"]])
@@ -233,12 +243,15 @@ observe({
         ##   updating the signature, feature, and keyword dropdown menus
         signatures <- getFieldValues("signature_name",
             "platform_signature_view", ins, betweens())
+        
+        ## Update the signature name dropdown menu
         updateSelectizeInput(
             session,
             "searchSignatureName",
             choices=c(signatures, input[["searchSignatureName"]]),
             selected=input[["searchSignatureName"]]
         )
+        
         ## Also update list of signature names for updating feature and
         ##   keyword dropdowns
         featureSignatures <- list("signature_name"=signatures)
@@ -277,7 +290,7 @@ observe({
 })
 
 ## Display output and download button after clicking search button
-observeEvent(input$search, {
+resultsTable <- eventReactive(input$search, {
     ## Make sure at least one search term is selected before querying database
     if (length(compact(c(ins(), betweens(), features()))) < 1) {
         shinyalert("Please select at least one search term!")
@@ -319,59 +332,34 @@ observeEvent(input$search, {
     
     ## Display error message instead of table if query produces no results
     if (dim(sqlObj)[1] < 1) {
-        shinyalert("No results found. Please modify your search.")
+        shinyalert("No results found.", "Please modify your search.")
         return()
     }
     
-    ## Display table of search results
-    output$searchResults <- renderDataTable({
-        ## Ensure that the table updates only once after clicking search
-        isolate(searchTable <- sqlObj)
-        ## Make signature name a link to that signature's directory
-        searchTable$signature_name <-
-            createLink(searchTable$signature_name)
-        return(searchTable)
-    }, escape=FALSE)
-    
-    ## Download button for full search results table
-    output$searchResultsDownload <- downloadHandler(
-        filename=paste("SigRepo_search_results_all.tsv"),
-        content=function(file) {
-            write.table(
-                sqlObj,
-                file,
-                row.names=FALSE,
-                quote=FALSE,
-                col.names=TRUE,
-                sep="\t"
-            )
-        }
-    )
-    
-    ## Download button for selected rows from search results table
-    output$selectedSearchResultsDownload <-
-        downloadHandler(
-            filename=paste("SigRepo_search_results_selected.tsv"),
-            content=function(file) {
-                for (signature in sqlObj[input$searchResultsRowsSelected, ]) {
-                    print(signature)
-                }
-                write.table(
-                    sqlObj[input$searchResultsRowsSelected, ],
-                    file,
-                    row.names=FALSE,
-                    quote=FALSE,
-                    col.names=TRUE,
-                    sep="\t"
-                )
-            }
-        )
+    return(sqlObj)
 })
+
+## Display table of search results
+output$searchResults <- renderDataTable({
+    ## Make sure there are results to show
+    if (!is.null(resultsTable())) {
+        ## Get table contents from reactive expression
+        resultsTable <- resultsTable()
+        
+        ## Make signature name a link to that signature's directory
+        resultsTable$signature_name <-
+            createLink(resultsTable$signature_name)
+        
+        return(resultsTable)
+    }
+}, escape = FALSE)
 
 ## Select/unselect all rows depending on checkbox input
 observeEvent(input$selectAll, {
     ## Create an object to manipulate existing table
     dtProxy <- dataTableProxy("searchResults")
+    
+    ## Update selected rows
     if (input$selectAll) {
         ## Select all rows
         DT::selectRows(dtProxy, input$searchResults_rows_all)
@@ -384,3 +372,51 @@ observeEvent(input$selectAll, {
 ## Update displayed table with list of selected rows
 output$selectedRows <-
     renderPrint(print(input$searchResults_rows_selected))
+
+## Download button for full search results table
+output$searchResultsDownload <- downloadHandler(
+    filename="SigRepo_search_results_table.tsv",
+    content=function(file) {
+        write.table(
+            resultsTable(),
+            file,
+            row.names=FALSE,
+            quote=FALSE,
+            col.names=TRUE,
+            sep="\t"
+        )
+    }
+)
+
+## Download button for selected signatures from search results table
+output$selectedSearchResultsDownload <-
+    downloadHandler(
+        filename="SigRepo_search_results_selected.zip",
+        content=function(file) {
+            ## Navigate to a temporary directory
+            owd <- setwd(tempdir())
+            
+            ## Return to original directory when download ends
+            on.exit(setwd(owd))
+            
+            ## Start a list of files to zip
+            files <- c()
+            
+            ## Extract signature names from selected rows
+            signatures <-
+                resultsTable()[input$searchResults_rows_selected, ]$signature_name
+            
+            ## Loop through the signature names from selected rows
+            for (signature in signatures){
+                ## Write each signature to a json file and save the filename
+                fileName <- paste0(getwd(), "/", signature, ".json")
+                writeJson(retrieveOmicSigObj(signature), fileName)
+                files <- c(fileName, files)
+            }
+            
+            ## Create the zip file
+            zip(file, files)
+        },
+        contentType="application/zip"
+    )
+
