@@ -409,7 +409,7 @@ output$selectedSearchResultsDownload <-
             ## Loop through the signature names from selected rows
             for (signature in signatures){
                 ## Write each signature to a json file and save the filename
-                fileName <- paste0(getwd(), "/", signature, ".json")
+                fileName <- paste0(signature, ".json")
                 writeJson(retrieveOmicSigObj(signature), fileName)
                 files <- c(fileName, files)
             }
