@@ -19,20 +19,20 @@ selectedHTML <- function(searchID, displayName) {
     }
 }
 
-#' General function for getting the values of a field using sql_finding_query()
+#' General function for getting the values of a field using sqlFindingQuery()
 #' 
 #' @param field the name of the search field whose dropdown menu should be
 #'   updated
 #' @param dbTable the database table to query
-#' @param ins list of all of the possible in clauses for sql_finding_query()
+#' @param ins list of all of the possible in clauses for sqlFindingQuery()
 #' @param betweens list of all of the possible between clauses for
-#'   sql_finding_query()
+#'   sqlFindingQuery()
 getFieldValues <- function(field, dbTable, ins, betweens) {
     ## Query the database
     sqlObj <-
-        sql_finding_query(
+        sqlFindingQuery(
             fields=field,
-            target_table=dbTable,
+            dbTable=dbTable,
             ins=ins[names(ins)!=field],
             betweens=betweens[names(betweens)!=field]
         )
@@ -46,9 +46,9 @@ getFieldValues <- function(field, dbTable, ins, betweens) {
 #' @param field the name of the search field whose dropdown menu should be
 #'   updated
 #' @param dbTable the database table to query
-#' @param ins list of all of the possible in clauses for sql_finding_query()
+#' @param ins list of all of the possible in clauses for sqlFindingQuery()
 #' @param betweens list of all of the possible between clauses for
-#'   sql_finding_query()
+#'   sqlFindingQuery()
 updateDropdown <- function(dropdown, field, dbTable, ins, betweens) {
     ## Query the database to find values of field that match selected values of
     ##   other fields
@@ -102,15 +102,15 @@ getIntersection <- function(field, dbTable, queryIns, insList) {
         intersect(correspondingValues, selectedValues)
     if (length(intersectValues) < 1 & length(selectedValues) >= 1) {
         ## If the intersection is empty and field values are selected
-        ##   then set the field value to an empty string for sql_finding_query()
+        ##   then set the field value to an empty string for sqlFindingQuery()
         insList[[field]] <- ""
     } else if (length(intersectValues) < 1 & length(selectedValues) < 1) {
         ## If the intersection is empty and no field values are selected
         ##   then set the field value to the values corresponding to the
-        ##   selected ins_query for sql_finding_query()
+        ##   selected ins_query for sqlFindingQuery()
         insList[[field]] <- correspondingValues
     } else {
-        ## Otherwise set field values to the intersection for sql_finding_query()
+        ## Otherwise set field values to the intersection for sqlFindingQuery()
         insList[[field]] <- intersectValues
     }
     return(insList)

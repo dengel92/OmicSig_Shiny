@@ -26,7 +26,7 @@ output$hypeREnrichDescription <- renderText({
 
 #----signature table----
 observe({
-  signature_list <- sql_finding_query("signatures", "signature_name")[["signature_name"]]
+  signature_list <- sqlFindingQuery("signatures", "signature_name")[["signature_name"]]
   updateSelectizeInput(
     session,
     "hypeREnrichSignature",

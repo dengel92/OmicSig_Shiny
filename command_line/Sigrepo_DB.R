@@ -72,16 +72,16 @@ if(length(commandArgs(trailingOnly = TRUE))>0){
     switch(
         input_groups$f,
         "find" = {
-            sql_finding_query(
-                target_table=input_groups$table,
+            sqlFindingQuery(
+                dbTable=input_groups$table,
                 fields=input_groups$fields
             )
         },
         "show_fields" = {
-            sql_generic(paste("SHOW COLUMNS FROM", input_groups$table, ";"))
+            sqlGeneric(paste("SHOW COLUMNS FROM", input_groups$table, ";"))
         },
         "show_tables" = {
-            sql_generic(paste("SHOW TABLES;"))
+            sqlGeneric(paste("SHOW TABLES;"))
         },
         "compare" = {
             compare_signatures(input_groups$signatures[1], input_groups$signatures[2])

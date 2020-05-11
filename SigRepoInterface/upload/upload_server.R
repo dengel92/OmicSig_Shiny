@@ -55,7 +55,7 @@ write_signature_file <- function(file_object, sig_name){
 # Input: OmicObj formatted object. consult OmicObj documentation
 odd_ones_out <- function(your_obj){
     #fetching feature ids corresponding to symbols
-    lv2_feature_ids = sql_finding_query(
+    lv2_feature_ids = sqlFindingQuery(
         "features", 
         c("feature_name","feature_id"), 
         wheres=list("feature_name" = c(your_obj$signatures$signature_symbol))
@@ -84,10 +84,10 @@ syno_fetch <- function(symbol_list, organism="Homo sapiens", genome=""){
 add_signature <- function(sig_name, species_name, platform_name, cell_line) {
     #tracking upload date for DB insert
     now = Sys.time()
-    signature_name = single_quoted(sig_name)
+    signature_name = singleQuote(sig_name)
     my_species = (species_name)
-    species_id_insert = sql_finding_query("species", c("species_id"), wheres=list("species"=my_species))$species_id[1]
-    platform_id = as.integer(sql_finding_query("assay_platforms", c("platform_id"), wheres=list("platform_name"=platform_name))$platform_id[1])
+    species_id_insert = sqlFindingQuery("species", c("species_id"), wheres=list("species"=my_species))$species_id[1]
+    platform_id = as.integer(sqlFindingQuery("assay_platforms", c("platform_id"), wheres=list("platform_name"=platform_name))$platform_id[1])
     cell_line = cell_line
     insert_query = paste("insert into signatures(
                          signature_name,
@@ -98,7 +98,7 @@ add_signature <- function(sig_name, species_name, platform_name, cell_line) {
     if(FALSE){
         print(insert_query)
     }
-    insert_signature_conn = new_conn_handle()
+    insert_signature_conn = newConnHandle()
     dbSendQuery(insert_signature_conn, insert_query)
     dbDisconnect(insert_signature_conn)
 }
@@ -131,7 +131,7 @@ add_lv2 <- function(lv2_file, sid, sig_name){
     lv2_table$signature_direction[which(tolower(lv2_table$signature_direction)=="up")]="+"
     lv2_table$signature_direction[which(tolower(lv2_table$signature_direction)=="dn")]="-"
     #fetching feature ids corresponding to symbols
-    lv2_feature_ids = sql_finding_query(
+    lv2_feature_ids = sqlFindingQuery(
                             "features", 
                             c("feature_name","feature_id"), 
                             wheres=list("feature_name" = c(lv2_table$signature_symbol))
@@ -165,14 +165,14 @@ add_lv2 <- function(lv2_file, sid, sig_name){
         sid_col, ",", 
         lv2_insert.df$feature_id, ",", 
         lv2_insert.df$signature_score, ",", 
-        single_quoted(lv2_insert.df$direction),")",sep="",collapse=","
+        singleQuote(lv2_insert.df$direction),")",sep="",collapse=","
     )
     insert_lv2_query = paste(
         "INSERT INTO feature_signature(signature_id,feature_id,weight,direction) VALUES ",
         insert_records,
         sep="")
     #executes insert
-    sql_generic(insert_lv2_query)
+    sqlGeneric(insert_lv2_query)
     write.csv(lv2_table, paste(upload_root_path,sig_name,"/level_2/",sig_name,".csv",sep=""))
 }
 
@@ -188,9 +188,9 @@ add_signature_keywords <- function(keyword_v, sid){
   keyword_sql = bind_rows(
     lapply(
       keywords,
-      sql_finding_query,
+      sqlFindingQuery,
       fields=c("keyword_id","keyword"),
-      target_table="keywords",
+      dbTable="keywords",
       field_where="keyword"
       )
     )
@@ -199,13 +199,13 @@ add_signature_keywords <- function(keyword_v, sid){
   #if there are any, add them to db
   if(length(new_keywords)!=0){
     insert_newkeywords_query = paste("INSERT INTO keywords(keyword) VALUES ",paste("(",new_keywords,")",sep="",collapse=","),";")
-    insert_newkeywords_sql = sql_generic(insert_newkeywords_query)
+    insert_newkeywords_sql = sqlGeneric(insert_newkeywords_query)
     new_keyword_ids = bind_rows(
       lapply(
         new_keywords,
-        sql_finding_query,
+        sqlFindingQuery,
         fields=c("keyword_id"),
-        target_table="keywords",
+        dbTable="keywords",
         field_where="keyword"
       )
     )$keyword_id
@@ -225,7 +225,7 @@ add_signature_keywords <- function(keyword_v, sid){
             ")",sep="",collapse=","),
             ";"
       )
-  sql_generic(keyword_signature_insert_query)
+  sqlGeneric(keyword_signature_insert_query)
 }
 
 
@@ -246,7 +246,7 @@ observeEvent(input$add_signature, {
             add_signature(input$signature_name, 
                           input$species_id, 
                           input$platform_name, 
-                          single_quoted(input$cell_line)),
+                          singleQuote(input$cell_line)),
             error = function(e){
                 #outputting the actual error message would be nice; however,
                 #would not want to output any sql in the error message(which could happen),
@@ -257,7 +257,7 @@ observeEvent(input$add_signature, {
     )
     #since signature is inserted now, we can get its signature id
     #and feed it into the lvl2/3 upload function
-    last_sid = as.integer(sql_generic(paste("select signature_id from signatures where signature_name=",(signature_name),";",sep=""))$signature_id[1])
+    last_sid = as.integer(sqlGeneric(paste("select signature_id from signatures where signature_name=",(signature_name),";",sep=""))$signature_id[1])
     add_lv2(input$rds_file_2$datapath,last_sid)
     if(length(input$keywords)!=0){
       add_signature_keywords(input$keywords,last_sid, signature_name)
@@ -311,11 +311,11 @@ observeEvent(input$upload_object, {
                     add_signature(input$signature_object_name, 
                               sig_meta$organism, 
                               sig_meta$platform, 
-                              single_quoted(sig_meta$cell_lines))
+                              singleQuote(sig_meta$cell_lines))
                     print("cool")
                     #since signature is inserted now, we can get its signature id
                     #and feed it into the lvl2/3 upload function
-                    last_sid = as.integer(sql_finding_query("signatures",c("signature_id"),wheres=list("signature_name"=input$signature_object_name))$signature_id[1])
+                    last_sid = as.integer(sqlFindingQuery("signatures",c("signature_id"),wheres=list("signature_name"=input$signature_object_name))$signature_id[1])
                     add_lv2(signature_object$signatures,last_sid, signature_name)
                     # if(length(signature_object$metadata$keywords)!=0){
                     #     add_signature_keywords(signature_object$metadata$keywords, last_sid, signature_name)
@@ -333,7 +333,7 @@ observeEvent(input$upload_object, {
 
 # Update options in species dropdown menu with list of species from database
 observe({
-    species_list <- sql_finding_query("species", "species")[["species"]]
+    species_list <- sqlFindingQuery("species", "species")[["species"]]
     updateSelectizeInput(session,
                          "species_id",
                          choices = c("", species_list))
@@ -341,7 +341,7 @@ observe({
 
 # Update options in platform dropdown menu with list of platforms from database
 observe({
-    platform_list <- sql_finding_query("assay_platforms", "platform_name")[["platform_name"]]
+    platform_list <- sqlFindingQuery("assay_platforms", "platform_name")[["platform_name"]]
     updateSelectizeInput(session,
                          "platform_name",
                          choices = c("", platform_list))

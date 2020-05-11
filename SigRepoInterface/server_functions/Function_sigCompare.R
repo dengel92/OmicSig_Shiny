@@ -131,18 +131,18 @@ sigCompare_two <- function(sig1, sig2, sig1_name = "sig1", sig2_name = "sig2", i
 ## implementation by getting feature sets from db
 ## compare signature function
 compare_signatures <- function(sig1_name,sig2_name,background=22000){
-    sig1 = sql_generic(
+    sig1 = sqlGeneric(
         paste(
             "select feature_name, weight from feature_signature_view where signature_name =",
-            single_quoted(sig1_name), ";",
+            singleQuote(sig1_name), ";",
             sep = ""
         )
     )
     colnames(sig1)=c("symbol","score")
-    sig2=sql_generic(
+    sig2=sqlGeneric(
         paste(
             "select feature_name, weight from feature_signature_view where signature_name =",
-            single_quoted(sig2_name), ";",
+            singleQuote(sig2_name), ";",
             sep = ""
         )
     )

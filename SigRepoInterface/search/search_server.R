@@ -301,7 +301,7 @@ observeEvent(input$search, {
     
     ## Search database for matching signatures
     sqlObj <-
-        sql_finding_query(
+        sqlFindingQuery(
             fields=c(
                 "signature_name",
                 "species",
@@ -312,7 +312,7 @@ observeEvent(input$search, {
                 "submitter",
                 "upload_date"
             ),
-            target_table="platform_signature_view",
+            dbTable="platform_signature_view",
             ins=ins,
             betweens=betweens()
         )
@@ -329,7 +329,7 @@ observeEvent(input$search, {
         isolate(searchTable <- sqlObj)
         ## Make signature name a link to that signature's directory
         searchTable$signature_name <-
-            create_link(searchTable$signature_name)
+            createLink(searchTable$signature_name)
         return(searchTable)
     }, escape=FALSE)
     

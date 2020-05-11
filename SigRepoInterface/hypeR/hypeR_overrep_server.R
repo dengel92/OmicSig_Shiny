@@ -26,7 +26,7 @@ output$hypeROverrepDescription <- renderText({
 
 #----signature table----
 observe({
-  signature_list <- sql_finding_query("signatures", "signature_name")[["signature_name"]]
+  signature_list <- sqlFindingQuery("signatures", "signature_name")[["signature_name"]]
   updateSelectizeInput(
     session,
     "hypeROverrepSignature",
@@ -38,13 +38,13 @@ observe({
 })
 
 hypeROverrepSignatureDFVariable <- reactive({
-  df <- sql_generic(paste(
+  df <- sqlGeneric(paste(
     "select feature_name, 
     weight, 
     direction 
     from feature_signature_view 
     where signature_name =",
-    single_quoted(input$hypeROverrepSignature), ";",
+    singleQuote(input$hypeROverrepSignature), ";",
     sep = ""
   ))
   df <- df[order(df$weight, decreasing = T), ]

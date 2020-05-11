@@ -4,7 +4,7 @@
 # to not include the name(s) of the other selectize inputs
 
 observe({
-  signature_list <- sql_finding_query("signatures", "signature_name")[["signature_name"]]
+  signature_list <- sqlFindingQuery("signatures", "signature_name")[["signature_name"]]
   updateSelectizeInput(
     session,
     "compare_1",

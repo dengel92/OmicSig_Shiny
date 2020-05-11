@@ -6,7 +6,7 @@ library(heatmaply)
 
 compare_heatmap <- function() {
     #getting overlaps for each distinct pair
-    ree = sql_generic(
+    ree = sqlGeneric(
         "select
         fsv.signature_name as 'signature1_name',
         fsv2.signature_name as 'signature2_name',
